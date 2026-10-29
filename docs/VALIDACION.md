@@ -1,5 +1,23 @@
 # Validation history and current workspace status
 
+## Public deployment on 29 October 2026
+
+The game is publicly available at [GitHub Pages](https://sjestiven.github.io/tension-carbono/) from the [public source repository](https://github.com/sjestiven/tension-carbono). GitHub Pages uses the Actions workflow and enforces HTTPS.
+
+Initial application commit: `973756719f87b8bd31226986c44fb8cbd1136b1b`. [Deployment run 40853527263](https://github.com/sjestiven/tension-carbono/actions/runs/40853527263) completed successfully, including locked installation, all 32 tests, the production build, artifact upload, and Pages deployment. The first push run reached configuration before Pages had been enabled; rerunning after enabling Pages succeeded.
+
+Verification performed against the actual public URL without a GitHub login:
+
+- The welcome screen and Three.js valley rendered.
+- A new table could be created and its guide opened.
+- Loading the complete example showed accumulated emissions of 1,345 tCO2e, production of 2,250 t, and points A 100, B 100, C 75, F1 100, F2 100, and government 95.5.
+- No warning or error messages were captured in the browser console during this smoke test.
+- All eight production files returned HTTP 200 and matched the local build byte for byte, including both dynamic scene chunks and the importable example JSON.
+
+Local screenshot evidence is retained in ignored `.local/validation/public-results.jpg`. Commit attribution uses the GitHub account's noreply address with the user's approval. The protected Gmail address was not included in the published commit history, and account privacy protections were left enabled.
+
+This public smoke test does not establish classroom learning outcomes, four rounds of free negotiation by six participants, broad mobile compatibility, file-picker/download behavior, or comparison of five student tables. The browser supported WebGL, so the SVG fallback was not forced in this public run. The earlier local and source-delivery records below are preserved as historical evidence; their publication-pending statements describe those earlier stages.
+
 ## Workspace preparation on 28 October 2026
 
 The game is extracted into the project root and Git is initialized on `main`. Source files, public game assets, current rules, and the five academic documents match the original package byte for byte. The original archive's 28 checksums were verified before extraction. The archive and manifest are retained locally in ignored `archive/`.

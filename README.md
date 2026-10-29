@@ -2,6 +2,8 @@
 
 A Spanish-language classroom simulation of a carbon credit market linked to a carbon tax. Three companies, two foundations, and a government negotiate through four annual rounds. Game version: **2.0.0**.
 
+**[Play Tensión de Carbono](https://sjestiven.github.io/tension-carbono/)** · [Source repository](https://github.com/sjestiven/tension-carbono)
+
 The application runs in the browser. Each table shares one computer, negotiates in person, and saves progress locally or through exported JSON. No backend, accounts, or API keys are required.
 
 ## Quick start
@@ -62,7 +64,7 @@ Dependencies, generated `dist/`, original archives, and local reference PDFs are
 
 The workflow installs locked dependencies, tests, builds, and deploys `dist/`. Relative asset URLs support repository subdirectories. Pull requests and other branch pushes validate without deployment. See the [deployment guide](docs/deployment.md).
 
-**Publication status:** prepared for GitHub Pages; no public deployment has been performed or verified in this workspace. The original proposed destination was `sjestiven/tension-carbono`; verify the account and repository when publishing.
+**Publication status:** public on GitHub Pages and verified on 29 October 2026 (America/Bogota). [The first successful deployment](https://github.com/sjestiven/tension-carbono/actions/runs/40853527263) passed all 32 tests and the production build. The live site was checked for table creation, guide access, WebGL rendering, and the complete example results. All eight published files matched the verified local build. See [validation evidence](docs/VALIDACION.md) for scope and limits.
 
 ## Documentation
 

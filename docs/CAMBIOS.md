@@ -1,5 +1,12 @@
 # Cambios de la versión 2
 
+## Public publication on 29 October 2026
+
+- Created the public repository `sjestiven/tension-carbono` and pushed the verified application to `main`.
+- Enabled GitHub Pages through Actions and verified the HTTPS site at `https://sjestiven.github.io/tension-carbono/`.
+- Confirmed 32 tests, the production build, and deployment in GitHub Actions; checked table creation, the guide, the WebGL valley, reference example results, and all eight public files.
+- Updated repository links, deployment instructions, and validation evidence. The game implementation and rules remain unchanged.
+
 ## Repository preparation on 28 October 2026
 
 - Extracted the verified source package directly into the project root; preserved the version 2 game implementation and academic documents.

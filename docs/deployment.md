@@ -1,10 +1,20 @@
 # GitHub Pages deployment
 
+## Current deployment
+
+- Game: https://sjestiven.github.io/tension-carbono/
+- Public repository: https://github.com/sjestiven/tension-carbono
+- First successful workflow: https://github.com/sjestiven/tension-carbono/actions/runs/40853527263
+- Initial application commit: `973756719f87b8bd31226986c44fb8cbd1136b1b`.
+- Public browser and asset verification: 29 October 2026 (America/Bogota).
+
+Pages is configured to use GitHub Actions with HTTPS enforced. `origin` points to the public repository and local `main` tracks `origin/main`. Commit attribution uses the account's GitHub noreply address, as requested, without changing global Git identity or account privacy settings.
+
 ## Prepare the repository
 
 Push the contents of this project root. `package.json`, `package-lock.json`, `src/`, `public/`, and `.github/` must be at the repository root. Avoid an extra containing folder. If using the browser uploader, verify that hidden `.github/` files were included.
 
-The default branch is `main`. The original proposed destination was `sjestiven/tension-carbono`; verify the account, repository, permissions, and history before publishing. The current workspace has no verified public deployment.
+The deployment branch is `main`. The destination is `sjestiven/tension-carbono`. If deploying a separate copy, verify its account, repository, permissions, and history before publishing.
 
 ```sh
 npm ci
@@ -16,17 +26,18 @@ Inspect the production preview. Relative URLs in `vite.config.js` support reposi
 
 ## Publish
 
-Git is initialized locally on `main`. The initial commit and remote are still to be created. After verifying the destination, replace `OWNER` and `REPOSITORY` below with the actual repository values:
+For updates in this checkout, review the changes, commit the intended files, and push `main`:
 
 ```sh
-git add .
-git diff --cached --stat
-git commit -m "Prepare Tension de Carbono v2 for GitHub Pages"
-git remote add origin https://github.com/OWNER/REPOSITORY.git
-git push -u origin main
+git status
+git diff
+git add <intended-paths>
+git diff --cached --check
+git commit -m "Describe the change"
+git push origin main
 ```
 
-Use an existing configured author identity or configure the correct identity locally. Do not invent an author or change global Git settings. If a remote or commit already exists when following this guide, inspect it before applying these initial-setup commands.
+Replace `<intended-paths>` with the actual files to include. Use the configured local author identity. Do not invent an author, change global Git identity, or weaken account email privacy settings.
 
 1. Create or select the intended GitHub repository. Inspect existing content and preserve history if it already exists.
 2. Push the source to `main`, including `.github/workflows/pages.yml`.
@@ -42,7 +53,7 @@ Keep `dist/` and `node_modules/` out of Git. Pages must serve the compiled artif
 
 Open the reported URL while signed out. Verify the welcome screen, guide, table creation, complete example, scene or SVG fallback, and `ejemplos/partida_demo_v2.json`. Reference results: 1,345 tCO₂e accumulated emissions, 2,250 t production, and points A 100, B 100, C 75, F1 100, F2 100, government 95.5.
 
-Record repository URL, deployed commit, successful Actions run, actual site URL, and smoke-test results in `docs/VALIDACION.md`. A successful local build does not confirm public deployment.
+Record repository URL, deployed commit, successful Actions run, actual site URL, and smoke-test results in `docs/VALIDACION.md`. The initial public deployment has been verified; apply the same checks after future application changes.
 
 | Symptom | Check |
 | --- | --- |
