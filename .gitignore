@@ -1,0 +1,21 @@
+node_modules/
+dist/
+.env*
+!.env.example
+.DS_Store
+coverage/
+*.log
+.openai/
+
+# Local source package and academic reference copies.
+/archive/
+/docs/references/*.pdf
+/tension-carbono-*-ano-*.json
+
+# Local tooling, temporary files, and browser artifacts.
+/.local/
+/tmp/
+/.vscode/
+/.idea/
+Thumbs.db
+*.tsbuildinfo

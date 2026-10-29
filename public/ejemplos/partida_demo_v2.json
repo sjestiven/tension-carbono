@@ -1,0 +1,606 @@
+{
+  "schema": "tension-carbono",
+  "version": "2.0.0",
+  "setup": {
+    "names": {
+      "team": "Valle Esmeralda",
+      "Estado": "Estado",
+      "A": "Empresa A",
+      "B": "Empresa B",
+      "C": "Empresa C",
+      "F1": "Fundación Bosque",
+      "F2": "Fundación Horizonte"
+    },
+    "players": {
+      "Estado": "",
+      "A": "",
+      "B": "",
+      "C": "",
+      "F1": "",
+      "F2": ""
+    }
+  },
+  "actions": [
+    {
+      "type": "policy",
+      "actor": "Estado",
+      "tax": 20,
+      "subsidy": 0
+    },
+    {
+      "type": "publish",
+      "actor": "Estado"
+    },
+    {
+      "type": "production",
+      "actor": "A",
+      "quantity": 200
+    },
+    {
+      "type": "production",
+      "actor": "B",
+      "quantity": 150
+    },
+    {
+      "type": "production",
+      "actor": "C",
+      "quantity": 150
+    },
+    {
+      "type": "addProject",
+      "actor": "F1",
+      "project": "P1"
+    },
+    {
+      "type": "addProject",
+      "actor": "F2",
+      "project": "P1"
+    },
+    {
+      "type": "confirmProjects",
+      "actor": "F1"
+    },
+    {
+      "type": "confirmProjects",
+      "actor": "F2"
+    },
+    {
+      "type": "confirmGrants",
+      "actor": "Estado"
+    },
+    {
+      "type": "execute",
+      "actor": "Docente"
+    },
+    {
+      "type": "verify",
+      "actor": "Docente",
+      "foundation": "F1",
+      "verified": true
+    },
+    {
+      "type": "verify",
+      "actor": "Docente",
+      "foundation": "F2",
+      "verified": true
+    },
+    {
+      "type": "openMarket",
+      "actor": "Docente"
+    },
+    {
+      "type": "propose",
+      "actor": "F1",
+      "foundation": "F1",
+      "company": "A",
+      "quantity": 20,
+      "price": 15
+    },
+    {
+      "type": "accept",
+      "actor": "A",
+      "id": "C-1-3"
+    },
+    {
+      "type": "propose",
+      "actor": "F2",
+      "foundation": "F2",
+      "company": "B",
+      "quantity": 10,
+      "price": 15
+    },
+    {
+      "type": "accept",
+      "actor": "B",
+      "id": "C-1-4"
+    },
+    {
+      "type": "propose",
+      "actor": "F2",
+      "foundation": "F2",
+      "company": "C",
+      "quantity": 10,
+      "price": 15
+    },
+    {
+      "type": "accept",
+      "actor": "C",
+      "id": "C-1-5"
+    },
+    {
+      "type": "confirmCompany",
+      "actor": "A"
+    },
+    {
+      "type": "confirmCompany",
+      "actor": "B"
+    },
+    {
+      "type": "confirmCompany",
+      "actor": "C"
+    },
+    {
+      "type": "close",
+      "actor": "Docente"
+    },
+    {
+      "type": "next",
+      "actor": "Docente"
+    },
+    {
+      "type": "policy",
+      "actor": "Estado",
+      "tax": 25,
+      "subsidy": 50
+    },
+    {
+      "type": "publish",
+      "actor": "Estado"
+    },
+    {
+      "type": "production",
+      "actor": "A",
+      "quantity": 200
+    },
+    {
+      "type": "production",
+      "actor": "B",
+      "quantity": 200
+    },
+    {
+      "type": "production",
+      "actor": "C",
+      "quantity": 150
+    },
+    {
+      "type": "addProject",
+      "actor": "F1",
+      "project": "P2"
+    },
+    {
+      "type": "addProject",
+      "actor": "F2",
+      "project": "P2"
+    },
+    {
+      "type": "confirmProjects",
+      "actor": "F1"
+    },
+    {
+      "type": "confirmProjects",
+      "actor": "F2"
+    },
+    {
+      "type": "confirmGrants",
+      "actor": "Estado"
+    },
+    {
+      "type": "execute",
+      "actor": "Docente"
+    },
+    {
+      "type": "verify",
+      "actor": "Docente",
+      "foundation": "F1",
+      "verified": true
+    },
+    {
+      "type": "verify",
+      "actor": "Docente",
+      "foundation": "F2",
+      "verified": true
+    },
+    {
+      "type": "openMarket",
+      "actor": "Docente"
+    },
+    {
+      "type": "propose",
+      "actor": "F1",
+      "foundation": "F1",
+      "company": "A",
+      "quantity": 40,
+      "price": 18
+    },
+    {
+      "type": "accept",
+      "actor": "A",
+      "id": "C-2-8"
+    },
+    {
+      "type": "propose",
+      "actor": "F1",
+      "foundation": "F1",
+      "company": "B",
+      "quantity": 20,
+      "price": 18
+    },
+    {
+      "type": "accept",
+      "actor": "B",
+      "id": "C-2-9"
+    },
+    {
+      "type": "propose",
+      "actor": "F2",
+      "foundation": "F2",
+      "company": "B",
+      "quantity": 20,
+      "price": 18
+    },
+    {
+      "type": "accept",
+      "actor": "B",
+      "id": "C-2-10"
+    },
+    {
+      "type": "propose",
+      "actor": "F2",
+      "foundation": "F2",
+      "company": "C",
+      "quantity": 40,
+      "price": 18
+    },
+    {
+      "type": "accept",
+      "actor": "C",
+      "id": "C-2-11"
+    },
+    {
+      "type": "confirmCompany",
+      "actor": "A"
+    },
+    {
+      "type": "confirmCompany",
+      "actor": "B"
+    },
+    {
+      "type": "confirmCompany",
+      "actor": "C"
+    },
+    {
+      "type": "close",
+      "actor": "Docente"
+    },
+    {
+      "type": "next",
+      "actor": "Docente"
+    },
+    {
+      "type": "policy",
+      "actor": "Estado",
+      "tax": 30,
+      "subsidy": 50
+    },
+    {
+      "type": "publish",
+      "actor": "Estado"
+    },
+    {
+      "type": "production",
+      "actor": "A",
+      "quantity": 200
+    },
+    {
+      "type": "production",
+      "actor": "B",
+      "quantity": 200
+    },
+    {
+      "type": "production",
+      "actor": "C",
+      "quantity": 200
+    },
+    {
+      "type": "addProject",
+      "actor": "F1",
+      "project": "P2"
+    },
+    {
+      "type": "addProject",
+      "actor": "F2",
+      "project": "P2"
+    },
+    {
+      "type": "confirmProjects",
+      "actor": "F1"
+    },
+    {
+      "type": "confirmProjects",
+      "actor": "F2"
+    },
+    {
+      "type": "confirmGrants",
+      "actor": "Estado"
+    },
+    {
+      "type": "execute",
+      "actor": "Docente"
+    },
+    {
+      "type": "verify",
+      "actor": "Docente",
+      "foundation": "F1",
+      "verified": true
+    },
+    {
+      "type": "verify",
+      "actor": "Docente",
+      "foundation": "F2",
+      "verified": true
+    },
+    {
+      "type": "openMarket",
+      "actor": "Docente"
+    },
+    {
+      "type": "propose",
+      "actor": "F1",
+      "foundation": "F1",
+      "company": "A",
+      "quantity": 20,
+      "price": 18
+    },
+    {
+      "type": "accept",
+      "actor": "A",
+      "id": "C-3-14"
+    },
+    {
+      "type": "propose",
+      "actor": "F1",
+      "foundation": "F1",
+      "company": "B",
+      "quantity": 25,
+      "price": 18
+    },
+    {
+      "type": "accept",
+      "actor": "B",
+      "id": "C-3-15"
+    },
+    {
+      "type": "propose",
+      "actor": "F1",
+      "foundation": "F1",
+      "company": "C",
+      "quantity": 30,
+      "price": 18
+    },
+    {
+      "type": "accept",
+      "actor": "C",
+      "id": "C-3-16"
+    },
+    {
+      "type": "propose",
+      "actor": "F2",
+      "foundation": "F2",
+      "company": "A",
+      "quantity": 20,
+      "price": 18
+    },
+    {
+      "type": "accept",
+      "actor": "A",
+      "id": "C-3-17"
+    },
+    {
+      "type": "propose",
+      "actor": "F2",
+      "foundation": "F2",
+      "company": "B",
+      "quantity": 25,
+      "price": 18
+    },
+    {
+      "type": "accept",
+      "actor": "B",
+      "id": "C-3-18"
+    },
+    {
+      "type": "propose",
+      "actor": "F2",
+      "foundation": "F2",
+      "company": "C",
+      "quantity": 30,
+      "price": 18
+    },
+    {
+      "type": "accept",
+      "actor": "C",
+      "id": "C-3-19"
+    },
+    {
+      "type": "confirmCompany",
+      "actor": "A"
+    },
+    {
+      "type": "confirmCompany",
+      "actor": "B"
+    },
+    {
+      "type": "confirmCompany",
+      "actor": "C"
+    },
+    {
+      "type": "close",
+      "actor": "Docente"
+    },
+    {
+      "type": "next",
+      "actor": "Docente"
+    },
+    {
+      "type": "policy",
+      "actor": "Estado",
+      "tax": 35,
+      "subsidy": 0
+    },
+    {
+      "type": "publish",
+      "actor": "Estado"
+    },
+    {
+      "type": "production",
+      "actor": "A",
+      "quantity": 250
+    },
+    {
+      "type": "production",
+      "actor": "B",
+      "quantity": 200
+    },
+    {
+      "type": "production",
+      "actor": "C",
+      "quantity": 150
+    },
+    {
+      "type": "confirmProjects",
+      "actor": "F1"
+    },
+    {
+      "type": "confirmProjects",
+      "actor": "F2"
+    },
+    {
+      "type": "confirmGrants",
+      "actor": "Estado"
+    },
+    {
+      "type": "execute",
+      "actor": "Docente"
+    },
+    {
+      "type": "verify",
+      "actor": "Docente",
+      "foundation": "F1",
+      "verified": true
+    },
+    {
+      "type": "verify",
+      "actor": "Docente",
+      "foundation": "F2",
+      "verified": true
+    },
+    {
+      "type": "openMarket",
+      "actor": "Docente"
+    },
+    {
+      "type": "propose",
+      "actor": "F1",
+      "foundation": "F1",
+      "company": "A",
+      "quantity": 25,
+      "price": 16
+    },
+    {
+      "type": "accept",
+      "actor": "A",
+      "id": "C-4-20"
+    },
+    {
+      "type": "propose",
+      "actor": "F1",
+      "foundation": "F1",
+      "company": "B",
+      "quantity": 25,
+      "price": 16
+    },
+    {
+      "type": "accept",
+      "actor": "B",
+      "id": "C-4-21"
+    },
+    {
+      "type": "propose",
+      "actor": "F1",
+      "foundation": "F1",
+      "company": "C",
+      "quantity": 20,
+      "price": 16
+    },
+    {
+      "type": "accept",
+      "actor": "C",
+      "id": "C-4-22"
+    },
+    {
+      "type": "propose",
+      "actor": "F2",
+      "foundation": "F2",
+      "company": "A",
+      "quantity": 25,
+      "price": 16
+    },
+    {
+      "type": "accept",
+      "actor": "A",
+      "id": "C-4-23"
+    },
+    {
+      "type": "propose",
+      "actor": "F2",
+      "foundation": "F2",
+      "company": "B",
+      "quantity": 25,
+      "price": 16
+    },
+    {
+      "type": "accept",
+      "actor": "B",
+      "id": "C-4-24"
+    },
+    {
+      "type": "propose",
+      "actor": "F2",
+      "foundation": "F2",
+      "company": "C",
+      "quantity": 20,
+      "price": 16
+    },
+    {
+      "type": "accept",
+      "actor": "C",
+      "id": "C-4-25"
+    },
+    {
+      "type": "confirmCompany",
+      "actor": "A"
+    },
+    {
+      "type": "confirmCompany",
+      "actor": "B"
+    },
+    {
+      "type": "confirmCompany",
+      "actor": "C"
+    },
+    {
+      "type": "close",
+      "actor": "Docente"
+    }
+  ]
+}
