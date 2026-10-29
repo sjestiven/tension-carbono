@@ -1,6 +1,6 @@
-# Orientación de la prueba local con turnos guiados
+# Orientación de turnos guiados
 
-Esta orientación complementa el instructivo académico de la versión 2 durante la prueba local del 29 de octubre de 2026. Cambia la operación de la interfaz para que los participantes sepan quién continúa; conserva los parámetros económicos, las cuentas y la puntuación. El juego lo ofrece el Laboratorio de Economía Aplicada.
+Esta orientación complementa el instructivo académico de la versión 2 con los ajustes probados y publicados el 29 de octubre de 2026. Describe los turnos, la producción anual fija y la comparación de cotizaciones; conserva los parámetros económicos, las cuentas y la puntuación. El juego lo ofrece el Laboratorio de Economía Aplicada.
 
 ## Preparación y primera decisión
 

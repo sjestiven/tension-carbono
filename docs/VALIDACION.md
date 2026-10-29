@@ -1,5 +1,15 @@
 # Validation history and current workspace status
 
+## Guided gameplay release on 29 October 2026
+
+Published application commit: `6e7173d332acb88329e00efd25eb119037876eef`. [GitHub Actions run 40872073522](https://github.com/sjestiven/tension-carbono/actions/runs/40872073522) completed successfully for both `build` and `deploy`, including locked dependency installation, 46 tests, and the production build. The updated game is live at [GitHub Pages](https://sjestiven.github.io/tension-carbono/), with source in [sjestiven/tension-carbono](https://github.com/sjestiven/tension-carbono).
+
+All eight live production files returned HTTP 200 and matched the locally validated build byte for byte. This includes the HTML, CSS, JavaScript chunks, favicon, and importable reference example. The source keeps generated output, local evidence, reference PDFs, dependencies, and personal exports excluded from Git.
+
+Public browser verification exercised the final-game results button against the four-year example and displayed the six expected scores: government 95.5, A 100, B 100, C 75, F1 100, F2 100. The example retained 1,345 tCO2e accumulated emissions and 2,250 t production. A fresh test table's clock was paused before opening the initial State cabin and started automatically afterward. The compact dashboard, organizations scene, route disclosure with Escape dismissal, and updated guide rendered. No warning or error messages were captured during these checks. Local evidence is retained in ignored `.local/validation/published-guided-results.jpg` and `published-assets.json`.
+
+The local development server was restarted after the locked installation. Previous local-trial records below describe their status at the time; this section records their subsequent publication. Broad classroom validation remains pending.
+
 ## Local follow-up trial on 29 October 2026
 
 The unreleased revision now passes 46 tests and the production build. A component rendering test covers the missing foundation import that broke Results. New workflow checks cover annual production locks, contract cancellation/refunds, separate seller inventory and shared buyer capacity, both quotes before purchases, alternating quote order, and four complete quote-based rounds with identical reference economic accounts and scores. Contract identifiers, proposal authors, and ordering naturally differ from the seller-proposal reference; the legacy replay still matches the complete original history.

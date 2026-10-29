@@ -1,5 +1,11 @@
 # Cambios de la versión 2
 
+## Guided gameplay publication on 29 October 2026
+
+- Published the two local usability revisions to `sjestiven/tension-carbono` and the existing GitHub Pages URL at the user's request.
+- Validated locked installation, 46 tests, and the production build. Actions run `40872073522` built and deployed application commit `6e7173d332acb88329e00efd25eb119037876eef` successfully.
+- Verified all eight public files against the local build and exercised final results, the updated guide, dashboard, route disclosure, and automatic timer start on the actual live site. Historical local-only notes below describe the preceding trial stage.
+
 ## Local follow-up trial on 29 October 2026
 
 - Restored the missing foundation constant used by Results and added an SSR rendering regression. Both the results navigation and final-game action open the results screen.

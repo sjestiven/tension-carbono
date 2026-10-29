@@ -2,6 +2,8 @@
 
 Date: 29 October 2026. Scope: gameplay changes developed and tested locally in response to user trials. Publication evidence is recorded in `VALIDACION.md`.
 
+Release status: published to the existing GitHub Pages site after local validation. Application commit `6e7173d332acb88329e00efd25eb119037876eef` passed workflow `40872073522`; all eight live assets matched the local build. Public browser checks confirmed final results and automatic State-cabin timer start. The local-trial evidence below remains a record of development testing.
+
 ## Findings and changes
 
 The previous interface persisted selections without defining an explicit handoff. Participants could open any cabin, production planning had no confirmation action, and the teacher control appeared below the valley. The same subsidy value was presented as two apparently separate inputs. These choices made successful state changes look like an unresponsive application.
@@ -41,7 +43,7 @@ The suite has 46 passing tests. The legacy four-round replay reproduces the full
 
 Browser checks completed locally: full revised first year with two P1 projects, both quotations before purchases, a purchase from F2 followed by cancellation and refund, restored F2 availability, bilateral acceptance, all company confirmations, teacher closing (405 tCO2e and USD 4,100 tax), annual results, and opening the second year with USD 1,230 fund. The clock was paused before opening the new State cabin and running afterward. Loading the full reference example and clicking the final-game results action displayed all final scores. The 320-pixel viewport had no page-level horizontal overflow after the navigation correction; the route popup remained inside the viewport and dismissed with Escape. The viewport override was reset afterward. Earlier checks also covered Details, single-guide navigation, logo/home, reload, and game restart. These are targeted checks, not broad device or assistive-technology certification.
 
-Continue testing at `http://127.0.0.1:5173/` while the local development server is running. This prototype still needs user and classroom feedback; it is not a completed classroom usability study.
+Continue testing at the public game or at `http://127.0.0.1:5173/` while the local development server is running. The game still needs user and classroom feedback; these checks are not a completed classroom usability study.
 
 ## Compatibility
 
