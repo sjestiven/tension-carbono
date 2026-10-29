@@ -16,7 +16,7 @@ Cada año sigue este recorrido:
 6. Ambas fundaciones presentan sus cotizaciones antes de cualquier compra: F1 primero en años impares y F2 primero en años pares. Después las empresas A, B y C comparan precios e inventarios, negocian y confirman sus contratos del año.
 7. La mesa docente cierra el año, revisa los resultados e inicia el siguiente, cuyo primer turno corresponde de nuevo al Estado.
 
-La mesa docente aparece como turno actual cuando debe intervenir. No es necesario buscar un control debajo del mapa. Las emisiones acumuladas, el impuesto, el fondo público y la visual de las organizaciones aparecen al principio de la mesa. El botón flotante Ruta del año, arriba a la derecha, despliega el recorrido sin ocupar permanentemente el área de decisión.
+La mesa docente aparece como turno actual cuando debe intervenir. No es necesario buscar un control debajo del mapa. Una franja breve al principio muestra emisiones acumuladas, impuesto y fondo público. Organizaciones despliega el valle y los nombres; Ruta del año despliega el recorrido. Ambos mantienen el espacio principal disponible para la cabina de decisión. Menú, en el encabezado, permite abrir u ocultar la navegación con una animación y recuerda la preferencia en este navegador. Al elegir una sección, el menú vuelve a cerrarse. Escape cierra el menú o el desplegable enfocado.
 
 ## Propuestas y respuesta de la contraparte
 

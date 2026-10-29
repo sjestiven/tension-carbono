@@ -4,6 +4,14 @@ Date: 29 October 2026. Scope: gameplay changes developed and tested locally in r
 
 Release status: published to the existing GitHub Pages site after local validation. Application commit `6e7173d332acb88329e00efd25eb119037876eef` passed workflow `40872073522`; all eight live assets matched the local build. Public browser checks confirmed final results and automatic State-cabin timer start. The local-trial evidence below remains a record of development testing.
 
+## Decision workspace refinement
+
+Further user feedback identified that the opening metrics inherited the height of the organizations scene, reducing the prominence of the decision cabin. The summary is now a compact horizontal strip: approximately 66 px at the reported 1496 by 727 viewport. Emissions, tax, and funding remain visible; the scene and organization names open from a labeled Organizations disclosure. The route uses the adjacent disclosure button. Both panels close with Escape or an outside click and return keyboard focus when explicitly dismissed. Only one panel opens at a time. The scene is loaded on demand in the game summary.
+
+Navigation starts collapsed to reserve space for the active decision. The header Menu button opens and closes it with a 240 ms transition; the existing reduced-motion rule disables that transition when requested. Desktop navigation expands horizontally, while narrow layouts expand vertically without covering the decision with an overlay. The preference is stored separately from game state and exports. Selecting a destination closes the menu. Hidden navigation is inert and excluded from the accessibility tree; closing it restores focus to the Menu button. The menu itself and its trigger support Escape.
+
+Targeted local checks covered desktop 1496 by 727, mobile 375 by 812, and 320 by 800: menu opening/closing, persistence after reload, keyboard operation, guide/results navigation, popup placement, and no page-level horizontal overflow. At 320 px both popups stayed within the available viewport after a width correction. With the State cabin opened at desktop size, its complete policy form and confirmation button were visible. Game rules, scoring, and action history are unchanged by this layout revision.
+
 ## Findings and changes
 
 The previous interface persisted selections without defining an explicit handoff. Participants could open any cabin, production planning had no confirmation action, and the teacher control appeared below the valley. The same subsidy value was presented as two apparently separate inputs. These choices made successful state changes look like an unresponsive application.

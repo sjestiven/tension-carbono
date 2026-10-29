@@ -1,5 +1,11 @@
 # Cambios de la versión 2
 
+## Decision workspace refinement on 29 October 2026
+
+- Replaced the tall economy dashboard with a compact summary strip. Organizations and their scene are available on demand beside the year route, keeping the decision cabin prominent.
+- Added animated, collapsible navigation with a persistent header Menu button. Navigation starts closed, remembers the display preference, closes after selection, supports Escape, and excludes hidden controls from keyboard and assistive-technology navigation.
+- Preserved reduced-motion behavior and checked desktop and narrow-screen layouts. Economic rules and scores are unchanged.
+
 ## Guided gameplay publication on 29 October 2026
 
 - Published the two local usability revisions to `sjestiven/tension-carbono` and the existing GitHub Pages URL at the user's request.

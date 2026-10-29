@@ -9,6 +9,7 @@ Tensión de Carbono is a static React application built by Vite. It uses browser
 | `src/App.jsx` | Setup, role controls, negotiation, results, guide, persistence. |
 | `src/components/GuidedRound.jsx` | Ordered cabin controls, handoffs, validation feedback, and counterpart responses. |
 | `src/components/ui.jsx` | Shared fields, buttons, statistics, and accessible contextual help. |
+| `src/components/GameNavigation.jsx` | Collapsible navigation content; its display preference is independent of game actions and exports. |
 | `src/workflow.js` | Derived interface turn, project-option explanations, and named prerequisites. |
 | `src/Valley.jsx` | Lazy-loaded Three.js scene and interactive SVG fallback. |
 | `src/styles.css` | Layout, responsive presentation, and reduced motion. |
