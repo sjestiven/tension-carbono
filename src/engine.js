@@ -32,6 +32,8 @@ function draft(year) {
   return { year, phase: 'policy', tax: 25, subsidy: 0, published: false,
     projects: [], projectConfirmed: { F1: false, F2: false }, stateConfirmed: false,
     verified: { F1: null, F2: null }, production: { A: 200, B: 150, C: 150 },
+    productionPlanned: { A: false, B: false, C: false }, marketFinished: { F1: false, F2: false },
+    productionLocked: { A: false, B: false, C: false }, quotes: { F1: null, F2: null }, quoteMode: false,
     companyConfirmed: { A: false, B: false, C: false }, contracts: [],
     fundStart: 0, executed: [], };
 }
@@ -61,13 +63,13 @@ export function projectDetails(g) {
     return { foundation: f, projects, cost, grant, capacity: g.foundations[f].capacity + sum(projects, p => p.reduction), cashAfter: round(g.foundations[f].cash + grant - cost) };
   });
 }
-function validateProjects(g) {
+function validateProjects(g, foundation) {
   const details = projectDetails(g);
-  for (const x of details) {
+  for (const x of details.filter(item => !foundation || item.foundation === foundation)) {
     check(x.capacity <= 100, `${x.foundation}: el máximo es 100 tCO₂e al año.`);
     check(x.cashAfter >= 0, `${x.foundation}: faltan USD ${(-x.cashAfter).toFixed(2)} para ejecutar antes de vender créditos.`);
   }
-  check(sum(details, x => x.grant) <= g.treasury.fund + 1e-6, 'Los convenios superan el fondo disponible. Ajusten proyectos o el porcentaje común de apoyo.');
+  if (!foundation) check(sum(details, x => x.grant) <= g.treasury.fund + 1e-6, 'Los convenios superan el fondo disponible. Ajusten proyectos o el porcentaje común de apoyo.');
   return details;
 }
 const live = c => c.status === 'pending' || c.status === 'accepted';
@@ -157,7 +159,7 @@ export function applyAction(original, action) {
       break;
     }
     case 'confirmProjects':
-      phase(g, 'projects'); actor(a, ...FOUNDATIONS); validateProjects(g);
+      phase(g, 'projects'); actor(a, ...FOUNDATIONS); validateProjects(g, a.actor);
       d.projectConfirmed[a.actor] = true;
       break;
     case 'confirmGrants':
@@ -165,7 +167,8 @@ export function applyAction(original, action) {
       break;
     case 'execute': {
       phase(g, 'projects'); actor(a, 'Docente');
-      check(FOUNDATIONS.every(f => d.projectConfirmed[f]) && d.stateConfirmed, 'Faltan firmas de las fundaciones o del Estado.');
+      const missing = [...FOUNDATIONS.filter(f => !d.projectConfirmed[f]), ...(!d.stateConfirmed ? ['Estado'] : [])];
+      check(!missing.length, `Faltan firmas: ${missing.map(r => g.setup.names[r]).join(', ')}. Cada participante debe confirmar su plan o los convenios.`);
       const details = validateProjects(g);
       for (const x of details) {
         const f = g.foundations[x.foundation];
@@ -185,19 +188,45 @@ export function applyAction(original, action) {
       break;
     case 'openMarket':
       phase(g, 'verification'); actor(a, 'Docente');
-      check(FOUNDATIONS.every(f => typeof d.verified[f] === 'boolean'), 'Verifique o rechace expresamente los dos lotes.');
+      check(FOUNDATIONS.every(f => typeof d.verified[f] === 'boolean'), `Verifique o rechace el lote de: ${FOUNDATIONS.filter(f => typeof d.verified[f] !== 'boolean').map(f => g.setup.names[f]).join(', ')}.`);
       d.phase = 'market';
       break;
     case 'production': {
       phase(g, 'projects', 'market'); actor(a, ...COMPANIES);
+      check(!d.productionLocked[a.actor], 'La producción ya está confirmada y no puede cambiar durante este año. Puedes revisar contratos, cantidades y precios antes del cierre.');
       check(typeof a.quantity === 'number' && Object.hasOwn(PRODUCTION, a.quantity), 'Producción no permitida.');
       const used = sum(d.contracts.filter(c => c.company === a.actor && live(c)), c => c.quantity);
       check(used <= a.quantity * INTENSITY[a.actor] * .5, 'La nueva producción deja contratos por encima del 50 %. Cancélelos primero.');
       d.production[a.actor] = a.quantity; d.companyConfirmed[a.actor] = false;
+      if (d.phase === 'projects') d.productionPlanned[a.actor] = false;
       break;
     }
+    case 'confirmProduction':
+      phase(g, 'projects'); actor(a, ...COMPANIES);
+      check(!Object.hasOwn(a, 'lock') || typeof a.lock === 'boolean', 'Confirmación de producción inválida.');
+      d.productionPlanned[a.actor] = true;
+      // Older action logs omit lock and retain their original replay behavior.
+      d.productionLocked[a.actor] ||= a.lock === true;
+      break;
+    case 'publishQuote':
+      phase(g, 'market'); actor(a, ...FOUNDATIONS);
+      check(a.price === null || lot(g, a.actor) > 0, 'No hay un lote verificado para cotizar.');
+      d.quotes[a.actor] = a.price === null ? null : { price: number(a.price, 'Precio de cotización', 0, 10000) };
+      d.quoteMode = true;
+      break;
+    case 'finishFoundationTurn':
+      phase(g, 'market'); actor(a, ...FOUNDATIONS);
+      check(!d.contracts.some(c => c.foundation === a.actor && c.status === 'pending'), 'Primero debe responder la contraparte de la oferta pendiente.');
+      d.marketFinished[a.actor] = true;
+      break;
+    case 'reopenNegotiation':
+      phase(g, 'market'); actor(a, 'Docente');
+      d.marketFinished = { F1: false, F2: false };
+      d.companyConfirmed = { A: false, B: false, C: false };
+      break;
     case 'propose': {
       phase(g, 'market');
+      check(!d.quoteMode || FOUNDATIONS.every(f => d.marketFinished[f]), 'Ambas fundaciones deben presentar o declinar su cotización antes de comenzar las compras.');
       check(COMPANIES.includes(a.company) && FOUNDATIONS.includes(a.foundation), 'Contrapartes desconocidas.');
       actor(a, a.company, a.foundation);
       number(a.quantity, 'Créditos', 1, 100, true); number(a.price, 'Precio', 0, 10000);
@@ -243,7 +272,7 @@ export function applyAction(original, action) {
       break;
     case 'close': {
       phase(g, 'market'); actor(a, 'Docente');
-      check(COMPANIES.every(e => d.companyConfirmed[e]), 'Las tres empresas deben confirmar sus decisiones.');
+      check(COMPANIES.every(e => d.companyConfirmed[e]), `Falta confirmar las decisiones de: ${COMPANIES.filter(e => !d.companyConfirmed[e]).map(e => g.setup.names[e]).join(', ')}.`);
       assertMarket(g);
       const result = previewRound(g), ratings = automaticRatings(g, result);
       for (const e of COMPANIES) {

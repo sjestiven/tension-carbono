@@ -4,6 +4,10 @@ A Spanish-language classroom simulation of a carbon credit market linked to a ca
 
 **[Play Tensión de Carbono](https://sjestiven.github.io/tension-carbono/)** · [Source repository](https://github.com/sjestiven/tension-carbono)
 
+## Guided gameplay
+
+The application includes mandatory cabin handoffs, fixed annual production after confirmation, contract cancellation with refunds, both foundation quotes before purchases, USD 0.50 price steps, an opening economy dashboard, a floating year route, and automatic timer start when the government opens its initial cabin. Final-results rendering, contextual Details, a single subsidy field, and confirmed game restart are available. See [the usability review](docs/ux-review.md), [the teaching workflow supplement](docs/teaching-workflow.md), and [the deployment record](docs/VALIDACION.md). For local testing, run `npm run dev` and open the printed URL.
+
 The application runs in the browser. Each table shares one computer, negotiates in person, and saves progress locally or through exported JSON. No backend, accounts, or API keys are required.
 
 ## Quick start
@@ -70,6 +74,7 @@ The workflow installs locked dependencies, tests, builds, and deploys `dist/`. R
 
 - [Current rules](docs/REGLAS.md)
 - [Current academic teaching guide](docs/Instructivo_Academico_Tension_de_Carbono_v2.docx)
+- [Local guided workflow teaching supplement](docs/teaching-workflow.md)
 - [Validation evidence and limits](docs/VALIDACION.md)
 - [Changes from the earlier prototype](docs/CAMBIOS.md)
 - [Historical document notice](docs/antecedentes/LEER_PRIMERO.md)

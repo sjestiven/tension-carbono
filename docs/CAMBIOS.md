@@ -1,5 +1,22 @@
 # Cambios de la versión 2
 
+## Local follow-up trial on 29 October 2026
+
+- Restored the missing foundation constant used by Results and added an SSR rendering regression. Both the results navigation and final-game action open the results screen.
+- New annual production confirmations lock production through all contract reviews, with the lock released for the following year. Older exported action logs retain their original replay semantics.
+- Both foundations publish indicative quotes before company purchases. Quotes do not reserve inventory or buyer capacity; companies explicitly choose between independent inventories. Quotation order alternates by year. Price controls use USD 0.50 steps.
+- Moved economy metrics and organizations to a compact opening dashboard. Replaced the large route sidebar with an upper-right floating disclosure, including keyboard dismissal and narrow-screen layout.
+- The timer starts automatically when the initial government cabin opens each year. Expanded the interface guide, current rules, and academic teaching supplement to explain government financing approval and teacher verification.
+- Changes remain local for user testing; no publication was performed.
+
+## Local guided-flow prototype on 29 October 2026
+
+- Replaced unrestricted cabin navigation with a visible mandatory interface route, explicit confirmations, and automatic handoff curtains. Pending offers route to the counterpart and then resume the main turn.
+- Unified cofinancing terminology and removed repeated subsidy entry. Government grant approval is read-only unless the participant explicitly requests renegotiation.
+- Added contextual Details, named missing requirements, and upfront explanations for unavailable options. Teacher actions appear as the current task instead of a control below the map.
+- Reduced guide navigation to one entry, made the logo open the home screen, added confirmed game restart beside timer reset, and corrected the institution to Laboratorio de Economía Aplicada.
+- Added replayable workflow markers without changing economic parameters or reference results. Added the local teaching supplement and workflow regressions. These changes are local and have not been pushed or deployed.
+
 ## Public publication on 29 October 2026
 
 - Created the public repository `sjestiven/tension-carbono` and pushed the verified application to `main`.

@@ -1,5 +1,15 @@
 # Reglas del juego Tensión de Carbono 2
 
+## Recorrido guiado
+
+La interfaz indica un turno obligatorio y el siguiente participante. El orden inicial de cada año es: Estado publica la política; empresas A, B y C confirman su producción; fundaciones F1 y F2 firman sus proyectos; Estado firma los convenios; mesa docente ejecuta y verifica. Los botones de confirmar guardan la decisión y muestran el relevo. No es necesario buscar el control docente al final del mapa.
+
+En el mercado ambas fundaciones publican primero sus cotizaciones indicativas, sin ventas ni reservas. Cotiza primero F1 en años impares y F2 en años pares. Después las empresas A, B y C comparan ambos inventarios y precios, eligen explícitamente un proveedor y negocian. Cada propuesta pasa temporalmente a la contraparte para aceptar o rechazar y luego regresa al turno principal. Las tres empresas confirman sus contratos y la mesa docente cierra el año. Antes del cierre, el docente puede reabrir la negociación; los acuerdos se conservan y se solicitan nuevas confirmaciones, pero la producción permanece fija. Después revisa resultados e inicia el año siguiente, cuyo primer turno vuelve al Estado.
+
+«Cofinanciación pública» y «apoyo público» son el mismo porcentaje. Se publica una vez y después se muestra al firmar convenios. Renegociarlo es una acción expresa que exige nuevas firmas. Los botones Detalles explican las selecciones mediante un cuadro flotante al usar el cursor, el teclado o un toque. Los requisitos pendientes identifican a cada participante y bloquean el avance antes de ejecutar una acción incompleta.
+
+El menú Reiniciar permite reiniciar solo el reloj o la partida. Reiniciar la partida exige confirmación y permite exportar antes; conserva los nombres y comienza de nuevo en el año 1. El logotipo vuelve al inicio sin borrar el avance. Las condiciones económicas y de puntuación se describen a continuación.
+
 ## Objetivo y roles
 
 Cada economía tiene tres empresas, dos fundaciones y un Estado. El objetivo es comprender cómo la financiación de proyectos produce una oferta de créditos y cómo un impuesto genera incentivos para comprarlos. Se juegan cuatro años y las mesas no comercian entre sí.
@@ -18,7 +28,7 @@ Empresas A, B y C comienzan con USD 5.000 cada una. Sus intensidades son 0,40, 0
 | Alto | 250 | 12.500 | 8.400 |
 | Muy alto | 300 | 15.000 | 10.400 |
 
-Se vende todo a USD 50/t. El Estado publica una tarifa común entera entre USD 20 y 40/tCO₂e. Las bandas baja 20–25, media 26–32 y alta 33–40 son intervalos de elección, no tramos progresivos. La tarifa no se modifica en ese año.
+Se vende todo a USD 50/t. Cada empresa confirma su producción antes de los proyectos: esa decisión queda fija durante todo el año, incluso al reabrir la negociación. Puede elegir una producción diferente al comenzar el año siguiente. El Estado publica una tarifa común entera entre USD 20 y 40/tCO₂e. Las bandas baja 20–25, media 26–32 y alta 33–40 son intervalos de elección, no tramos progresivos. La tarifa no se modifica en ese año.
 
 Cada empresa puede retirar créditos enteros hasta el 50 % de sus emisiones anuales. Si el tope es fraccionario, se utiliza su parte entera inferior. No hay préstamos ni caja negativa; los créditos se pagan con la caja disponible al aceptar. Los ingresos, costos productivos e impuesto se liquidan al cerrar.
 
@@ -35,15 +45,17 @@ Al cierre, el 30 % del recaudo se reserva para proyectos del año siguiente y el
 
 La fundación debe tener dinero para ejecutar antes de vender. El aporte público no compra créditos ni propiedad para el Estado. Cada fundación confirma su plan y el Estado confirma los convenios. El docente ejecuta después de las tres firmas y de validar cajas, topes y fondos.
 
+El Estado aprueba la financiación cuando se aplica el porcentaje común publicado, hay fondo suficiente, cada fundación puede pagar su parte y respeta su capacidad máxima de 100 tCO₂e/año. Si no se cumple, devuelve el plan para corregirlo o renegocia el porcentaje común antes de nuevas firmas. No certifica las reducciones: esa función corresponde a la mesa docente en la verificación. En el año 1, con fondo cero, firma convenios con aporte público de cero.
+
 ## Etapas y negociación
 
 1. **Política pública.** El Estado elige y publica tarifa y porcentaje de apoyo.
-2. **Proyectos.** Las fundaciones proponen inversiones y acuerdan convenios. Las empresas pueden planear producción. Se firman y ejecutan los proyectos.
+2. **Proyectos.** Las empresas confirman su producción definitiva del año; las fundaciones proponen inversiones y acuerdan convenios. Se firman y ejecutan los proyectos.
 3. **Verificación.** El docente comprueba financiación, ejecución y línea base; verifica o rechaza expresamente cada lote. Es una simulación, no auditoría ambiental real.
-4. **Mercado.** Empresas y fundaciones proponen contratos bilaterales. Cada oferta registra lote, contrapartes, cantidad y precio. La oferta reserva inventario y capacidad de compensación; solo la contraparte acepta. Se paga al contado y no hay anticipos. Puede rechazarse o anularse antes del cierre, devolviendo el pago. No hay reventa.
+4. **Mercado.** Ambas fundaciones cotizan antes de cualquier compra. Cada una conserva su propio inventario; la demanda de las empresas es limitada por el tope de compensación. Las cotizaciones no reservan créditos ni obligan a comprar. Las empresas comparan y proponen contratos bilaterales, ajustando el precio unitario en pasos de USD 0,50. Cada oferta registra lote, contrapartes, cantidad y precio. La oferta bilateral sí reserva inventario y capacidad de compensación; solo la contraparte acepta. Se paga al contado y no hay anticipos. Puede rechazarse o anularse antes del cierre, devolviendo el pago. No hay reventa ni ventas garantizadas para ninguna fundación.
 5. **Resultados.** Las empresas confirman sus planes; el docente cierra cuando no hay ofertas pendientes. Se liquidan producción e impuestos, se retiran los créditos y se calcula la evaluación estatal. Se revisan los resultados y se pasa al siguiente año.
 
-La producción puede corregirse antes del cierre siempre que respete el tope de los contratos activos; de lo contrario deben anularse primero. Un error rechaza la acción sin modificar el estado previo. No se puede ofrecer un lote no verificado. Los créditos sin venta vencen; las reducciones verificadas sí cuentan en la meta física. Los proyectos instalados continúan aunque su lote de un año no se verifique.
+En la revisión previa al cierre pueden corregirse los contratos, pero no la producción ya confirmada. Un error rechaza la acción sin modificar el estado previo. No se puede ofrecer un lote no verificado. Los créditos sin venta vencen; las reducciones verificadas sí cuentan en la meta física. Los proyectos instalados continúan aunque su lote de un año no se verifique.
 
 ## Dos cuentas distintas
 
@@ -106,7 +118,7 @@ Estos umbrales hacen operativa la lista pendiente del informe. Son elecciones pe
 
 ## Orientación docente
 
-Sesión propuesta de 90 minutos: 12 de contextualización; 8 de ensayo; cuatro rondas de 12; 17 de discusión y 5 de respuesta individual. El reloj es orientativo y no fuerza un cierre automático.
+Sesión propuesta de 90 minutos: 12 de contextualización; 8 de ensayo; cuatro rondas de 12; 17 de discusión y 5 de respuesta individual. El reloj inicia automáticamente al abrir la cabina inicial del Estado cada año. Se puede pausar y reiniciar; es orientativo y no fuerza un cierre automático.
 
 Los puntos no son la nota académica. Rúbrica: 30 % distinción proyecto, financiación y crédito; 30 % justificación con datos; 25 % cuenta fiscal frente a física; 15 % mejora y participación. La respuesta final explica una decisión, una alternativa y consecuencias con dos datos.
 

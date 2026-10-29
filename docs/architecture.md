@@ -7,6 +7,9 @@ Tensión de Carbono is a static React application built by Vite. It uses browser
 | `index.html`, `src/main.jsx` | Metadata, root element, and React startup. |
 | `src/engine.js` | Rules, immutable transitions, accounting, scoring, import/export. |
 | `src/App.jsx` | Setup, role controls, negotiation, results, guide, persistence. |
+| `src/components/GuidedRound.jsx` | Ordered cabin controls, handoffs, validation feedback, and counterpart responses. |
+| `src/components/ui.jsx` | Shared fields, buttons, statistics, and accessible contextual help. |
+| `src/workflow.js` | Derived interface turn, project-option explanations, and named prerequisites. |
 | `src/Valley.jsx` | Lazy-loaded Three.js scene and interactive SVG fallback. |
 | `src/styles.css` | Layout, responsive presentation, and reduced motion. |
 | `src/demo.js`, `src/demo.json` | Four-round example replayed through the engine. |
@@ -23,3 +26,5 @@ The annual phases are policy, projects, verification, market, and results, repea
 Vite generates `dist/` with relative asset URLs. React and Three.js have separate chunks; the scene is dynamically imported. Pages publishes only `dist/`. Source documents and tests do not become site assets.
 
 The version 2 engine, current rules, and academic guide define current behavior. `docs/antecedentes/` preserves earlier designs under their existing filenames.
+
+The local guided-flow prototype adds replayable confirmation markers for annual company production, indicative foundation quotes, and foundation market turns. New production confirmations set an engine-enforced annual lock; older logs without the lock preserve their replay behavior. Both quotes precede company proposals and do not reserve stock or buyer capacity. `RoundOverview.jsx` contains the compact economy dashboard and route disclosure. The interface restricts cabin access to the derived current turn; pending offers preempt that turn until the counterpart responds. See `docs/ux-review.md` for compatibility with the older public implementation and the local verification scope.
