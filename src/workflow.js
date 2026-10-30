@@ -1,4 +1,4 @@
-import { COMPANIES, FOUNDATIONS, PROJECTS, companyView, projectDetails } from './engine.js';
+import { COMPANIES, FOUNDATIONS, PROJECTS, companyView, projectDetails, isGameOver } from './engine.js';
 
 export function roleName(game, role) {
   return role === 'Docente' ? 'Mesa docente' : game.setup.names[role];
@@ -20,6 +20,7 @@ function marketOwner(game) {
 // This derives the interface sequence; financial rules remain in the engine.
 export function currentTurn(game) {
   const d = game.draft;
+  if (isGameOver(game)) return { role: 'Docente', kind: 'finished', title: game.emissions > 1400 ? 'Partida terminada por emisiones' : 'Revisar los resultados finales', next: null };
   if (d.phase === 'policy') return { role: 'Estado', kind: 'policy', title: 'Publicar la política', next: 'A' };
   if (d.phase === 'projects') {
     const company = COMPANIES.find(role => !d.productionPlanned[role]);

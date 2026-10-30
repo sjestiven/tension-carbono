@@ -1,11 +1,12 @@
 import template from './demo.json' with { type: 'json' };
-import { createGame, applyAction, COMPANIES, FOUNDATIONS } from './engine.js';
+import { createGame, applyAction, COMPANIES, FOUNDATIONS, isGameOver } from './engine.js';
 export const DEMO = template;
 // Usa exactamente el mismo motor y validaciones que cada control de la interfaz.
 export function playTemplate(rounds = template, setup) {
   let game = createGame(setup);
   const act = a => { game = applyAction(game, a); };
   for (const [index, r] of rounds.entries()) {
+    if (isGameOver(game)) break;
     if (index) act({ type: 'next', actor: 'Docente' });
     const grants = Object.values(r.proyectos).flat();
     const subsidy = grants.some(p => p.aporte) ? 50 : 0;

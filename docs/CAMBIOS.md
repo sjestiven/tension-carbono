@@ -1,5 +1,12 @@
 # Cambios de la versión 2
 
+## Version 2.1 changes on 30 October 2026
+
+- Open at home on initial load and after confirmed game restart; preserve saved games until the participant continues or restarts.
+- Offer 12-, 8-, and 4-minute annual timers. Remember duration independently of game exports, reset to the selected duration each year, and stop the clock at game end. Duration changes reset and pause the clock.
+- End immediately at a year closing that exceeds 1,400 accumulated physical tCO2e. Show collective defeat and partial final accounts, block further actions, and allow completed losing games in teacher comparison. Exactly 1,400 remains within the limit.
+- Export version 2.1 logs. Fully validate older version 2.0 logs and migrate them to their first terminal round. Reference economic parameters and score formulas are unchanged.
+
 ## Decision workspace refinement on 29 October 2026
 
 - Published application commit `ed140c265dd515c5d505008a003c8341c0cd2f8d` through successful workflow `40876051365`. All eight public files match the validated build; 46 tests pass.

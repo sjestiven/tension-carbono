@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { createGame, applyAction, scores, exportGame, importGame, automaticRatings, lot, projectDetails, companyView, available, remaining, VERSION } from '../src/engine.js';
+import { createGame, applyAction, scores, exportGame, importGame, automaticRatings, lot, projectDetails, companyView, available, remaining, VERSION, isGameOver } from '../src/engine.js';
 import { playTemplate, DEMO } from '../src/demo.js';
 const act = (g, type, actor, data = {}) => applyAction(g, { type, actor, ...data });
 
@@ -173,7 +173,34 @@ test('El Estado ya no puede ganar con producción acumulada de 1200', () => {
 });
 test('Una derrota ambiental impide todas las victorias', () => {
   const ds=structuredClone(DEMO);for(const d of ds)d.produccion={A:300,B:300,C:300};
-  const g=playTemplate(ds);assert.equal(g.emissions,2040);assert.ok(Object.values(scores(g)).every(s=>!s.victory));
+  const g=playTemplate(ds);assert.equal(g.emissions,1590);assert.equal(g.history.length,3);assert.ok(isGameOver(g));assert.ok(Object.values(scores(g)).every(s=>!s.victory));
+  for (const action of [{type:'next',actor:'Docente'},{type:'close',actor:'Docente'},{type:'reopenNegotiation',actor:'Docente'},{type:'policy',actor:'Estado',tax:20,subsidy:0}]) rejects(g,action,/terminó/);
+  assert.deepEqual(importGame(exportGame(g)),g);
+});
+
+test('Exactly 1400 accumulated emissions before year four does not end the game', () => {
+  const rounds=structuredClone(DEMO.slice(0,3));
+  for (const round of rounds.slice(0,2)) round.produccion={A:300,B:300,C:300};
+  rounds[2].produccion={A:150,B:100,C:250};
+  rounds[2].contratos=rounds[2].contratos.map(contract=>({...contract,cantidad:{A:15,B:10,C:30}[contract.empresa]}));
+  const game=playTemplate(rounds);
+  assert.equal(game.emissions,1400);
+  assert.equal(isGameOver(game),false);
+  assert.equal(act(game,'next','Docente').draft.year,4);
+});
+
+test('Legacy losing logs are fully validated and migrated to their first losing round', () => {
+  const legacy=exportGame(playTemplate());
+  legacy.version='2.0.0';
+  legacy.actions=legacy.actions.map(action=>action.type==='production'?{...action,quantity:300}:action);
+  const migrated=importGame(legacy);
+  assert.equal(migrated.version,VERSION);
+  assert.equal(migrated.emissions,1590);
+  assert.equal(migrated.history.length,3);
+  assert.ok(migrated.actions.length<legacy.actions.length);
+  assert.deepEqual(importGame(exportGame(migrated)),migrated);
+  assert.throws(()=>importGame({...legacy,version:VERSION}),/terminó/);
+  assert.throws(()=>importGame({...legacy,actions:[...legacy.actions,{type:'close',actor:'Docente'}]}),/etapa/);
 });
 test('No hay victoria prematura ni quinta ronda', () => {
   assert.throws(()=>scores(createGame()),/cuatro/);rejects(playTemplate(),{type:'next',actor:'Docente'},/terminó/);

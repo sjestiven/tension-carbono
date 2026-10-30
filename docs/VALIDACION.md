@@ -1,5 +1,11 @@
 # Validation history and current workspace status
 
+## Version 2.1 local validation on 30 October 2026
+
+Locked installation completed with `npm ci --no-fund --no-audit`. The 49-test suite includes early collective defeat, no next-year workflow, terminal action rejection, exactly 1,400 emissions before year four, full validation and terminal-state migration of legacy version 2.0 logs, and rendering of early final results for all six roles. The unchanged four-year reference still reproduces the original economic accounts and scores.
+
+Browser checks confirmed initial home with saved data, restart to home without an automatically opened cabin, 12/8/4-minute selection, eight-minute automatic State-cabin start, reset/pause on duration change, and persisted duration after reload. A synthetic third-year fixture reached 1,590 accumulated tCO2e on closing and immediately displayed collective-defeat results with no fourth-year action and disabled timer Start. At 320 px the page width matched the available viewport; the override was reset. The original academic Word guide is supplemented by the current version 2.1 rules and teaching workflow.
+
 ## Compact decision workspace release on 29 October 2026
 
 Published application commit: `ed140c265dd515c5d505008a003c8341c0cd2f8d`. [Actions run 40876051365](https://github.com/sjestiven/tension-carbono/actions/runs/40876051365) passed both build and deployment, including locked installation and all 46 tests. The actual [public game](https://sjestiven.github.io/tension-carbono/) serves all eight production files with HTTP 200 and bytes identical to the validated local build.

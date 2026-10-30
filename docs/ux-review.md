@@ -1,5 +1,15 @@
 # Guided gameplay usability revision
 
+## Home, terminal climate rule, and timer durations (30 October 2026)
+
+Version 2.1 opens at home even with a saved game. Confirmed restart creates a fresh year-one game with preserved names, clears the curtain, stops the clock, and returns home. Home offers Continue for unfinished games, Start for a fresh saved table, and Results for completed games. A new table can select its duration before creation; existing tables use the header selector.
+
+Annual timers offer 12, 8, or 4 minutes, stored as a browser preference outside the exported economic log. Selecting a different duration resets and pauses the clock; reset-clock uses the selected duration. Opening the initial State cabin starts it automatically once per year. Ending the game disables Start and stops the clock. Reaching zero remains advisory and does not end a round.
+
+Closing a year above 1,400 accumulated physical emissions immediately opens collective-defeat results, removes the next-year handoff, and blocks all later engine actions. Exactly 1,400 is permitted. Partial scores describe the recorded rounds and do not grant victory after collective defeat. Version 2.0 logs are fully validated, then migrated to their first terminal state; version 2.1 logs reject decisions after termination. Teacher comparison accepts either four-year completion or early climate defeat.
+
+Local checks verified home on reload with a saved losing game, home after restart without a State curtain, all three timer values, automatic start with eight minutes, four-minute reset/pause, and persisted duration. A synthetic import just before the third-year closing produced 1,590 accumulated tCO2e, automatically displayed final results, removed the fourth-year action, and disabled timer Start. The 320 px layout had no page-level horizontal overflow; the temporary viewport override was reset. The suite has 49 passing tests, including the exact-limit boundary, blocked terminal actions, loss-result rendering, and legacy migration with validation of the complete historical log.
+
 Date: 29 October 2026. Scope: gameplay changes developed and tested locally in response to user trials. Publication evidence is recorded in `VALIDACION.md`.
 
 Release status: published to the existing GitHub Pages site after local validation. Application commit `6e7173d332acb88329e00efd25eb119037876eef` passed workflow `40872073522`; all eight live assets matched the local build. Public browser checks confirmed final results and automatic State-cabin timer start. The local-trial evidence below remains a record of development testing.

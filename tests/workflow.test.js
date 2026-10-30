@@ -6,6 +6,15 @@ import { currentTurn, foundationOrder, projectIssues, projectOptionIssue, closin
 
 const act = (game, type, actor, data = {}) => applyAction(game, { type, actor, ...data });
 
+test('An early climate defeat has no next-year handoff', () => {
+  const rounds=structuredClone(DEMO);
+  for (const round of rounds) round.produccion={A:300,B:300,C:300};
+  const turn=currentTurn(playTemplate(rounds));
+  assert.equal(turn.kind,'finished');
+  assert.equal(turn.next,null);
+  assert.match(turn.title,/emisiones/);
+});
+
 function plannedGame() {
   let game = act(createGame(), 'publish', 'Estado');
   for (const role of ['A', 'B', 'C']) game = act(game, 'confirmProduction', role);

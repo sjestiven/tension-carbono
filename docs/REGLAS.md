@@ -1,5 +1,7 @@
 # Reglas del juego Tensión de Carbono 2
 
+Reglas vigentes: versión 2.1.0, revisión del 30 de octubre de 2026.
+
 ## Recorrido guiado
 
 La interfaz indica un turno obligatorio y el siguiente participante. El orden inicial de cada año es: Estado publica la política; empresas A, B y C confirman su producción; fundaciones F1 y F2 firman sus proyectos; Estado firma los convenios; mesa docente ejecuta y verifica. Los botones de confirmar guardan la decisión y muestran el relevo. No es necesario buscar el control docente al final del mapa.
@@ -8,11 +10,11 @@ En el mercado ambas fundaciones publican primero sus cotizaciones indicativas, s
 
 «Cofinanciación pública» y «apoyo público» son el mismo porcentaje. Se publica una vez y después se muestra al firmar convenios. Renegociarlo es una acción expresa que exige nuevas firmas. Los botones Detalles explican las selecciones mediante un cuadro flotante al usar el cursor, el teclado o un toque. Los requisitos pendientes identifican a cada participante y bloquean el avance antes de ejecutar una acción incompleta.
 
-El menú Reiniciar permite reiniciar solo el reloj o la partida. Reiniciar la partida exige confirmación y permite exportar antes; conserva los nombres y comienza de nuevo en el año 1. El logotipo vuelve al inicio sin borrar el avance. Las condiciones económicas y de puntuación se describen a continuación.
+El juego abre siempre en el inicio, incluso si hay una partida guardada. Desde allí se puede comenzar o continuar. El menú Reiniciar permite reiniciar solo el reloj o la partida. Reiniciar la partida exige confirmación y permite exportar antes; conserva los nombres, prepara el año 1 y vuelve al inicio sin abrir ninguna cabina. El logotipo vuelve al inicio sin borrar el avance. Las condiciones económicas y de puntuación se describen a continuación.
 
 ## Objetivo y roles
 
-Cada economía tiene tres empresas, dos fundaciones y un Estado. El objetivo es comprender cómo la financiación de proyectos produce una oferta de créditos y cómo un impuesto genera incentivos para comprarlos. Se juegan cuatro años y las mesas no comercian entre sí.
+Cada economía tiene tres empresas, dos fundaciones y un Estado. El objetivo es comprender cómo la financiación de proyectos produce una oferta de créditos y cómo un impuesto genera incentivos para comprarlos. Se juegan hasta cuatro años y las mesas no comercian entre sí.
 
 Un crédito representa una tCO₂e de reducción externa verificada frente a una línea base. El proyecto y el crédito son bienes distintos. La fundación conserva la propiedad del proyecto. El Estado no fija precios ni autoriza contratos privados.
 
@@ -71,7 +73,9 @@ Los créditos no se descuentan de nuevo de las emisiones físicas. Con emisiones
 
 ## Puntuación y victoria
 
-Si las emisiones físicas acumuladas superan 1.400 tCO₂e, todos pierden. Se pueden continuar las cuatro rondas para analizar. Cumplido ese límite, gana cada rol con al menos 70/100. El Estado además debe alcanzar 1.800 t de producción acumulada. No existe un ganador absoluto.
+Al cerrar cada año se registran las emisiones físicas reales del equipo. Si el acumulado supera 1.400 tCO₂e, todos pierden y la partida termina inmediatamente: se muestran los resultados y no se permiten más decisiones ni abrir otro año. Alcanzar exactamente 1.400 no provoca derrota. Las previsiones de producción no finalizan la partida antes de contabilizar el año, porque todavía deben ejecutarse y verificarse las reducciones externas. Sin derrota anticipada, se completan los cuatro años y gana cada rol con al menos 70/100. El Estado además debe alcanzar 1.800 t de producción acumulada. No existe un ganador absoluto.
+
+En una derrota anticipada, los resultados y los puntos describen solo los años cerrados hasta el corte. Ningún rol gana, independientemente de sus puntos. Se pueden revisar y exportar las cuentas para la discusión docente. Las partidas antiguas de la versión 2.0 se importan validando todas sus decisiones y se ajustan al primer cierre que superó el límite; las nuevas exportaciones usan la versión 2.1.
 
 ### Empresas
 
@@ -118,7 +122,7 @@ Estos umbrales hacen operativa la lista pendiente del informe. Son elecciones pe
 
 ## Orientación docente
 
-Sesión propuesta de 90 minutos: 12 de contextualización; 8 de ensayo; cuatro rondas de 12; 17 de discusión y 5 de respuesta individual. El reloj inicia automáticamente al abrir la cabina inicial del Estado cada año. Se puede pausar y reiniciar; es orientativo y no fuerza un cierre automático.
+Sesión propuesta de 90 minutos: 12 de contextualización; 8 de ensayo; hasta cuatro rondas de 12; 17 de discusión y 5 de respuesta individual. El reloj permite elegir 12, 8 o 4 minutos por año. La duración se conserva entre años y al recargar este navegador. Cambiarla reinicia y pausa el reloj; reiniciar solo el reloj conserva la duración elegida. Arranca automáticamente al abrir la cabina inicial del Estado cada año y se detiene al terminar la partida. Es orientativo: llegar a cero no cierra la ronda ni provoca derrota. Si la partida termina antes por emisiones, el tiempo restante puede dedicarse al análisis.
 
 Los puntos no son la nota académica. Rúbrica: 30 % distinción proyecto, financiación y crédito; 30 % justificación con datos; 25 % cuenta fiscal frente a física; 15 % mejora y participación. La respuesta final explica una decisión, una alternativa y consecuencias con dos datos.
 

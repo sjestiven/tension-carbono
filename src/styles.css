@@ -63,6 +63,7 @@
 .valley-details .role-grid { padding:12px 0 0; grid-template-columns:repeat(2,minmax(0,1fr)); }
 .role-card:disabled { opacity:.5; cursor:default; }
 .return-to-turn { margin-bottom:20px; }
+.results-page { scroll-margin-top:60px; }
 .reset-menu { position:relative; }
 .reset-menu summary { list-style:none; display:flex; gap:5px; align-items:center; cursor:pointer; padding:6px; font-size:11px; }
 .reset-menu summary::-webkit-details-marker { display:none; }
@@ -70,6 +71,8 @@
 .timer .reset-menu button { display:block; width:100%; font-size:12px; padding:12px; margin:3px 0; text-align:left; }
 .topbar { min-height:82px; height:auto; gap:15px; padding-top:12px; padding-bottom:12px; }
 .topbar .timer { padding:5px; }
+.timer .timer-duration { width:auto; min-height:30px; padding:4px 5px; border-radius:6px; background:#f4f7ed; font-size:11px; }
+.welcome-duration { max-width:250px; margin-bottom:20px; }
 .topbar .brand small { color:#65765f; }
 .feedback { font-size:12px; }
 @media(max-width:1100px) {
@@ -183,6 +186,9 @@
  .turn-banner { padding:13px 15px; }
 }
 @media(max-width:480px) {
+ .topbar { padding-left:14px; padding-right:14px; }
+ .top-actions { flex-wrap:wrap; gap:4px; }
+ .timer .reset-menu summary>span { display:none; }
  .sidebar nav { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
  .sidebar nav button { justify-content:center; }
  .round-dashboard { padding:11px; }

@@ -1,10 +1,12 @@
 # Tensión de Carbono
 
-A Spanish-language classroom simulation of a carbon credit market linked to a carbon tax. Three companies, two foundations, and a government negotiate through four annual rounds. Game version: **2.0.0**.
+A Spanish-language classroom simulation of a carbon credit market linked to a carbon tax. Three companies, two foundations, and a government negotiate through up to four annual rounds. Game version: **2.1.0**.
 
 **[Play Tensión de Carbono](https://sjestiven.github.io/tension-carbono/)** · [Source repository](https://github.com/sjestiven/tension-carbono)
 
 ## Guided gameplay
+
+The game opens at home and returns there after a confirmed restart. Annual timers offer 12, 8, or 4 minutes. Closing a year with accumulated physical emissions above 1,400 tCO2e immediately ends the game with collective defeat and opens final results; exactly 1,400 does not trigger defeat. Version 2.0 exports remain importable and are migrated to the first terminal round after their full logs are validated.
 
 The application includes mandatory cabin handoffs, fixed annual production after confirmation, contract cancellation with refunds, both foundation quotes before purchases, USD 0.50 price steps, an opening economy dashboard, a floating year route, and automatic timer start when the government opens its initial cabin. Final-results rendering, contextual Details, a single subsidy field, and confirmed game restart are available. See [the usability review](docs/ux-review.md), [the teaching workflow supplement](docs/teaching-workflow.md), and [the deployment record](docs/VALIDACION.md). For local testing, run `npm run dev` and open the printed URL.
 

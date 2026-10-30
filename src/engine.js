@@ -1,5 +1,6 @@
 // Motor puro y determinista. Todas las decisiones pasan por applyAction.
-export const VERSION = '2.0.0';
+export const VERSION = '2.1.0';
+export const EMISSIONS_LIMIT = 1400;
 export const COMPANIES = ['A', 'B', 'C'];
 export const FOUNDATIONS = ['F1', 'F2'];
 export const ROLES = ['Estado', ...COMPANIES, ...FOUNDATIONS];
@@ -121,10 +122,17 @@ function assertMarket(g) {
   }
   for (const f of FOUNDATIONS) check(sum(g.draft.contracts.filter(c => c.foundation === f && accepted(c)), c => c.quantity) <= lot(g, f), 'No se pueden vender créditos sin verificar.');
 }
+export function isGameOver(game) {
+  return game.emissions > EMISSIONS_LIMIT || (game.history.length === 4 && game.draft.phase === 'results');
+}
 export function applyAction(original, action) {
+  return transition(original, action);
+}
+function transition(original, action, legacyReplay = false) {
   check(action && typeof action === 'object' && !Array.isArray(action), 'Acción inválida.');
   check(typeof action.type === 'string', 'Acción sin tipo.');
   check(ROLES.includes(action.actor) || action.actor === 'Docente', 'Rol desconocido.');
+  check(legacyReplay || !isGameOver(original), 'La partida ya terminó. Revisa los resultados o reinicia desde el inicio.');
   const g = clone(original), a = clone(action), d = g.draft;
   switch (a.type) {
     case 'policy':
@@ -304,8 +312,8 @@ export function applyAction(original, action) {
   return g;
 }
 export function scores(g) {
-  check(g.history.length === 4 && g.draft.phase === 'results', 'Los puntos finales se calculan después de cuatro rondas.');
-  const climate = g.emissions <= 1400, out = {};
+  check(isGameOver(g), 'Los puntos finales se calculan después de cuatro rondas o de una derrota ambiental.');
+  const climate = g.emissions <= EMISSIONS_LIMIT, out = {};
   for (const e of COMPANIES) {
     const s = g.companies[e], margin = s.income ? s.profit / s.income : 0, coverage = s.emissions ? s.credits / s.emissions : 0;
     const components = [margin >= .1 - 1e-9 ? 40 : margin >= .05 - 1e-9 ? 25 : margin > 0 ? 10 : 0,
@@ -326,9 +334,15 @@ export function exportGame(g) {
   return { schema: 'tension-carbono', version: VERSION, setup: clone(g.setup), actions: clone(g.actions) };
 }
 export function importGame(data) {
-  check(data && data.schema === 'tension-carbono' && data.version === VERSION, 'Formato incompatible. Use una partida JSON de Tensión de Carbono 2.0.0.');
+  check(data && data.schema === 'tension-carbono' && [VERSION, '2.0.0'].includes(data.version), 'Formato incompatible. Use una partida JSON de Tensión de Carbono 2.0 o 2.1.');
   check(Array.isArray(data.actions) && data.actions.length <= 2000, 'Bitácora inválida o demasiado extensa.');
   let game = createGame(data.setup);
-  for (const action of data.actions) game = applyAction(game, action);
-  return game;
+  let terminalState = null;
+  const legacyReplay = data.version === '2.0.0';
+  for (const action of data.actions) {
+    game = transition(game, action, legacyReplay);
+    if (!terminalState && isGameOver(game)) terminalState = game;
+  }
+  // Validate the complete legacy log, then migrate to its first terminal round.
+  return terminalState || game;
 }

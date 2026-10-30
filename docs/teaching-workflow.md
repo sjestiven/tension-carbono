@@ -1,10 +1,10 @@
 # Orientación de turnos guiados
 
-Esta orientación complementa el instructivo académico de la versión 2 con los ajustes probados y publicados el 29 de octubre de 2026. Describe los turnos, la producción anual fija y la comparación de cotizaciones; conserva los parámetros económicos, las cuentas y la puntuación. El juego lo ofrece el Laboratorio de Economía Aplicada.
+Esta orientación complementa el instructivo académico de la versión 2 con las reglas vigentes de la versión 2.1, revisadas el 30 de octubre de 2026. Describe los turnos, la producción anual fija, la comparación de cotizaciones y el final anticipado por emisiones. Conserva los parámetros económicos y las fórmulas de cuentas y puntuación. El juego lo ofrece el Laboratorio de Economía Aplicada.
 
 ## Preparación y primera decisión
 
-Al crear la mesa, el programa anuncia el turno del Estado. El cronómetro de doce minutos inicia automáticamente al abrir su cabina inicial, una vez por año; puede pausarse. Cada participante abre su turno, toma decisiones y utiliza el botón de confirmar o continuar. Elegir un nivel de producción muestra la selección actual; confirmar fija esa producción hasta el año siguiente y termina el turno. Al cambiar de participante, la cortina indica a quién entregar el dispositivo y la tarea pendiente.
+El juego abre en el inicio y conserva la mesa guardada hasta que se decida continuar o reiniciar. Al crear la mesa, el programa anuncia el turno del Estado. El cronómetro permite 12, 8 o 4 minutos e inicia automáticamente al abrir su cabina inicial, una vez por año; puede pausarse. La duración se recuerda entre años. Cambiarla reinicia y pausa el reloj; llegar a cero no termina la ronda. Cada participante abre su turno, toma decisiones y utiliza el botón de confirmar o continuar. Elegir un nivel de producción muestra la selección actual; confirmar fija esa producción hasta el año siguiente y termina el turno. Al cambiar de participante, la cortina indica a quién entregar el dispositivo y la tarea pendiente.
 
 Cada año sigue este recorrido:
 
@@ -14,7 +14,9 @@ Cada año sigue este recorrido:
 4. El Estado firma los convenios calculados con el porcentaje que ya publicó.
 5. La mesa docente ejecuta los proyectos y verifica o rechaza los dos lotes.
 6. Ambas fundaciones presentan sus cotizaciones antes de cualquier compra: F1 primero en años impares y F2 primero en años pares. Después las empresas A, B y C comparan precios e inventarios, negocian y confirman sus contratos del año.
-7. La mesa docente cierra el año, revisa los resultados e inicia el siguiente, cuyo primer turno corresponde de nuevo al Estado.
+7. La mesa docente cierra el año. Si el acumulado supera 1.400 tCO₂e, todos pierden, se detiene el reloj y se abren los resultados finales sin permitir otra ronda. Si no supera el límite, revisa los resultados y puede iniciar el siguiente año hasta completar cuatro; el primer turno corresponde de nuevo al Estado.
+
+El límite se aplica a emisiones físicas acumuladas registradas, no a previsiones. Exactamente 1.400 tCO₂e permite continuar si aún faltan años. Ante una derrota anticipada, explique: «El presupuesto climático era una restricción compartida. Al superarlo, la economía termina; ahora analizamos qué decisiones llevaron al resultado». Los puntos al corte no otorgan victorias ni se extrapolan a años no jugados. Puede usarse el tiempo restante para comparar alternativas y argumentar con las cuentas exportadas. Una partida finalizada por emisiones también se puede cargar en Comparar mesas.
 
 La mesa docente aparece como turno actual cuando debe intervenir. No es necesario buscar un control debajo del mapa. Una franja breve al principio muestra emisiones acumuladas, impuesto y fondo público. Organizaciones despliega el valle y los nombres; Ruta del año despliega el recorrido. Ambos mantienen el espacio principal disponible para la cabina de decisión. Menú, en el encabezado, permite abrir u ocultar la navegación con una animación y recuerda la preferencia en este navegador. Al elegir una sección, el menú vuelve a cerrarse. Escape cierra el menú o el desplegable enfocado.
 
@@ -44,6 +46,6 @@ Puede explicarse a los estudiantes así: «El Estado cuida el presupuesto y apli
 
 Los requisitos pendientes se muestran antes de permitir ejecutar una acción. La interfaz identifica el lote o participante que falta y explica las opciones que no se pueden elegir por límites de caja, capacidad o créditos. Una firma de la fundación confirma su propio plan; la firma estatal y la ejecución comprueban el conjunto de convenios.
 
-El menú Reiniciar distingue entre volver el reloj a doce minutos y comenzar otra vez la partida. Reiniciar la partida requiere confirmación, permite exportar antes y conserva los nombres. Cancelar conserva el avance. El logotipo abre el inicio sin borrar la mesa.
+El menú Reiniciar distingue entre volver el reloj a la duración elegida y comenzar otra vez la partida. Reiniciar la partida requiere confirmación, permite exportar antes y conserva los nombres. Después vuelve al inicio con el año 1 preparado y el reloj detenido; la cabina del Estado se abre solo al volver a comenzar. Cancelar conserva el avance. El logotipo abre el inicio sin borrar la mesa.
 
 Los puntos siguen siendo distintos de la nota académica. La prueba con estudiantes debe observar comprensión, participación, tiempos y calidad de la negociación, además de la facilidad para completar el recorrido.
