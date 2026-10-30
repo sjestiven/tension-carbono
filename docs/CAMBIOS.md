@@ -2,6 +2,7 @@
 
 ## Version 2.1 changes on 30 October 2026
 
+- Published commit `31d8f5b2cee231f8fef36ed837332d37e840db94` through successful workflow `41103885684`; all eight live files matched the validated build and 49 tests passed.
 - Open at home on initial load and after confirmed game restart; preserve saved games until the participant continues or restarts.
 - Offer 12-, 8-, and 4-minute annual timers. Remember duration independently of game exports, reset to the selected duration each year, and stop the clock at game end. Duration changes reset and pause the clock.
 - End immediately at a year closing that exceeds 1,400 accumulated physical tCO2e. Show collective defeat and partial final accounts, block further actions, and allow completed losing games in teacher comparison. Exactly 1,400 remains within the limit.

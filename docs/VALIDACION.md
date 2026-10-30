@@ -1,5 +1,13 @@
 # Validation history and current workspace status
 
+## Version 2.1 public release on 30 October 2026
+
+Application commit `31d8f5b2cee231f8fef36ed837332d37e840db94` was published by [successful Actions run 41103885684](https://github.com/sjestiven/tension-carbono/actions/runs/41103885684). Locked installation, all 49 tests, the production build, and Pages deployment completed. The live [game](https://sjestiven.github.io/tension-carbono/) returned HTTP 200 for all eight production files, each matching the locally validated build byte for byte.
+
+Public browser verification opened directly at home with the existing saved table preserved. The timer selector offered 12, 8, and 4 minutes; choosing eight and four displayed 08:00 and 04:00, and the preference was restored to twelve afterward. No warning or error messages were captured. Earlier local checks verified restart-to-home and automatic early-defeat results through the actual year-three close button. Evidence is retained in ignored `.local/validation/version-2.1-home-public.jpg`, `early-climate-defeat-local.jpg`, and `version-2.1-assets.json`.
+
+GitHub delayed runner assignment and briefly returned HTTP 502 while reading job status; the final run conclusion was confirmed as success before recording this publication. A following documentation-only record does not alter the deployed application assets.
+
 ## Version 2.1 local validation on 30 October 2026
 
 Locked installation completed with `npm ci --no-fund --no-audit`. The 49-test suite includes early collective defeat, no next-year workflow, terminal action rejection, exactly 1,400 emissions before year four, full validation and terminal-state migration of legacy version 2.0 logs, and rendering of early final results for all six roles. The unchanged four-year reference still reproduces the original economic accounts and scores.
