@@ -1,5 +1,13 @@
 # Validation history and current workspace status
 
+## Compact decision workspace release on 29 October 2026
+
+Published application commit: `ed140c265dd515c5d505008a003c8341c0cd2f8d`. [Actions run 40876051365](https://github.com/sjestiven/tension-carbono/actions/runs/40876051365) passed both build and deployment, including locked installation and all 46 tests. The actual [public game](https://sjestiven.github.io/tension-carbono/) serves all eight production files with HTTP 200 and bytes identical to the validated local build.
+
+Public browser checks confirmed the compact summary (66.2 px high at 1496 by 727), hidden navigation with the inert attribute, animated opening and closing, the State cabin, and Organizations disclosure with Escape dismissal. The opened policy form and its continue button fit in that desktop viewport after the existing cabin scroll. No warning or error messages were captured. Earlier local checks also covered menu preference after reload, guide/results navigation, 375 and 320 px layouts, and both popup bounds at 320 px. The temporary viewport override was reset. Evidence remains in ignored `.local/validation/compact-workspace-public.jpg` and `compact-workspace-assets.json`.
+
+This release changes layout and navigation only; game rules and scores remain unchanged. The following entries preserve earlier publication and trial records.
+
 ## Guided gameplay release on 29 October 2026
 
 Published application commit: `6e7173d332acb88329e00efd25eb119037876eef`. [GitHub Actions run 40872073522](https://github.com/sjestiven/tension-carbono/actions/runs/40872073522) completed successfully for both `build` and `deploy`, including locked dependency installation, 46 tests, and the production build. The updated game is live at [GitHub Pages](https://sjestiven.github.io/tension-carbono/), with source in [sjestiven/tension-carbono](https://github.com/sjestiven/tension-carbono).

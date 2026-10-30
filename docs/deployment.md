@@ -4,9 +4,9 @@
 
 - Game: https://sjestiven.github.io/tension-carbono/
 - Public repository: https://github.com/sjestiven/tension-carbono
-- Latest application release: `6e7173d332acb88329e00efd25eb119037876eef` (guided gameplay, results repair, independent foundation quotes, fixed annual production, and automatic timer).
-- Latest verified application deployment: https://github.com/sjestiven/tension-carbono/actions/runs/40872073522
-- Latest validation: 46 tests and build passed; all eight live files matched the local build; public results, guide, dashboard, route, and automatic State-cabin timer checked.
+- Latest application release: `ed140c265dd515c5d505008a003c8341c0cd2f8d` (compact summary, on-demand organizations scene, and animated collapsible navigation; earlier gameplay improvements retained).
+- Latest verified application deployment: https://github.com/sjestiven/tension-carbono/actions/runs/40876051365
+- Latest validation: 46 tests and build passed; all eight live files matched the local build; compact summary, menu, State cabin, and organization disclosure checked on the public site. Earlier final-results and automatic-timer checks are recorded in `VALIDACION.md`.
 - First successful workflow: https://github.com/sjestiven/tension-carbono/actions/runs/40853527263
 - Initial application commit: `973756719f87b8bd31226986c44fb8cbd1136b1b`.
 - Public browser and asset verification: 29 October 2026 (America/Bogota).

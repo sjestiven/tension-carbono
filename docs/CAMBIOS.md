@@ -2,6 +2,7 @@
 
 ## Decision workspace refinement on 29 October 2026
 
+- Published application commit `ed140c265dd515c5d505008a003c8341c0cd2f8d` through successful workflow `40876051365`. All eight public files match the validated build; 46 tests pass.
 - Replaced the tall economy dashboard with a compact summary strip. Organizations and their scene are available on demand beside the year route, keeping the decision cabin prominent.
 - Added animated, collapsible navigation with a persistent header Menu button. Navigation starts closed, remembers the display preference, closes after selection, supports Escape, and excludes hidden controls from keyboard and assistive-technology navigation.
 - Preserved reduced-motion behavior and checked desktop and narrow-screen layouts. Economic rules and scores are unchanged.

@@ -6,6 +6,8 @@ Release status: published to the existing GitHub Pages site after local validati
 
 ## Decision workspace refinement
 
+Published application commit `ed140c265dd515c5d505008a003c8341c0cd2f8d` passed workflow `40876051365`. All eight live files matched the local build, and public browser checks confirmed the 66.2 px desktop summary, navigation controls, and organization disclosure. No warning or error messages were captured. The viewport override was reset after validation.
+
 Further user feedback identified that the opening metrics inherited the height of the organizations scene, reducing the prominence of the decision cabin. The summary is now a compact horizontal strip: approximately 66 px at the reported 1496 by 727 viewport. Emissions, tax, and funding remain visible; the scene and organization names open from a labeled Organizations disclosure. The route uses the adjacent disclosure button. Both panels close with Escape or an outside click and return keyboard focus when explicitly dismissed. Only one panel opens at a time. The scene is loaded on demand in the game summary.
 
 Navigation starts collapsed to reserve space for the active decision. The header Menu button opens and closes it with a 240 ms transition; the existing reduced-motion rule disables that transition when requested. Desktop navigation expands horizontally, while narrow layouts expand vertically without covering the decision with an overlay. The preference is stored separately from game state and exports. Selecting a destination closes the menu. Hidden navigation is inert and excluded from the accessibility tree; closing it restores focus to the Menu button. The menu itself and its trigger support Escape.
