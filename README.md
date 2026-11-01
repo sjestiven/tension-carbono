@@ -1,6 +1,6 @@
 # Tensión de Carbono
 
-A Spanish-language classroom simulation of a carbon credit market linked to a carbon tax. Three companies, two foundations, and a government negotiate through up to four annual rounds. Game version: **2.1.0**.
+A Spanish-language classroom simulation of a carbon credit market linked to a carbon tax. Three companies, two foundations, and a government negotiate through up to four annual rounds. Game version: **2.2.0**.
 
 **[Play Tensión de Carbono](https://sjestiven.github.io/tension-carbono/)** · [Source repository](https://github.com/sjestiven/tension-carbono)
 
@@ -10,7 +10,7 @@ The game opens at home and returns there after a confirmed restart. Annual timer
 
 The application includes mandatory cabin handoffs, fixed annual production after confirmation, contract cancellation with refunds, both foundation quotes before purchases, USD 0.50 price steps, an opening economy dashboard, a floating year route, and automatic timer start when the government opens its initial cabin. Final-results rendering, contextual Details, a single subsidy field, and confirmed game restart are available. See [the usability review](docs/ux-review.md), [the teaching workflow supplement](docs/teaching-workflow.md), and [the deployment record](docs/VALIDACION.md). For local testing, run `npm run dev` and open the printed URL.
 
-The application runs in the browser. Each table shares one computer, negotiates in person, and saves progress locally or through exported JSON. No backend, accounts, or API keys are required.
+The application runs in the browser. Each table shares one computer, negotiates in person, and saves progress locally or through exported JSON. Core play works without a backend. Optional Supabase research collection requests six student codes, uses private tables and team opt-in, and retains pending uploads without blocking decisions. See [research setup](docs/research-setup.md) and [private analysis queries](supabase/analysis.sql).
 
 ## Quick start
 

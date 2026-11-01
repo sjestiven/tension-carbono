@@ -24,6 +24,10 @@ jobs:
         run: npm ci
       - name: Test and build
         run: npm run check
+        env:
+          VITE_SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.SUPABASE_PUBLISHABLE_KEY }}
+          VITE_RESEARCH_STUDY: ${{ vars.RESEARCH_STUDY }}
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
       - name: Upload production site

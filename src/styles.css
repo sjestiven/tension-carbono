@@ -73,6 +73,11 @@
 .topbar .timer { padding:5px; }
 .timer .timer-duration { width:auto; min-height:30px; padding:4px 5px; border-radius:6px; background:#f4f7ed; font-size:11px; }
 .welcome-duration { max-width:250px; margin-bottom:20px; }
+.research-consent { display:flex; align-items:flex-start; gap:10px; margin:18px 0; padding:14px; border:1px solid var(--line); border-radius:9px; background:#f0f5e8; line-height:1.6; font-size:12px; }
+.research-consent input { width:18px; min-height:18px; height:18px; flex-shrink:0; margin-top:3px; }
+.research-status { margin-left:auto; border:0; background:none; color:#42684b; text-decoration:underline; font-size:10px; padding:6px; }
+.app-footer { flex-wrap:wrap; }
+@media(max-width:930px) { .app-footer>span:nth-of-type(2) { display:none; } }
 .topbar .brand small { color:#65765f; }
 .feedback { font-size:12px; }
 @media(max-width:1100px) {

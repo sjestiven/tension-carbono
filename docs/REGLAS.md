@@ -1,6 +1,14 @@
 # Reglas del juego Tensión de Carbono 2
 
-Reglas vigentes: versión 2.1.0, revisión del 30 de octubre de 2026.
+Reglas vigentes: versión 2.2.0, revisión del 1 de noviembre de 2026.
+
+## Identificación y registro de partidas
+
+Al iniciar una partida se solicita el código de estudiante de los seis roles: Estado, empresas A/B/C y fundaciones F1/F2. Los códigos se conservan como texto para no perder ceros iniciales. Los nombres de personas siguen siendo opcionales. Los códigos también forman parte del guardado local y del JSON exportado; esos archivos contienen identificaciones y no deben publicarse.
+
+El equipo puede autorizar el registro para investigación al confirmar los participantes. En ese caso, Supabase guarda los códigos en una tabla privada, separados de los eventos de decisiones y los resultados anuales. Los nombres personales y del equipo no se envían. Sin autorización, se puede jugar sin enviar datos. El registro no modifica las cuentas ni la puntuación. Las importaciones y el ejemplo no se envían automáticamente como partidas nuevas de investigación.
+
+El pie de página informa si hay datos pendientes o confirmados por el servidor. Si falla la conexión, la partida continúa y se reintenta el envío. Los códigos de una partida que ya se está registrando quedan fijos; otro grupo debe iniciar una partida nueva. Desde el diálogo del registro puede detenerse la captura futura. Esto no elimina los datos ya recibidos por el servidor. El equipo investigador accede a las tablas y exportaciones desde su proyecto Supabase protegido, no desde una consulta pública del juego.
 
 ## Recorrido guiado
 

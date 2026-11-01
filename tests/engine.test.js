@@ -5,6 +5,17 @@ import { createGame, applyAction, scores, exportGame, importGame, automaticRatin
 import { playTemplate, DEMO } from '../src/demo.js';
 const act = (g, type, actor, data = {}) => applyAction(g, { type, actor, ...data });
 
+test('Student codes retain leading zeros and survive export without changing economic initialization',()=>{
+  const game=createGame({studentCodes:{A:' 001234 '}});
+  assert.equal(game.setup.studentCodes.A,'001234');
+  assert.deepEqual(importGame(exportGame(game)),game);
+  assert.deepEqual(game.companies,createGame().companies);
+  assert.throws(()=>createGame({studentCodes:{A:'X'.repeat(41)}}),/Código/);
+  const old={...exportGame(createGame()),version:'2.1.0'};
+  delete old.setup.studentCodes;
+  assert.equal(importGame(old).setup.studentCodes.A,'');
+});
+
 test('The public example replays the same state as the source template', () => {
   const example = JSON.parse(readFileSync(
     new URL('../public/ejemplos/partida_demo_v2.json', import.meta.url),

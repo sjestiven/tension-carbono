@@ -1,5 +1,13 @@
 # Validation history and current workspace status
 
+## Version 2.2 local research validation on 1 November 2026
+
+Locked installation completed with `npm ci --no-fund --no-audit`. All 56 tests and the production build passed. New checks cover string student codes and legacy compatibility, opt-in boundaries, removal of personal fields, persistent offline retry, acknowledgements during concurrent new events, withdrawal, and separation of an older upload from a new unrecorded game. Embedded PostgreSQL executes the actual migration, verifies private-table permissions, authenticated ingestion, owner isolation, immutable student codes, deduplication, and all supplied analysis queries against a complete four-year replay.
+
+The owner confirmed applying the migration and enabling Anonymous Sign-Ins. Actual Supabase synthetic probes confirmed an accepted write, idempotent acknowledgement, rejection of another owner, and blocked participant reads. Browser checks required all six codes, recorded synthetic decisions with a server-confirmed footer, resumed after reload, locked codes during collection, stopped capture, and started a new unrecorded game without a false saved status. Technical sessions use study `validation`, excluded by the supplied `pilot-2026` analysis filters; no real student identifiers were used.
+
+All eight production files returned HTTP 200 and matched local build bytes under `/tension-carbono/`; HTML asset references remained relative. The compiled site opened in the browser at that repository subdirectory. The existing Three.js chunk still produces Vite's advisory size warning. These checks establish technical operation, not classroom learning outcomes or verified student identity. Public publication evidence is recorded separately after deployment succeeds.
+
 ## Version 2.1 public release on 30 October 2026
 
 Application commit `31d8f5b2cee231f8fef36ed837332d37e840db94` was published by [successful Actions run 41103885684](https://github.com/sjestiven/tension-carbono/actions/runs/41103885684). Locked installation, all 49 tests, the production build, and Pages deployment completed. The live [game](https://sjestiven.github.io/tension-carbono/) returned HTTP 200 for all eight production files, each matching the locally validated build byte for byte.

@@ -1,5 +1,5 @@
 // Motor puro y determinista. Todas las decisiones pasan por applyAction.
-export const VERSION = '2.1.0';
+export const VERSION = '2.2.0';
 export const EMISSIONS_LIMIT = 1400;
 export const COMPANIES = ['A', 'B', 'C'];
 export const FOUNDATIONS = ['F1', 'F2'];
@@ -40,14 +40,17 @@ function draft(year) {
 }
 export function createGame(setup = {}) {
   check(setup && typeof setup === 'object' && !Array.isArray(setup), 'Configuración inválida.');
-  const names = {}, players = {};
+  const names = {}, players = {}, studentCodes = {};
   for (const key of ['team', ...ROLES]) names[key] = text(setup.names?.[key] ?? DEFAULT_NAMES[key], 'Nombre', 60);
   for (const key of ROLES) {
     const name = setup.players?.[key] ?? '';
     check(typeof name === 'string' && name.length <= 60, 'Nombre de participante inválido.');
     players[key] = name.trim();
+    const code = setup.studentCodes?.[key] ?? '';
+    check(typeof code === 'string' && code.trim().length <= 40, 'Código de estudiante inválido: máximo 40 caracteres.');
+    studentCodes[key] = code.trim();
   }
-  return { version: VERSION, setup: { names, players }, history: [], actions: [], seq: 0,
+  return { version: VERSION, setup: { names, players, studentCodes }, history: [], actions: [], seq: 0,
     companies: Object.fromEntries(COMPANIES.map(e => [e, { cash: 5000, income: 0, profit: 0, emissions: 0, credits: 0, solvent: true }])),
     foundations: Object.fromEntries(FOUNDATIONS.map(f => [f, { cash: 1000, capacity: 0, reductions: 0, issued: 0, sold: 0, projects: [] }])),
     treasury: { fund: 0, general: 0, tax: 0, grants: 0, votes: 0, published: true },
@@ -334,7 +337,7 @@ export function exportGame(g) {
   return { schema: 'tension-carbono', version: VERSION, setup: clone(g.setup), actions: clone(g.actions) };
 }
 export function importGame(data) {
-  check(data && data.schema === 'tension-carbono' && [VERSION, '2.0.0'].includes(data.version), 'Formato incompatible. Use una partida JSON de Tensión de Carbono 2.0 o 2.1.');
+  check(data && data.schema === 'tension-carbono' && [VERSION, '2.1.0', '2.0.0'].includes(data.version), 'Formato incompatible. Use una partida JSON de Tensión de Carbono 2.0, 2.1 o 2.2.');
   check(Array.isArray(data.actions) && data.actions.length <= 2000, 'Bitácora inválida o demasiado extensa.');
   let game = createGame(data.setup);
   let terminalState = null;

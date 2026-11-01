@@ -1,6 +1,6 @@
 # Architecture
 
-Tensión de Carbono is a static React application built by Vite. It uses browser storage and downloadable JSON. There is no application backend, remote database, authentication service, or multiplayer transport.
+Tensión de Carbono is a static React application built by Vite. It uses browser storage and downloadable JSON. Optional Supabase research collection adds authenticated write-only ingestion into private tables. Core play remains local and there is no multiplayer transport. Student codes are identifiers, separated from decision events in the private database.
 
 | Location | Responsibility |
 | --- | --- |
@@ -31,3 +31,9 @@ Vite generates `dist/` with relative asset URLs. React and Three.js have separat
 The version 2 engine, current rules, and academic guide define current behavior. `docs/antecedentes/` preserves earlier designs under their existing filenames.
 
 The local guided-flow prototype adds replayable confirmation markers for annual company production, indicative foundation quotes, and foundation market turns. New production confirmations set an engine-enforced annual lock; older logs without the lock preserve their replay behavior. Both quotes precede company proposals and do not reserve stock or buyer capacity. `RoundOverview.jsx` contains the compact economy dashboard and route disclosure. The interface restricts cabin access to the derived current turn; pending offers preempt that turn until the counterpart responds. See `docs/ux-review.md` for compatibility with the older public implementation and the local verification scope.
+
+## Research boundary
+
+`src/research/recorder.js` maintains a project-bound persistent outbox independent of financial actions. `data.js` allowlists event values and projects engine-produced annual summaries. `transport.js` initializes the official Supabase client only for opted-in collection and signs in through technical anonymous Auth before calling the write-only ingestion function. The React context records contextual-help openings without sending free-text labels. Student codes remain strings in setup/export for compatibility and are mandatory in new-game UI. Importing an old game does not activate research collection.
+
+The migration in `supabase/migrations/` creates private, RLS-enabled tables and an authenticated security-definer function with an empty search path and explicit owner checks. There are no participant SELECT grants. `supabase/analysis.sql` is for the owner's SQL Editor, not a public application endpoint. Build configuration rejects non-publishable keys; administrative credentials are never part of browser configuration.

@@ -1,5 +1,13 @@
 # Cambios de la versión 2
 
+## Version 2.2 research collection on 1 November 2026
+
+- Added mandatory student-code fields for all six player roles at new-game confirmation. Codes remain strings and personal exports include them; older 2.0/2.1 exports still import.
+- Added opt-in Supabase recording, private identity/session/event/outcome tables, authenticated write-only ingestion, owner checks, and idempotent snapshots. No participant read grants are provided.
+- Kept economic decisions independent of network availability. Added a persistent, project-bound outbox, upload acknowledgement, reload recovery, and an option to stop future collection.
+- Added private SQL analysis queries and updated teaching guidance. Technical validation uses the separate `validation` study; classroom builds use `pilot-2026`.
+- Added embedded PostgreSQL tests for the real migration and analysis queries, plus privacy, owner-isolation, retry, and identification regressions. Economic rules and scoring formulas are unchanged.
+
 ## Version 2.1 changes on 30 October 2026
 
 - Published commit `31d8f5b2cee231f8fef36ed837332d37e840db94` through successful workflow `41103885684`; all eight live files matched the validated build and 49 tests passed.

@@ -1,16 +1,20 @@
 import { Children, cloneElement, isValidElement, useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { CircleHelp } from 'lucide-react';
+import { useResearch } from '../research/context.jsx';
 
 export function Button({ children, kind = '', className = '', ...props }) {
   return <button className={`btn ${kind} ${className}`} {...props}>{children}</button>;
 }
 
 export function Help({ label, children }) {
+  const research = useResearch();
   const id = useId();
   const button = useRef();
   const timeout = useRef();
   const [position, setPosition] = useState(null);
+  const visible = useRef(false);
+  useEffect(() => { if (position && !visible.current) research?.record('help_opened'); visible.current = !!position; }, [!!position,research]);
   useEffect(() => () => clearTimeout(timeout.current), []);
   function show() {
     clearTimeout(timeout.current);

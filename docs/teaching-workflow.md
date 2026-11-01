@@ -1,6 +1,14 @@
 # Orientación de turnos guiados
 
-Esta orientación complementa el instructivo académico de la versión 2 con las reglas vigentes de la versión 2.1, revisadas el 30 de octubre de 2026. Describe los turnos, la producción anual fija, la comparación de cotizaciones y el final anticipado por emisiones. Conserva los parámetros económicos y las fórmulas de cuentas y puntuación. El juego lo ofrece el Laboratorio de Economía Aplicada.
+Esta orientación complementa el instructivo académico de la versión 2 con las reglas vigentes de la versión 2.2, revisadas el 1 de noviembre de 2026. Describe los turnos, la producción anual fija, la comparación de cotizaciones y el final anticipado por emisiones. Conserva los parámetros económicos y las fórmulas de cuentas y puntuación. El juego lo ofrece el Laboratorio de Economía Aplicada.
+
+## Registro e identificación para la investigación
+
+Al iniciar cada mesa, solicite los seis códigos de estudiante en los campos de los agentes. Son identificaciones: el registro no es anónimo. Explique al equipo el propósito de analizar decisiones e interfaz para mejorar el juego. La casilla de autorización está desmarcada inicialmente y jugar sin enviar datos sigue siendo posible. Los nombres personales no se envían a Supabase. Los códigos quedan separados de los eventos en una tabla privada, vinculados por una sesión aleatoria y el rol.
+
+El pie de página distingue datos pendientes de datos confirmados. Una falla de conexión no impide jugar. El equipo puede detener la captura futura desde ese diálogo; los datos ya enviados requieren gestión del investigador en Supabase. Los códigos quedan fijos durante una sesión registrada para no atribuir decisiones a otra persona. Para otro grupo, reinicie y confirme de nuevo los participantes. Los JSON exportados contienen los códigos y no son archivos públicos.
+
+Las consultas para analizar decisiones, tiempos, producción, precios y resultados están en `supabase/analysis.sql`; se ejecutan desde el SQL Editor del proyecto autorizado. Las pruebas técnicas llevan el estudio `validation` y las consultas de aula usan `pilot-2026`, por lo que no mezclan las pruebas con estudiantes. Una partida sin cierre final no prueba abandono. El tiempo visible de la interfaz no mide atención ni comprensión; combine los registros con observaciones y discusión. Las tasas describen las partidas registradas, no a todos los usuarios del sitio.
 
 ## Preparación y primera decisión
 
