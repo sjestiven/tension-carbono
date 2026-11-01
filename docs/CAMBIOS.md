@@ -2,6 +2,7 @@
 
 ## Version 3.0 combined gameplay revision on 1 November 2026
 
+- Published final commit `86b1c350aae21d5cefdbcadb3776045f4bdfd0fb` through successful workflow `41340482490`. All 69 tests pass and all eight live files match the validated build; public guide consistency was checked after correcting stale bilateral wording.
 - Added after-tax production results and live purchase previews separating expense, tax saving, profit, and immediate/closing cash. All accounting stays in the engine.
 - Added binding batch offers, combined buyer reservations, worst-case subset solvency, seller choice among competing whole offers, automatic empty-sale skipping, and final accepted contracts. Historical 2.x logs retain bilateral cancellation/refund rules.
 - Added policy/production feasibility checks to prevent reliance on uncertain purchases for basic cash solvency. Kept economic parameters and scoring formulas unchanged.

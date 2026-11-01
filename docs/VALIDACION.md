@@ -1,5 +1,13 @@
 # Validation history and current workspace status
 
+## Version 3.0 public release on 1 November 2026
+
+Final application commit `86b1c350aae21d5cefdbcadb3776045f4bdfd0fb` was published by [successful Actions run 41340482490](https://github.com/sjestiven/tension-carbono/actions/runs/41340482490), including locked installation, all 69 tests, production compilation, and deployment. The main implementation commit `eb44e268283cb3fa8ffaac71efc0ec71b90a14e6` had also passed [run 41340119619](https://github.com/sjestiven/tension-carbono/actions/runs/41340119619). Final online review found and corrected a stale guide paragraph before this final verification.
+
+All eight files at the [public game](https://sjestiven.github.io/tension-carbono/) returned HTTP 200 and matched the locally validated `pilot-2026` build byte for byte. Browser verification confirmed the 3.0 guide and expanded the corrected binding-market explanation: buyer cash/capacity reservation, seller acceptance after all submissions, final contracts, rejected-offer release, empty-sale skipping, financial distinctions, and legacy 2.x behavior. No warning/error messages were captured during that check. The home compatibility notice preserves the saved 2.x table and explains starting a fresh game for the new rules. No synthetic `pilot-2026` session was submitted from the public page.
+
+Evidence remains in ignored `.local/validation/version-3-assets.json`, `version-3-guide-public.jpg`, `version-3-production-local.jpg`, and `version-3-purchase-local.jpg`. Temporary narrow viewport overrides were reset. A subsequent documentation-only record does not change the deployed assets.
+
 ## Version 3.0 combined local validation on 1 November 2026
 
 Locked installation completed after stopping the project's development/preview processes, which held esbuild open on Windows. All 69 tests and the production build passed. Thirteen new tests cover tax-inclusive production, exact purchase-preview/settlement parity for prices below/equal/above tax and free credits, competing offers without first-arrival stock reservation, binding and final contracts, combined cash limits, worst-case acceptance-subset solvency, fiscal/production feasibility, automatic empty-sale skipping, old bilateral affordability, version 3 early defeat, full four-year equivalence, and 32 deterministic mixed-market games with replay checks. Embedded PostgreSQL also tests both migrations and complete sessions for both rule versions with private analysis.

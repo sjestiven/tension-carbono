@@ -4,9 +4,9 @@
 
 - Game: https://sjestiven.github.io/tension-carbono/
 - Public repository: https://github.com/sjestiven/tension-carbono
-- Latest application release: `b32e1d0435a0cfd6db74c147224fc28fa6255cb8`, version 2.2.0 (student codes and optional private Supabase research collection).
-- Latest verified application deployment: https://github.com/sjestiven/tension-carbono/actions/runs/41316601930
-- Latest validation: 56 tests and build passed; all eight live files matched the local build; public home and participant registration checked. Real Supabase ingestion and access-isolation checks are recorded in `VALIDACION.md`.
+- Latest application release: `86b1c350aae21d5cefdbcadb3776045f4bdfd0fb`, version 3.0.0 (financial previews, binding batch offers, policy balance, and collective climate accents).
+- Latest verified application deployment: https://github.com/sjestiven/tension-carbono/actions/runs/41340482490
+- Latest validation: 69 tests and build passed, including 32 mixed-game replays; all eight live files matched the local build; public home compatibility and corrected 3.0 guide checked. Real research ingestion, full browser-year checks, and financial/climate evidence are recorded in `VALIDACION.md`.
 - First successful workflow: https://github.com/sjestiven/tension-carbono/actions/runs/40853527263
 - Initial application commit: `973756719f87b8bd31226986c44fb8cbd1136b1b`.
 - Latest public browser and asset verification: 1 November 2026 (America/Bogota).

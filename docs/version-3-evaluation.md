@@ -53,3 +53,5 @@ The owner applied migration `202611010002_batch_market.sql`. It only extends the
 The analysis supports both versions and recognizes implicit rejection by seller finalization. Comparisons should separate game versions and keep timer duration, instructions, and facilitation comparable. Consent, private tables, identity separation, and offline retry are retained. Research is not a tamper-proof grading system; visible interaction time is not a measurement of attention.
 
 See `VALIDACION.md` for final test counts, browser/viewport evidence, and any subsequent public deployment record.
+
+Final publication: commit `86b1c350aae21d5cefdbcadb3776045f4bdfd0fb`, [successful workflow 41340482490](https://github.com/sjestiven/tension-carbono/actions/runs/41340482490). All 69 tests passed and all eight production files matched the actual public build. The online guide was expanded and checked after correcting an older bilateral explanation. The updated [game](https://sjestiven.github.io/tension-carbono/) keeps existing 2.x tables under their original rules; refresh and start a new table to test version 3.
