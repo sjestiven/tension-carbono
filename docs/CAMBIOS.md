@@ -2,6 +2,7 @@
 
 ## Version 2.2 research collection on 1 November 2026
 
+- Published application commit `b32e1d0435a0cfd6db74c147224fc28fa6255cb8` through successful workflow `41316601930`. All eight public files match the validated build; all 56 tests pass.
 - Added mandatory student-code fields for all six player roles at new-game confirmation. Codes remain strings and personal exports include them; older 2.0/2.1 exports still import.
 - Added opt-in Supabase recording, private identity/session/event/outcome tables, authenticated write-only ingestion, owner checks, and idempotent snapshots. No participant read grants are provided.
 - Kept economic decisions independent of network availability. Added a persistent, project-bound outbox, upload acknowledgement, reload recovery, and an option to stop future collection.

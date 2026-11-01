@@ -4,12 +4,12 @@
 
 - Game: https://sjestiven.github.io/tension-carbono/
 - Public repository: https://github.com/sjestiven/tension-carbono
-- Latest application release: `31d8f5b2cee231f8fef36ed837332d37e840db94`, version 2.1.0 (home on load/restart, terminal climate defeat, and selectable 12/8/4-minute timers).
-- Latest verified application deployment: https://github.com/sjestiven/tension-carbono/actions/runs/41103885684
-- Latest validation: 49 tests and build passed; all eight live files matched the local build; public home and all timer durations checked. Local restart and early-defeat checks are recorded in `VALIDACION.md`.
+- Latest application release: `b32e1d0435a0cfd6db74c147224fc28fa6255cb8`, version 2.2.0 (student codes and optional private Supabase research collection).
+- Latest verified application deployment: https://github.com/sjestiven/tension-carbono/actions/runs/41316601930
+- Latest validation: 56 tests and build passed; all eight live files matched the local build; public home and participant registration checked. Real Supabase ingestion and access-isolation checks are recorded in `VALIDACION.md`.
 - First successful workflow: https://github.com/sjestiven/tension-carbono/actions/runs/40853527263
 - Initial application commit: `973756719f87b8bd31226986c44fb8cbd1136b1b`.
-- Public browser and asset verification: 29 October 2026 (America/Bogota).
+- Latest public browser and asset verification: 1 November 2026 (America/Bogota).
 
 Pages is configured to use GitHub Actions with HTTPS enforced. `origin` points to the public repository and local `main` tracks `origin/main`. Commit attribution uses the account's GitHub noreply address, as requested, without changing global Git identity or account privacy settings.
 
@@ -49,6 +49,8 @@ Replace `<intended-paths>` with the actual files to include. Use the configured 
 5. Wait for both `build` and `deploy` to succeed. Open the URL reported by the `github-pages` environment.
 
 The workflow installs with `npm ci`, runs `npm run check`, configures Pages, uploads `dist/`, and deploys the artifact. Only deployment receives Pages write and OIDC token permissions. Pull requests and other branch pushes run `ci.yml` without deployment.
+
+Optional research collection reads public Actions variables `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, and `RESEARCH_STUDY` during the build. Without valid configuration, research collection is disabled and the game remains playable. Configure the private database separately as described in [research setup](research-setup.md). Never place administrative Supabase credentials in Actions build variables or frontend assets.
 
 Keep `dist/` and `node_modules/` out of Git. Pages must serve the compiled artifact, not uncompiled React source from root or `docs/`. Local archives and reference PDFs are ignored.
 

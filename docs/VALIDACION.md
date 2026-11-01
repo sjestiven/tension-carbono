@@ -1,5 +1,11 @@
 # Validation history and current workspace status
 
+## Version 2.2 public release on 1 November 2026
+
+Application commit `b32e1d0435a0cfd6db74c147224fc28fa6255cb8` was published by [successful Actions run 41316601930](https://github.com/sjestiven/tension-carbono/actions/runs/41316601930). Locked installation, all 56 tests, the production build, and Pages deployment succeeded. All eight live files at the [public game](https://sjestiven.github.io/tension-carbono/) returned HTTP 200 and matched the locally validated `pilot-2026` build byte for byte.
+
+The actual public browser opened at home, displayed the six required student-code inputs and unchecked research authorization, and captured no warning/error messages during this check. The final client transport also received an actual Supabase acknowledgement in the local `validation` study before publication. No synthetic classroom-study session was submitted from the public page. Evidence remains in ignored `.local/validation/research-registration-public.jpg` and `version-2.2-assets.json`. Public configuration contains only the project URL, publishable key, and study label; private administrative access remains outside the game. A subsequent documentation-only record does not change application assets.
+
 ## Version 2.2 local research validation on 1 November 2026
 
 Locked installation completed with `npm ci --no-fund --no-audit`. All 56 tests and the production build passed. New checks cover string student codes and legacy compatibility, opt-in boundaries, removal of personal fields, persistent offline retry, acknowledgements during concurrent new events, withdrawal, and separation of an older upload from a new unrecorded game. Embedded PostgreSQL executes the actual migration, verifies private-table permissions, authenticated ingestion, owner isolation, immutable student codes, deduplication, and all supplied analysis queries against a complete four-year replay.
