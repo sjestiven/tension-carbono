@@ -2,10 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { PGlite } from '@electric-sql/pglite';
-import { createGame, applyAction, ROLES } from '../src/engine.js';
+import { createGame as createCurrentGame, applyAction, ROLES } from '../src/engine.js';
 import { ResearchRecorder } from '../src/research/recorder.js';
 import { actionData } from '../src/research/data.js';
-import { playTemplate } from '../src/demo.js';
+import { playTemplate as playCurrentTemplate } from '../src/demo.js';
+const createGame = setup => createCurrentGame(setup,'2.2.0');
+const playTemplate = (rounds,setup) => playCurrentTemplate(rounds,setup,'2.2.0');
 
 const codes=Object.fromEntries(ROLES.map((role,index)=>[role,`TEST-00${index}`]));
 const setup={studentCodes:codes,names:{team:'PRIVATE TEAM'},players:{A:'PRIVATE NAME'}};
@@ -76,6 +78,9 @@ test('The database blocks public reads, unauthenticated writes, identity changes
   try {
     await db.exec("create role anon;create role authenticated;create schema auth;create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;");
     await db.exec(readFileSync(new URL('../supabase/migrations/202611010001_research.sql',import.meta.url),'utf8'));
+    await db.exec(readFileSync(new URL('../supabase/migrations/202611010002_batch_market.sql',import.meta.url),'utf8'));
+    assert.equal((await db.query("select research.valid_event_data('engine_action','submitBids','{}') as valid")).rows[0].valid,true);
+    assert.equal((await db.query("select research.valid_event_data('engine_action','finishSales','{}') as valid")).rows[0].valid,true);
     const tracker=recorder(); tracker.begin(createGame(setup),12);
     const payload=tracker.active().payload;
     const args=body=>[body.p_session,body.p_codes,body.p_events,body.p_rounds].map(JSON.stringify);
@@ -109,5 +114,13 @@ test('The database blocks public reads, unauthenticated writes, identity changes
     const contracts=analyses.at(-1).rows;
     assert.equal(contracts.length,game.history.reduce((sum,round)=>sum+round.contracts.length,0));
     assert.ok(contracts.every(contract=>contract.accepted&&!contract.cancelled_or_rejected));
+    const batchTracker=recorder();let batch=createCurrentGame(setup);batchTracker.begin(batch,8);
+    for(const action of playCurrentTemplate().actions){const next=applyAction(batch,action);batchTracker.applied(batch,next,[action]);batch=next;}
+    const batchPayload=batchTracker.state.sessions[0].payload;
+    await db.exec('set role authenticated');
+    assert.equal((await rpc(batchPayload)).rows[0].revision,batchPayload.p_events.length);
+    await db.exec('reset role');
+    const combined=await db.exec(readFileSync(new URL('../supabase/analysis.sql',import.meta.url),'utf8').replaceAll("'pilot-2026'","'validation'"));
+    assert.equal(combined.at(-1).rows.filter(row=>row.session_id===batchPayload.p_session.id).length,batch.history.reduce((total,round)=>total+round.contracts.length,0));
   } finally {await db.close();}
 });

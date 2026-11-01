@@ -111,6 +111,39 @@
 
 .turn-banner { scroll-margin-top:64px; }
 
+/* Climate consumption changes the setting while decision surfaces stay readable. */
+.app { --climate-accent:#426748; --climate-setting:#f7f9f2; --climate-leaf:#5d845b; --climate-land:#b5c69e; background:var(--climate-setting); min-height:100vh; transition:background-color .7s ease; }
+.app[data-climate=ochre] { --climate-accent:#825d1a; --climate-setting:#faf5e9; --climate-leaf:#a77a35; --climate-land:#c7bb8d; }
+.app[data-climate=terracotta] { --climate-accent:#9b482d; --climate-setting:#fbefe8; --climate-leaf:#b05d39; --climate-land:#cead8b; }
+.app[data-climate=red],.app[data-climate=defeat] { --climate-accent:#a03532; --climate-setting:#f9e9e5; --climate-leaf:#b34d39; --climate-land:#caa18a; }
+.app[data-climate=defeat] { --climate-accent:#812923; --climate-setting:#f3e0db; }
+.climate-budget { grid-column:1; grid-row:2; display:flex; flex-wrap:wrap; align-items:center; gap:5px 12px; font-size:11px; color:var(--climate-accent); }
+.climate-budget progress { width:78px; height:6px; accent-color:var(--climate-accent); flex-shrink:0; }
+.round-dashboard { row-gap:7px; }
+.round-toolbar { grid-column:2; grid-row:1 / span 2; }
+.financial-preview,.policy-balance,.commitment-confirmation { margin:18px 0; padding:16px 18px; border:1px solid #d4dfcb; border-radius:9px; background:#f5f8ef; }
+.financial-preview h3,.financial-preview h4,.policy-balance h3,.commitment-confirmation h3 { margin:0 0 10px; font-size:16px; }
+.financial-preview p,.policy-balance p,.policy-balance li { font-size:12px; line-height:1.6; }
+.financial-preview .mini-grid { margin-bottom:0; grid-template-columns:repeat(3,minmax(0,1fr)); }
+.production-facts { font-size:12px!important; line-height:1.7; }
+.financial-preview .ledger dd { overflow-wrap:anywhere; }
+.financial-warning { border-color:#b96d45; background:#fcf1e8; }
+.policy-balance details { margin-top:10px; }
+.policy-balance summary { cursor:pointer; font-size:12px; color:#36583f; }
+.policy-balance ul { padding-left:19px; }
+.commitment-confirmation { border-color:#c49047; background:#fff5df; }
+.bid-list { margin:24px 0 18px; }
+@media(max-width:1000px) {
+ .round-toolbar { grid-column:1; grid-row:3; }
+}
+@media(max-width:480px) {
+ .financial-preview .mini-grid { grid-template-columns:1fr; }
+ .financial-preview,.policy-balance,.commitment-confirmation { padding:12px; }
+ .financial-preview .ledger>div { align-items:flex-start; gap:12px; }
+ .financial-preview .ledger dt { max-width:64%; }
+}
+@media(prefers-reduced-motion:reduce) { .app { transition:none; } }
+
 /* Compact round dashboard and comparable seller quotations. */
 /* Keep the annual context secondary to the active decision. */
 .round-dashboard { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:16px; align-items:center; padding:11px 14px; margin-bottom:14px; background:#fffefa; border:1px solid var(--line); border-radius:10px; scroll-margin-top:16px; }

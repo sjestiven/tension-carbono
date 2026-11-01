@@ -1,4 +1,4 @@
-import { COMPANIES, FOUNDATIONS, PROJECTS, companyView, projectDetails, isGameOver } from './engine.js';
+import { COMPANIES, FOUNDATIONS, PROJECTS, companyView, projectDetails, isGameOver, isBatchMarket, batchMarketTurn } from './engine.js';
 
 export function roleName(game, role) {
   return role === 'Docente' ? 'Mesa docente' : game.setup.names[role];
@@ -32,6 +32,10 @@ export function currentTurn(game) {
   }
   if (d.phase === 'verification') return { role: 'Docente', kind: 'verify', title: 'Verificar los lotes y abrir el mercado', next: foundationOrder(game)[0] };
   if (d.phase === 'market') {
+    if (isBatchMarket(game)) {
+      const turn=batchMarketTurn(game);
+      return {...turn,title:turn.kind==='quote'?'Presentar una cotización':turn.kind==='bids'?'Preparar y confirmar ofertas':turn.kind==='sales'?'Comparar ofertas y decidir ventas':'Cerrar el año'};
+    }
     const owner = marketOwner(game);
     const pending = d.contracts.find(contract => contract.status === 'pending');
     if (pending) return { role: pending.proposer === pending.company ? pending.foundation : pending.company, kind: 'reply', title: 'Responder una propuesta', next: owner.role, contract: pending };

@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Check, Factory, GraduationCap, Landmark, LockKeyhole, ShieldCheck, Trees, X } from 'lucide-react';
-import { COMPANIES, FOUNDATIONS, INTENSITY, PROJECTS, PRODUCTION, available, companyView, lot, previewRound, projectDetails, remaining } from '../engine.js';
+import { COMPANIES, FOUNDATIONS, INTENSITY, PROJECTS, PRODUCTION, available, companyView, purchasePreview, policyIssues, isBatchMarket, lot, previewRound, projectDetails, remaining } from '../engine.js';
 import { closingIssues, currentTurn, foundationOrder, projectIssues, projectOptionIssue, roleName } from '../workflow.js';
 import { Button, Field, Help, Stat } from './ui.jsx';
 
 import RoundOverview from './RoundOverview.jsx';
+import PolicyBalance from './PolicyBalance.jsx';
+import { Bidding, Sales, FinancialPreview } from './MarketDecisions.jsx';
 const number = value => new Intl.NumberFormat('es-CO', { maximumFractionDigits: 2 }).format(value);
 const money = value => `USD ${number(value)}`;
 export const GUIDE_ORDER = 'Estado → Empresa A → Empresa B → Empresa C → Fundación 1 → Fundación 2 → Estado → Mesa docente';
@@ -29,19 +31,22 @@ function Production({ game, role, send }) {
     <div className="production-options">{Object.entries(PRODUCTION).map(([quantity, option]) => <button type="button" key={quantity} disabled={view.credits > Math.floor(+quantity * INTENSITY[role] * .5)} aria-pressed={view.production === +quantity} className={view.production === +quantity ? 'selected' : ''} onClick={() => send({ type: 'production', actor: role, quantity: +quantity })}><strong>{quantity} t</strong><small>{option.label}</small></button>)}</div>
     {view.credits > Math.floor(100 * INTENSITY[role] * .5) && <p className="muted small">Los niveles deshabilitados dejarían tus créditos por encima del 50 % permitido. Anula los contratos correspondientes si necesitas bajar a esos niveles.</p>}
     <p className="selection-status" role="status"><Check size={15}/>Selección actual: {view.production} t. Al confirmar queda fija hasta el próximo año.</p>
-    <div className="mini-grid"><Stat label="Ingresos previstos" value={money(view.income)}/><Stat label="Costo de producción" value={money(view.cost)}/><Stat label="Emisiones propias" value={`${number(view.emissions)} tCO₂e`}/><Stat label="Máximo de créditos" value={Math.floor(view.emissions * .5)}/></div>
+    <p className="production-facts">Ingresos: <strong>{money(view.income)}</strong> · Producción: <strong>{money(view.cost)}</strong> · Emisiones propias: <strong>{number(view.emissions)} tCO₂e</strong> · Máximo de créditos: <strong>{Math.floor(view.emissions*.5)}</strong></p>
+    <section className={`financial-preview ${view.profit<0?'financial-warning':''}`} aria-label="Resultado esperado de producción" aria-live="polite"><h3>Resultado esperado después de impuestos</h3><div className="mini-grid"><Stat label="Impuesto esperado sin nuevas compras" value={money(view.tax)}/><Stat label="Utilidad esperada después de impuestos" value={money(view.profit)}/><Stat label="Caja prevista al cierre" value={money(view.closingCash)}/></div><p>Utilidad = ingresos − producción − compra de créditos − impuesto. Esta previsión no supone compras futuras. La caja inicial no forma parte de la utilidad.</p>{view.profit<0&&<p className="notice-text">Este nivel genera una pérdida prevista. Revisa si tu caja puede cubrirla; elige otro nivel antes de confirmar si la caja al cierre sería negativa.</p>}</section>
   </>;
 }
 
 function Policy({ game, turn, send }) {
   const [tax, setTax] = useState(game.draft.tax);
   const [subsidy, setSubsidy] = useState(game.treasury.fund > 0 ? game.draft.subsidy : 0);
+  const issues=policyIssues(game,+tax);
   return <form onSubmit={event => { event.preventDefault(); send([{ type: 'policy', actor: 'Estado', tax: +tax, subsidy: +subsidy }, { type: 'publish', actor: 'Estado' }]); }}>
+    <PolicyBalance game={game}/>
     <p>Define la política del año. Al publicarla se guarda y continúa la Empresa A.</p>
     <Field label="Impuesto por tCO₂e" help="Tarifa entera entre USD 20 y 40." details="Es el valor del impuesto por cada tonelada de emisiones que la empresa no compensa con créditos. La misma tarifa se aplica a las tres empresas y queda fija durante el año."><input type="number" required min={20} max={40} step={1} value={tax} onChange={event => setTax(event.target.value)}/></Field>
     <Field label="Cofinanciación pública (%)" details="Es la parte del costo de cada proyecto nuevo que paga el Estado. Cofinanciación y apoyo público significan lo mismo. Por ejemplo, un 50 % en un proyecto de USD 600 equivale a USD 300 públicos y USD 300 de la fundación. Se aplica por igual a ambas fundaciones y solo utiliza el fondo disponible."><input type="number" required min={0} max={50} step={1} disabled={!game.treasury.fund} value={subsidy} onChange={event => setSubsidy(event.target.value)}/></Field>
     <p className="notice-text">Fondo disponible: <strong>{money(game.treasury.fund)}</strong>. {!game.treasury.fund ? 'Sin fondo, la cofinanciación es 0 % este año. Las fundaciones comienzan con recursos propios.' : 'El porcentaje se define una sola vez. Después firmarás los convenios correspondientes.'}</p>
-    <Continue game={game} turn={turn}>Publicar política y continuar con {roleName(game, 'A')}</Continue>
+    <Issues issues={issues}/><Continue game={game} turn={turn} disabled={Boolean(issues.length)}>Publicar política y continuar con {roleName(game, 'A')}</Continue>
   </form>;
 }
 
@@ -99,38 +104,41 @@ function Quotes({ game, turn, send }) {
   </>;
 }
 
-function QuoteComparison({game}) {
-  return <section className="quote-comparison" aria-label="Comparar fundaciones"><h3>Compara las dos fundaciones</h3><p>Inventarios independientes. Las cotizaciones no reservan capacidad de compra; un contrato bilateral sí la reserva.</p><div className="quote-grid">{foundationOrder(game).map(foundation=><article className="quote-card" key={foundation}><h4>{roleName(game,foundation)}</h4><strong>{game.draft.quotes[foundation]?`${money(game.draft.quotes[foundation].price)} / crédito`:'Sin cotización publicada'}</strong><dl><div><dt>Lote verificado</dt><dd>{lot(game,foundation)}</dd></div><div><dt>Disponible</dt><dd>{available(game,foundation)}</dd></div></dl></article>)}</div></section>;
+export function QuoteComparison({game}) {
+  return <section className="quote-comparison" aria-label="Comparar fundaciones"><h3>Compara las dos fundaciones</h3><p>{isBatchMarket(game)?'Inventarios independientes. Las ofertas reservan caja y capacidad de la empresa; las fundaciones conservan su inventario hasta aceptar ventas.':'Inventarios independientes. Las cotizaciones no reservan capacidad de compra; un contrato bilateral sí la reserva.'}</p><div className="quote-grid">{foundationOrder(game).map(foundation=><article className="quote-card" key={foundation}><h4>{roleName(game,foundation)}</h4><strong>{game.draft.quotes[foundation]?`${money(game.draft.quotes[foundation].price)} / crédito`:'Sin cotización publicada'}</strong><dl><div><dt>Lote verificado</dt><dd>{lot(game,foundation)}</dd></div><div><dt>Disponible</dt><dd>{available(game,foundation)}</dd></div></dl></article>)}</div></section>;
 }
 
-function TradeForm({ game, role, send }) {
+export function TradeForm({ game, role, send }) {
   const [other,setOther]=useState('');
   const [quantity,setQuantity]=useState(1);
   const [price,setPrice]=useState(18);
-  const maximum=other?Math.max(0,Math.min(available(game,other),remaining(game,role))):0;
-  return <form className="trade-form" onSubmit={event=>{event.preventDefault();send({type:'propose',actor:role,company:role,foundation:other,quantity:+quantity,price:+price});}}>
-    <h3>Proponer una compra</h3>
-    <Field label="Fundación vendedora" details="Elige después de comparar ambas cotizaciones. Ninguna fundación está preseleccionada. La vendedora recibirá el contrato para aceptarlo o rechazarlo; después retomarás tu turno."><select required value={other} onChange={event=>{setOther(event.target.value);setPrice(game.draft.quotes[event.target.value]?.price ?? 18);}}><option value="">Selecciona una fundación</option>{foundationOrder(game).map(foundation=><option key={foundation} value={foundation}>{roleName(game,foundation)}</option>)}</select></Field>
-    <div className="form-two"><Field label="Cantidad de créditos" details="Cada crédito representa una tCO₂e verificada. Solo puedes reservar el inventario de la fundación elegida y hasta el 50 % de tus emisiones confirmadas."><input type="number" required min={1} max={Math.max(1,maximum)} step={1} value={quantity} onChange={event=>setQuantity(event.target.value)}/></Field><Field label="Precio unitario USD" details="El valor puede negociarse a partir de la cotización. Las flechas avanzan USD 0,50 y el pago se realiza al aceptar el contrato."><input type="number" required min={0} max={10000} step="0.5" value={price} onChange={event=>setPrice(event.target.value)}/></Field></div>
+  const preview=purchasePreview(game,role,{foundation:other,quantity:quantity===''?null:+quantity,price:price===''?null:+price});
+  const maximum=preview.maximum;
+  const batch=isBatchMarket(game);
+  return <form className="trade-form" onSubmit={event=>{event.preventDefault();if(preview.valid){const saved=send({type:'propose',actor:role,company:role,foundation:other,quantity:+quantity,price:+price});if(saved&&batch){setOther('');setQuantity(1);setPrice(18);}}}}>
+    <h3>{batch?'Preparar una oferta de compra':'Proponer una compra'}</h3>
+    <Field label="Fundación vendedora" details={batch?'Elige a qué fundación diriges este borrador. Las fundaciones decidirán después de que las tres empresas confirmen sus ofertas.':'Elige después de comparar ambas cotizaciones. La vendedora recibirá la propuesta para aceptarla o rechazarla.'}><select required value={other} onChange={event=>{setOther(event.target.value);setPrice(game.draft.quotes[event.target.value]?.price ?? 18);}}><option value="">Selecciona una fundación</option>{foundationOrder(game).map(foundation=><option key={foundation} value={foundation}>{roleName(game,foundation)}</option>)}</select></Field>
+    <div className="form-two"><Field label="Cantidad de créditos" details={batch?'Cada crédito representa una tCO₂e verificada. Tus ofertas combinadas no pueden superar el 50 % de tus emisiones, la caja disponible ni la solvencia al cierre. La fundación compara todas las ofertas antes de asignar inventario.':'Cada crédito representa una tCO₂e verificada. La propuesta reserva inventario y capacidad de compensación.'}><input type="number" required min={1} max={Math.max(1,maximum)} step={1} value={quantity} onChange={event=>setQuantity(event.target.value)}/></Field><Field label="Precio unitario USD" details="El valor puede negociarse a partir de la cotización. Las flechas avanzan USD 0,50 y el pago se realiza al aceptar el contrato."><input type="number" required min={0} max={10000} step="0.5" value={price} onChange={event=>setPrice(event.target.value)}/></Field></div>
     <div className="trade-total"><span>Valor total</span><strong>{money((+quantity||0)*(+price||0))}</strong></div><p className="muted">{other?`Disponibles para este acuerdo: ${maximum}.`:'Compara las dos ofertas y elige una fundación.'}</p>
-    <Button className="full" kind="secondary" disabled={!other||!maximum}>Enviar propuesta a {other?roleName(game,other):'la fundación'}<ArrowRight size={16}/></Button>
+    {other&&<><FinancialPreview preview={preview} batch={batch}/><Issues issues={preview.issues}/></>}
+    <Button className="full" kind="secondary" disabled={!preview.valid}>{batch?'Agregar borrador para':'Enviar propuesta a'} {other?roleName(game,other):'la fundación'}<ArrowRight size={16}/></Button>
   </form>;
 }
 
 function Reply({ game, turn, send }) {
   const contract = turn.contract;
   const total = Math.round(contract.quantity * contract.price * 100) / 100;
-  const view = companyView(game, contract.company);
-  const cannotPay = game.companies[contract.company].cash < total || view.closingCash < total;
+  const preview=purchasePreview(game,contract.company,{foundation:contract.foundation,quantity:contract.quantity,price:contract.price,contractId:contract.id});
+  const cannotPay = !preview.valid;
   return <><p><strong>{roleName(game, contract.proposer)}</strong> te propone este acuerdo. Respóndelo para retomar el turno de {roleName(game, turn.next)}.</p><dl className="ledger"><div><dt>Comprador</dt><dd>{roleName(game, contract.company)}</dd></div><div><dt>Vendedor</dt><dd>{roleName(game, contract.foundation)}</dd></div><div><dt>Cantidad</dt><dd>{contract.quantity} créditos</dd></div><div><dt>Precio por crédito</dt><dd>{money(contract.price)}</dd></div><div><dt>Pago total</dt><dd>{money(total)}</dd></div></dl><p className="muted">Aceptar transfiere el pago al contado. Rechazar libera la cantidad reservada.</p>{cannotPay && <Issues issues={['El comprador no puede cubrir este pago sin quedar con caja negativa. Rechaza la propuesta y renegocien cantidad o precio.']}/>}
-    <Button kind="primary full" disabled={cannotPay} onClick={() => send({ type: 'accept', actor: turn.role, id: contract.id })}>Aceptar y volver al turno de {roleName(game, turn.next)}<Check size={17}/></Button><Button className="full" onClick={() => send({ type: 'cancel', actor: turn.role, id: contract.id })}>Rechazar y volver<X size={17}/></Button>
+    <FinancialPreview preview={preview}/><Button kind="primary full" disabled={cannotPay} onClick={() => send({ type: 'accept', actor: turn.role, id: contract.id })}>Aceptar y volver al turno de {roleName(game, turn.next)}<Check size={17}/></Button><Button className="full" onClick={() => send({ type: 'cancel', actor: turn.role, id: contract.id })}>Rechazar y volver<X size={17}/></Button>
   </>;
 }
 
-function AcceptedContracts({game,role,send}) {
+export function AcceptedContracts({game,role,send}) {
   const contracts=game.draft.contracts.filter(contract=>(contract.company===role||contract.foundation===role)&&contract.status==='accepted');
   if(!contracts.length)return null;
-  return <section className="contracts"><h3>Acuerdos aceptados</h3>{contracts.map(contract=><div className="contract" key={contract.id}><strong>{contract.quantity} créditos · {money(contract.price)} c/u</strong><p>{roleName(game,contract.company===role?contract.foundation:contract.company)} · pago {money(contract.quantity*contract.price)}</p><Button onClick={()=>send({type:'cancel',actor:role,id:contract.id})}>Anular y devolver el pago</Button></div>)}</section>;
+  return <section className="contracts"><h3>Acuerdos aceptados</h3>{contracts.map(contract=><div className="contract" key={contract.id}><strong>{contract.quantity} créditos · {money(contract.price)} c/u</strong><p>{roleName(game,contract.company===role?contract.foundation:contract.company)} · pago {money(contract.quantity*contract.price)}</p><>{isBatchMarket(game)?<small>Contrato definitivo · pago registrado</small>:<Button onClick={()=>send({type:'cancel',actor:role,id:contract.id})}>Anular y devolver el pago</Button>}</></div>)}</section>;
 }
 
 function Trading({ game, turn, send }) {
@@ -146,7 +154,7 @@ function Trading({ game, turn, send }) {
 function Close({ game, send }) {
   const issues = closingIssues(game);
   const result = previewRound(game);
-  return <><p>Las tres empresas confirmaron sus decisiones. Revisa el resumen y cierra el año para liquidar producción, impuestos y créditos.</p><div className="mini-grid"><Stat label="Emisión física anual" value={`${number(result.emissions)} tCO₂e`}/><Stat label="Recaudo anual" value={money(result.tax)}/></div><Issues issues={issues}/><Button kind="primary full" disabled={Boolean(issues.length)} onClick={() => send({ type: 'close', actor: 'Docente' })}>Cerrar año {game.draft.year} y ver resultados<ShieldCheck size={17}/></Button><details className="correction-options"><summary>Hace falta renegociar antes del cierre</summary><p>Reabre las cotizaciones y los contratos. Los acuerdos se conservan hasta que una parte los anule; las empresas vuelven a confirmar. La producción permanece fija.</p><Button onClick={() => send({ type: 'reopenNegotiation', actor: 'Docente' })}>Reabrir negociación</Button></details></>;
+  return <><p>Las tres empresas confirmaron sus decisiones. Revisa el resumen y cierra el año para liquidar producción, impuestos y créditos.</p><div className="mini-grid"><Stat label="Emisión física anual" value={`${number(result.emissions)} tCO₂e`}/><Stat label="Recaudo anual" value={money(result.tax)}/></div><Issues issues={issues}/><Button kind="primary full" disabled={Boolean(issues.length)} onClick={() => send({ type: 'close', actor: 'Docente' })}>Cerrar año {game.draft.year} y ver resultados<ShieldCheck size={17}/></Button>{!isBatchMarket(game)&&<details className="correction-options"><summary>Hace falta renegociar antes del cierre</summary><p>Reabre las cotizaciones y los contratos. Los acuerdos se conservan hasta que una parte los anule; las empresas vuelven a confirmar. La producción permanece fija.</p><Button onClick={() => send({ type: 'reopenNegotiation', actor: 'Docente' })}>Reabrir negociación</Button></details>}</>;
 }
 
 export default function GuidedRound({ game, role, choose, send, hide, onResults }) {
@@ -163,7 +171,7 @@ export default function GuidedRound({ game, role, choose, send, hide, onResults 
     <section className="turn-banner" aria-label="Turno actual"><div><span className="eyebrow">{turn.kind === 'finished' ? 'Partida finalizada' : `Año ${d.year} de 4 · turno actual`}</span><h1><RoleIcon role={turn.role} size={25}/>{roleName(game, turn.role)}</h1><p>{turn.title}. {turn.next && <span>Después continúa: <strong>{nextLabel}</strong>.</span>}</p></div>{!active && <Button kind="primary" onClick={() => choose(turn.role)}>Continuar con {roleName(game, turn.role)}<ArrowRight size={18}/></Button>}</section>
     <div className="guided-layout"><section className="private-panel guided-panel" aria-label="Cabina del participante"><div className="panel-title"><div><span className="eyebrow">{active ? turn.kind === 'reply' ? 'Respuesta de la contraparte' : 'Decisión del turno' : 'Siguiente paso'}</span><h2>{turn.title}</h2></div>{active && <button className="icon-btn" aria-label="Ocultar cabina y pasar" onClick={hide}><LockKeyhole size={19}/></button>}</div>
       {!active ? <div className="guided-locked"><RoleIcon role={turn.role} size={32}/><h3>Es el turno de {roleName(game, turn.role)}</h3><p>Usa «Continuar con {roleName(game, turn.role)}» en el encabezado. Registra la decisión y confirma para pasar al siguiente participante.</p></div> : <div className="panel-body" key={`${d.year}-${turn.kind}-${turn.role}-${turn.contract?.id || ''}`}>
-        {turn.kind === 'policy' ? <Policy {...{game, turn, send}}/> : turn.kind === 'production' ? <><Production game={game} role={turn.role} send={send}/><p>Revisa la selección antes de confirmar: será tu producción definitiva de este año. Los contratos sí podrán renegociarse.</p><Continue game={game} turn={turn} onClick={() => send({ type: 'confirmProduction', actor: turn.role, lock: true })}>Confirmar {d.production[turn.role]} t y continuar con {nextLabel}</Continue></> : turn.kind === 'projects' ? <Projects {...{game, turn, send}}/> : turn.kind === 'grants' ? <Grants {...{game, turn, send}}/> : turn.kind === 'execute' ? <Execute {...{game, send}}/> : turn.kind === 'verify' ? <Verify {...{game, send}}/> : turn.kind === 'reply' ? <Reply {...{game, turn, send}}/> : turn.kind === 'quote' ? <Quotes {...{game, turn, send}}/> : turn.kind === 'trade' ? <Trading {...{game, turn, send}}/> : turn.kind === 'close' ? <Close {...{game, send}}/> : <><p>Año {d.year} cerrado. Emisiones acumuladas: <strong>{number(game.emissions)} de 1.400 tCO₂e</strong>. Revisa las cuentas antes de continuar.</p><Button kind="primary" className="full" onClick={onResults}>{turn.kind==='finished'?'Ver resultados finales':'Ver resultados del año'}</Button>{turn.kind === 'next' && <Button kind="primary full" onClick={() => send({ type: 'next', actor: 'Docente' })}>Empezar año {d.year + 1} y continuar con el Estado<ArrowRight size={17}/></Button>}{turn.kind === 'finished' && <p>La partida terminó. La sección Resultados muestra el desenlace y los puntos acumulados de los seis roles.</p>}</>}
+        {turn.kind === 'policy' ? <Policy {...{game, turn, send}}/> : turn.kind === 'production' ? <><Production game={game} role={turn.role} send={send}/><p>Revisa la selección antes de confirmar: será tu producción definitiva de este año. {isBatchMarket(game)?'Las ofertas podrán revisarse antes de confirmarlas; los contratos aceptados serán definitivos.':'Los contratos sí podrán renegociarse.'}</p><Continue game={game} turn={turn} disabled={isBatchMarket(game)&&companyView(game,turn.role).closingCash<0} onClick={() => send({ type: 'confirmProduction', actor: turn.role, lock: true })}>Confirmar {d.production[turn.role]} t y continuar con {nextLabel}</Continue></> : turn.kind === 'projects' ? <Projects {...{game, turn, send}}/> : turn.kind === 'grants' ? <Grants {...{game, turn, send}}/> : turn.kind === 'execute' ? <Execute {...{game, send}}/> : turn.kind === 'verify' ? <Verify {...{game, send}}/> : turn.kind === 'bids' ? <Bidding {...{game,turn,send}}><QuoteComparison game={game}/><TradeForm game={game} role={turn.role} send={send}/></Bidding> : turn.kind === 'sales' ? <Sales {...{game,turn,send}}><AcceptedContracts game={game} role={turn.role} send={send}/></Sales> : turn.kind === 'reply' ? <Reply {...{game, turn, send}}/> : turn.kind === 'quote' ? <Quotes {...{game, turn, send}}/> : turn.kind === 'trade' ? <Trading {...{game, turn, send}}/> : turn.kind === 'close' ? <Close {...{game, send}}/> : <><p>Año {d.year} cerrado. Emisiones acumuladas: <strong>{number(game.emissions)} de 1.400 tCO₂e</strong>. Revisa las cuentas antes de continuar.</p><Button kind="primary" className="full" onClick={onResults}>{turn.kind==='finished'?'Ver resultados finales':'Ver resultados del año'}</Button>{turn.kind === 'next' && <Button kind="primary full" onClick={() => send({ type: 'next', actor: 'Docente' })}>Empezar año {d.year + 1} y continuar con el Estado<ArrowRight size={17}/></Button>}{turn.kind === 'finished' && <p>La partida terminó. La sección Resultados muestra el desenlace y los puntos acumulados de los seis roles.</p>}</>}
       </div>}
     </section></div>
   </>;

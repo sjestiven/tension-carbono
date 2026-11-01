@@ -1,5 +1,14 @@
 # Cambios de la versión 2
 
+## Version 3.0 combined gameplay revision on 1 November 2026
+
+- Added after-tax production results and live purchase previews separating expense, tax saving, profit, and immediate/closing cash. All accounting stays in the engine.
+- Added binding batch offers, combined buyer reservations, worst-case subset solvency, seller choice among competing whole offers, automatic empty-sale skipping, and final accepted contracts. Historical 2.x logs retain bilateral cancellation/refund rules.
+- Added policy/production feasibility checks to prevent reliance on uncertain purchases for basic cash solvency. Kept economic parameters and scoring formulas unchanged.
+- Replaced expanded automatic rating cards with a compact policy balance and optional evidence. Added autumn accents, a confirmed collective budget indicator, and distinctly provisional forecasts.
+- Extended private Supabase ingestion and analysis for new decisions; the owner applied the incremental migration. Added deterministic mixed-game tests and a reproducible comparison: reference market handoffs 58 to 28 with identical accounts.
+- See `version-3-evaluation.md` for remaining tradeoffs, including unfilled whole offers, stronger commitments, and the unchanged State scoring baseline.
+
 ## Version 2.2 research collection on 1 November 2026
 
 - Published application commit `b32e1d0435a0cfd6db74c147224fc28fa6255cb8` through successful workflow `41316601930`. All eight public files match the validated build; all 56 tests pass.

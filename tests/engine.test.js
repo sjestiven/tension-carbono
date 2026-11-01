@@ -1,8 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { createGame, applyAction, scores, exportGame, importGame, automaticRatings, lot, projectDetails, companyView, available, remaining, VERSION, isGameOver } from '../src/engine.js';
-import { playTemplate, DEMO } from '../src/demo.js';
+import { createGame as createCurrentGame, applyAction, scores, exportGame, importGame, automaticRatings, lot, projectDetails, companyView, available, remaining, VERSION, isGameOver } from '../src/engine.js';
+import { playTemplate as playCurrentTemplate, DEMO } from '../src/demo.js';
+const createGame = setup => createCurrentGame(setup,'2.2.0');
+const playTemplate = (rounds,setup) => playCurrentTemplate(rounds,setup,'2.2.0');
 const act = (g, type, actor, data = {}) => applyAction(g, { type, actor, ...data });
 
 test('Student codes retain leading zeros and survive export without changing economic initialization',()=>{
@@ -205,12 +207,12 @@ test('Legacy losing logs are fully validated and migrated to their first losing 
   legacy.version='2.0.0';
   legacy.actions=legacy.actions.map(action=>action.type==='production'?{...action,quantity:300}:action);
   const migrated=importGame(legacy);
-  assert.equal(migrated.version,VERSION);
+  assert.equal(migrated.version,'2.2.0');
   assert.equal(migrated.emissions,1590);
   assert.equal(migrated.history.length,3);
   assert.ok(migrated.actions.length<legacy.actions.length);
   assert.deepEqual(importGame(exportGame(migrated)),migrated);
-  assert.throws(()=>importGame({...legacy,version:VERSION}),/terminó/);
+  assert.throws(()=>importGame({...legacy,version:'2.2.0'}),/terminó/);
   assert.throws(()=>importGame({...legacy,actions:[...legacy.actions,{type:'close',actor:'Docente'}]}),/etapa/);
 });
 test('No hay victoria prematura ni quinta ronda', () => {

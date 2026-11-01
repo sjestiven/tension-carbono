@@ -7,6 +7,7 @@ The application remains on GitHub Pages. Supabase stores research sessions in a 
 Project URL: `https://flqdtiyxwpwobgafebla.supabase.co`.
 
 1. Run `supabase/migrations/202611010001_research.sql` in the project's SQL Editor.
+   Then run `supabase/migrations/202611010002_batch_market.sql` to support `submitBids` and `finishSales` decisions in version 3.0. Both migrations preserve private tables and write-only participant access. Existing projects need only the second migration. The owner confirmed applying it on 1 November 2026.
 2. Enable Anonymous Sign-Ins under Authentication / Sign In / Providers. These technical accounts own write-only sessions; they do not replace the six student codes.
 3. Copy `.env.example` to `.env.local` for local development. Set the project URL, its **publishable** key, and `VITE_RESEARCH_STUDY`. Never use a secret key, service-role key, or database password in browser configuration.
 4. In the GitHub repository, define Actions variables `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, and `RESEARCH_STUDY`. The Pages build reads them as public Vite configuration. Only the publishable key is included in the browser build.
@@ -19,6 +20,8 @@ Each new game requests a student code for government, companies A/B/C, and found
 Codes are fixed after recording starts. A new group must start a new game and confirm its codes. Old exports remain importable, but imports and the built-in example never automatically become live research sessions. Editing names is not permission to begin collection. The six codes also belong to the personal game export, so those JSON files must not be published.
 
 The client records validated engine actions, cabin opening, help opening, structured rejected-action categories, section changes, timer changes, and visibility changes. Successful action events only contain an explicit allowlist of decision fields. Error strings, personal names, raw setup objects, free text, and browser fingerprints are not collected. Year summaries come from the engine, not a second accounting implementation.
+
+Version 3.0 distinguishes withdrawn drafts, binding submissions, accepted offers, explicit rejections, and pending offers rejected by `finishSales`. No-offer seller phases are skipped inside the last buyer submission. Contract IDs still advance only on successful project additions and proposals; the analysis query supports both 2.2 and 3.0 and recognizes implicit rejection at sale finalization. Separate game versions when comparing cohorts: fewer handoffs are a software observation, not proof of learning or faster classroom negotiation.
 
 Client elapsed time and visible-tab time are observations of interface activity. They do not establish attention, understanding, or time spent in face-to-face negotiation. Reload/closed-tab intervals are not counted as observed visible activity. Data is submitted by the browser; it is not a tamper-proof grading record.
 

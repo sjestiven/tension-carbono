@@ -1,14 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { climateStatus } from './engine.js';
 
 function MapFallback({game,onSelect}) {
   const positions={A:[194,208],B:[350,284],C:[506,208],F1:[194,119],F2:[350,58],Estado:[506,119]};
-  const tree=(x,y,k)=> <g key={k} transform={`translate(${x} ${y})`}><path d="M0 9V-7" stroke="#877860" strokeWidth="4"/><path d="M-14 0 0-30 14 0Z" fill="#5d845b"/><path d="M0-30 14 0H0Z" fill="#466c4d"/></g>;
+  const tree=(x,y,k)=> <g key={k} transform={`translate(${x} ${y})`}><path d="M0 9V-7" stroke="#877860" strokeWidth="4"/><path d="M-14 0 0-30 14 0Z" fill="var(--climate-leaf,#5d845b)"/><path d="M0-30 14 0H0Z" fill="var(--climate-leaf,#466c4d)"/></g>;
   return <svg className="valley-map" viewBox="0 0 700 410" role="img" aria-label="Mapa accesible del valle con seis organizaciones">
     <defs><filter id="soft"><feDropShadow dx="0" dy="10" stdDeviation="8" floodColor="#59704b" floodOpacity=".12"/></filter></defs>
     <path d="M350 53 656 206 350 371 44 206V192L350 39 656 192V206L350 357 44 206" fill="#bdc3a3"/>
-    <path d="M350 39 656 192 350 357 44 192Z" fill="#b5c69e" filter="url(#soft)"/>
+    <path d="M350 39 656 192 350 357 44 192Z" fill="var(--climate-land,#b5c69e)" filter="url(#soft)"/>
     <path d="m75 195 275-136 275 136-275 139Z" fill="#bdcdaa"/>
     <path d="M100 214q120-35 180 15t110-5q70-50 198-26" stroke="#8eafab" strokeWidth="14" fill="none" opacity=".85"/>
     {Object.values(positions).map(([x,y],i)=><path key={i} d={`M350 192 ${x} ${y+20}`} stroke="#e4dfc4" strokeWidth="8"/>)}
@@ -28,8 +29,11 @@ export default function Valley({ game, onSelect }) {
   select.current = onSelect;
   const quantities = Object.values(game.draft.production).join('-');
   const capacities = Object.values(game.foundations).map(f => f.capacity).join('-');
+  const climate=climateStatus(game);
   useEffect(() => {
     const container = host.current;
+    const warmth=climate.ratio*.8;
+    const autumn=color=>new THREE.Color(color).lerp(new THREE.Color(0xb34d39),warmth).getHex();
     let renderer;
     try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); }
     catch { setFailed(true); return; }
@@ -53,7 +57,7 @@ export default function Valley({ game, onSelect }) {
     function mesh(geo, color, parent, x=0,y=0,z=0) {
       const m=new THREE.Mesh(geo, typeof color==='number'?mat(color):color);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m;
     }
-    const land=mesh(new THREE.CylinderGeometry(9.3,8.9,.7,64),0xa6ba8c,scene,0,-.4,0);
+    const land=mesh(new THREE.CylinderGeometry(9.3,8.9,.7,64),autumn(0xa6ba8c),scene,0,-.4,0);
     mesh(new THREE.CylinderGeometry(9.4,9.5,.25,64),0xd2cbb2,scene,0,-.85,0);
     const ground=mesh(new THREE.PlaneGeometry(200,200),0xe9eee4,scene,0,-1.05,0);ground.rotation.x=-Math.PI/2;
     mesh(new THREE.CylinderGeometry(1.6,1.6,.05,48),0xdde4ca,scene,0,.01,0);
@@ -83,7 +87,7 @@ export default function Valley({ game, onSelect }) {
         for(let i=0;i<n;i++) {
           const angle=i*2.399,rad=.5+(i%3)*.4,x=Math.cos(angle)*rad,z=Math.sin(angle)*rad-.3;
           mesh(new THREE.CylinderGeometry(.07,.1,.65,7),0x85715b,group,x,.35,z);
-          mesh(new THREE.ConeGeometry(.42,.95,7),i%2?0x648858:0x3e725c,group,x,1,z);
+          mesh(new THREE.ConeGeometry(.42,.95,7),autumn(i%2?0x648858:0x3e725c),group,x,1,z);
         }
       } else {
         mesh(new THREE.BoxGeometry(1.8,.8,1.2),0xe5dabd,group,0,.45,0);
@@ -95,7 +99,7 @@ export default function Valley({ game, onSelect }) {
     // Vegetación de borde sin recursos externos ni texturas remotas.
     for(let i=0;i<22;i++) {
       const a=i*Math.PI*2/22, r=8.2;
-      mesh(new THREE.ConeGeometry(.3,.8,6),0x709365,scene,Math.cos(a)*r,.4,Math.sin(a)*r);
+      mesh(new THREE.ConeGeometry(.3,.8,6),autumn(0x709365),scene,Math.cos(a)*r,.4,Math.sin(a)*r);
     }
     const ray=new THREE.Raycaster(), pointer=new THREE.Vector2();let down;
     const pointerDown=e=>{down=[e.clientX,e.clientY];};
@@ -120,7 +124,7 @@ export default function Valley({ game, onSelect }) {
       scene.traverse(o=>{o.geometry?.dispose(); if(o.material){const ms=Array.isArray(o.material)?o.material:[o.material];ms.forEach(m=>m.dispose());}});
       renderer.dispose();renderer.domElement.remove();
     };
-  },[quantities,capacities]);
+  },[quantities,capacities,climate.ratio]);
   return <div className="valley-wrap"><div ref={host} className="valley" role="img" aria-label="Valle 3D con tres empresas, dos fundaciones y un Estado. Use las tarjetas inferiores para abrir cada rol." />
     {failed ? <div className="scene-fallback"><MapFallback game={game} onSelect={onSelect}/><small>Vista de mapa · 3D disponible en dispositivos con WebGL</small></div> : <span className="scene-hint">Arrastra para explorar el valle</span>}
   </div>;

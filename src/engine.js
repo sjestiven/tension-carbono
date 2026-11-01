@@ -1,5 +1,5 @@
 // Motor puro y determinista. Todas las decisiones pasan por applyAction.
-export const VERSION = '2.2.0';
+export const VERSION = '3.0.0';
 export const EMISSIONS_LIMIT = 1400;
 export const COMPANIES = ['A', 'B', 'C'];
 export const FOUNDATIONS = ['F1', 'F2'];
@@ -36,9 +36,11 @@ function draft(year) {
     productionPlanned: { A: false, B: false, C: false }, marketFinished: { F1: false, F2: false },
     productionLocked: { A: false, B: false, C: false }, quotes: { F1: null, F2: null }, quoteMode: false,
     companyConfirmed: { A: false, B: false, C: false }, contracts: [],
+    bidsSubmitted: { A: false, B: false, C: false }, salesFinished: { F1: false, F2: false }, quoteDeclared: { F1: false, F2: false },
     fundStart: 0, executed: [], };
 }
-export function createGame(setup = {}) {
+export function createGame(setup = {}, version = VERSION) {
+  check([VERSION, '2.2.0'].includes(version), 'Versión de reglas no compatible.');
   check(setup && typeof setup === 'object' && !Array.isArray(setup), 'Configuración inválida.');
   const names = {}, players = {}, studentCodes = {};
   for (const key of ['team', ...ROLES]) names[key] = text(setup.names?.[key] ?? DEFAULT_NAMES[key], 'Nombre', 60);
@@ -50,7 +52,7 @@ export function createGame(setup = {}) {
     check(typeof code === 'string' && code.trim().length <= 40, 'Código de estudiante inválido: máximo 40 caracteres.');
     studentCodes[key] = code.trim();
   }
-  return { version: VERSION, setup: { names, players, studentCodes }, history: [], actions: [], seq: 0,
+  return { version, setup: { names, players, studentCodes }, history: [], actions: [], seq: 0,
     companies: Object.fromEntries(COMPANIES.map(e => [e, { cash: 5000, income: 0, profit: 0, emissions: 0, credits: 0, solvent: true }])),
     foundations: Object.fromEntries(FOUNDATIONS.map(f => [f, { cash: 1000, capacity: 0, reductions: 0, issued: 0, sold: 0, projects: [] }])),
     treasury: { fund: 0, general: 0, tax: 0, grants: 0, votes: 0, published: true },
@@ -78,9 +80,25 @@ function validateProjects(g, foundation) {
 }
 const live = c => c.status === 'pending' || c.status === 'accepted';
 const accepted = c => c.status === 'accepted';
+export const isBatchMarket = g => g.version === VERSION;
+const committed = c => ['draft','pending','accepted'].includes(c.status);
+export function batchMarketTurn(g) {
+  const d = g.draft, order = d.year % 2 ? FOUNDATIONS : [...FOUNDATIONS].reverse();
+  const seller = order.find(f => !d.marketFinished[f]);
+  if (seller) return {role:seller,kind:'quote',next:order[order.indexOf(seller)+1] || 'A'};
+  const buyer = COMPANIES.find(e => !d.bidsSubmitted[e]);
+  if (buyer) return {role:buyer,kind:'bids',next:COMPANIES[COMPANIES.indexOf(buyer)+1] || order.find(f=>d.contracts.some(c=>c.foundation===f&&['draft','pending'].includes(c.status))) || 'Docente'};
+  const sales = order.find(f => !d.salesFinished[f]);
+  if (sales) return {role:sales,kind:'sales',next:order.slice(order.indexOf(sales)+1).find(f=>!d.salesFinished[f]) || 'Docente'};
+  return {role:'Docente',kind:'close',next:'Docente'};
+}
+function batchActor(g, role, kind) {
+  const turn = batchMarketTurn(g);
+  check(turn.role === role && turn.kind === kind, `Ahora corresponde ${turn.role}: ${turn.kind === 'bids' ? 'confirmar ofertas' : turn.kind === 'sales' ? 'decidir las ventas' : 'presentar cotización'}.`);
+}
 export function lot(g, f) { return g.draft.verified[f] ? g.foundations[f].capacity : 0; }
-export function available(g, f) { return lot(g, f) - sum(g.draft.contracts.filter(c => c.foundation === f && live(c)), c => c.quantity); }
-export function remaining(g, e) { return Math.floor(g.draft.production[e] * INTENSITY[e] * .5) - sum(g.draft.contracts.filter(c => c.company === e && live(c)), c => c.quantity); }
+export function available(g, f) { return lot(g, f) - sum(g.draft.contracts.filter(c => c.foundation === f && (isBatchMarket(g) ? accepted(c) : live(c))), c => c.quantity); }
+export function remaining(g, e) { return Math.floor(g.draft.production[e] * INTENSITY[e] * .5) - sum(g.draft.contracts.filter(c => c.company === e && (isBatchMarket(g) ? committed(c) : live(c))), c => c.quantity); }
 export function companyView(g, e) {
   const d = g.draft, q = d.production[e], production = PRODUCTION[q];
   const cs = d.contracts.filter(c => c.company === e && accepted(c));
@@ -90,6 +108,60 @@ export function companyView(g, e) {
   // Los créditos ya se pagaron al aceptar el contrato; aquí no se descuentan otra vez.
   const closingCash = round(g.companies[e].cash + production.income - production.cost - tax);
   return { production: q, income: production.income, cost: production.cost, emissions, credits, spend: round(spend), tax, profit, closingCash };
+}
+function projectedPurchases(g,company,offers,excluded=offers) {
+  const payment=round(sum(offers,offer=>offer.quantity*offer.price));
+  const cashAfterPayment=round(g.companies[company].cash-payment);
+  const projected=companyView({...g,
+    companies:{...g.companies,[company]:{...g.companies[company],cash:cashAfterPayment}},
+    draft:{...g.draft,contracts:[...g.draft.contracts.filter(contract=>!excluded.includes(contract)),...offers.map(offer=>({...offer,company,status:'accepted'}))]},
+  },company);
+  return {payment,cashAfterPayment,projected};
+}
+export function companyCommitment(g, company, additional = []) {
+  const offers = [...g.draft.contracts.filter(c => c.company === company && ['draft','pending'].includes(c.status)), ...additional];
+  const result=projectedPurchases(g,company,offers);
+  // Benefits from unaccepted low-price offers cannot guarantee closing solvency.
+  const adverse=offers.filter(offer=>offer.price>g.draft.tax);
+  const worst=projectedPurchases(g,company,adverse,offers);
+  return {...result,worstClosingCash:worst.projected.closingCash};
+}
+export function productionView(g, company, quantity, tax=g.draft.tax) {
+  check(Object.hasOwn(PRODUCTION,quantity),'Producción no permitida.');
+  return companyView({...g,draft:{...g.draft,tax,production:{...g.draft.production,[company]:+quantity}}},company);
+}
+export function policyIssues(g,tax=g.draft.tax) {
+  if (!isBatchMarket(g)) return [];
+  return COMPANIES.filter(company=>!Object.keys(PRODUCTION).some(quantity=>productionView(g,company,quantity,tax).closingCash>=0)).map(company=>`${g.setup.names[company]} no tiene ningún nivel de producción viable con esta tarifa y su caja actual. Reduce el impuesto antes de publicar.`);
+}
+export function purchasePreview(g, company, {foundation,quantity,price,contractId=null}) {
+  const baseline = companyView(g,company), pending = g.draft.contracts.find(c => c.id === contractId && c.company === company && c.foundation === foundation && c.status === 'pending');
+  const source = pending ? {...g,draft:{...g.draft,contracts:g.draft.contracts.filter(c => c !== pending)}} : g;
+  const validPrice = typeof price === 'number' && Number.isFinite(price) && price >= 0 && price <= 10000 && Math.abs(price*100-Math.round(price*100)) < 1e-6;
+  const maximum = FOUNDATIONS.includes(foundation) ? Math.max(0,Math.min(100,available(source,foundation),remaining(source,company))) : 0;
+  const projection = count => {
+    const offer = {company,foundation,quantity:count,price};
+    if (isBatchMarket(g)) return companyCommitment(source,company,[offer]);
+    return projectedPurchases(source,company,[offer]);
+  };
+  const affordable = value => value.cashAfterPayment >= 0 && (value.worstClosingCash ?? value.projected.closingCash) >= 0;
+  let maxQuantity = 0;
+  if (validPrice) for (let count=1;count<=maximum;count++) if (affordable(projection(count))) maxQuantity=count;
+  const issues = [];
+  if (!FOUNDATIONS.includes(foundation)) issues.push('Selecciona una fundación.');
+  if (!validPrice) issues.push('Introduce un precio válido entre USD 0 y 10.000.');
+  const validQuantity = Number.isInteger(quantity) && quantity >= 1 && quantity <= 100;
+  if (!validQuantity) issues.push('Introduce una cantidad entera de 1 a 100 créditos.');
+  if (validQuantity && quantity > maximum) issues.push(`El máximo por inventario y compensación es ${maximum} créditos.`);
+  const result = validPrice && validQuantity ? projection(quantity) : null;
+  if (result?.cashAfterPayment < 0) issues.push('La caja disponible no alcanza para pagar las ofertas al contado.');
+  if (result && (result.worstClosingCash ?? result.projected.closingCash) < 0) issues.push('La caja al cierre sería negativa en alguna combinación de aceptaciones. Reduce cantidad o precio.');
+  const before = isBatchMarket(g) ? companyCommitment(source,company).projected : baseline;
+  return {valid:!issues.length,issues,baseline,...result,maxQuantity,maximum,payment:validPrice&&validQuantity?round(quantity*price):null,taxSavings:result?round(before.tax-result.projected.tax):null,profitChange:result?round(result.projected.profit-before.profit):null};
+}
+export function climateStatus(g) {
+  const ratio = g.emissions / EMISSIONS_LIMIT;
+  return {ratio:Math.max(0,Math.min(1,ratio)),remaining:round(Math.max(0,EMISSIONS_LIMIT-g.emissions)),band:ratio>1?'defeat':ratio>=.9?'red':ratio>=.75?'terracotta':ratio>=.5?'ochre':'green',reference:350*g.draft.year,projected:previewRound(g).cumulative};
 }
 export function previewRound(g) {
   const companies = Object.fromEntries(COMPANIES.map(e => [e, companyView(g, e)]));
@@ -116,8 +188,16 @@ export function automaticRatings(g, result = previewRound(g)) {
     return [r, { value: count === 3 ? 1 : count === 2 ? 0 : -1, criteria }];
   }));
 }
+export function policyReview(g,result=g.history.at(-1)) {
+  if (!result) return null;
+  const ratingTotal=sum(Object.values(result.ratings),item=>item.value);
+  return {onPath:result.cumulative<=350*result.year,reference:350*result.year,
+    losing:COMPANIES.filter(role=>result.companies[role].profit<0),
+    lagging:FOUNDATIONS.filter(role=>result.foundations[role].reduction<20*result.year),
+    ratingTotal,scoreDelta:ratingTotal/2};
+}
 function assertMarket(g) {
-  check(!g.draft.contracts.some(c => c.status === 'pending'), 'Hay ofertas pendientes. Acéptenlas o rechácenlas antes de cerrar.');
+  check(!g.draft.contracts.some(c => ['draft','pending'].includes(c.status)), 'Hay ofertas pendientes. Acéptenlas o rechácenlas antes de cerrar.');
   for (const e of COMPANIES) {
     const v = companyView(g, e);
     check(v.credits <= .5 * v.emissions, `${e}: créditos superiores al 50 % de sus emisiones.`);
@@ -145,6 +225,7 @@ function transition(original, action, legacyReplay = false) {
       break;
     case 'publish':
       phase(g, 'policy'); actor(a, 'Estado');
+      check(!policyIssues(g).length,policyIssues(g).join(' '));
       d.published = true; d.phase = 'projects'; d.fundStart = g.treasury.fund;
       break;
     case 'subsidy':
@@ -178,6 +259,7 @@ function transition(original, action, legacyReplay = false) {
       break;
     case 'execute': {
       phase(g, 'projects'); actor(a, 'Docente');
+      if (isBatchMarket(g)) check(COMPANIES.every(company=>d.productionLocked[company]),'Las tres empresas deben confirmar su producción antes de ejecutar.');
       const missing = [...FOUNDATIONS.filter(f => !d.projectConfirmed[f]), ...(!d.stateConfirmed ? ['Estado'] : [])];
       check(!missing.length, `Faltan firmas: ${missing.map(r => g.setup.names[r]).join(', ')}. Cada participante debe confirmar su plan o los convenios.`);
       const details = validateProjects(g);
@@ -204,6 +286,7 @@ function transition(original, action, legacyReplay = false) {
       break;
     case 'production': {
       phase(g, 'projects', 'market'); actor(a, ...COMPANIES);
+      check(!isBatchMarket(g) || d.phase === 'projects', 'La producción solo se elige antes de abrir el mercado.');
       check(!d.productionLocked[a.actor], 'La producción ya está confirmada y no puede cambiar durante este año. Puedes revisar contratos, cantidades y precios antes del cierre.');
       check(typeof a.quantity === 'number' && Object.hasOwn(PRODUCTION, a.quantity), 'Producción no permitida.');
       const used = sum(d.contracts.filter(c => c.company === a.actor && live(c)), c => c.quantity);
@@ -214,29 +297,35 @@ function transition(original, action, legacyReplay = false) {
     }
     case 'confirmProduction':
       phase(g, 'projects'); actor(a, ...COMPANIES);
+      if (isBatchMarket(g)) check(companyView(g,a.actor).closingCash>=0,'Elige una producción con caja al cierre no negativa sin depender de compras de créditos todavía no garantizadas.');
       check(!Object.hasOwn(a, 'lock') || typeof a.lock === 'boolean', 'Confirmación de producción inválida.');
       d.productionPlanned[a.actor] = true;
       // Older action logs omit lock and retain their original replay behavior.
-      d.productionLocked[a.actor] ||= a.lock === true;
+      d.productionLocked[a.actor] ||= isBatchMarket(g) || a.lock === true;
       break;
     case 'publishQuote':
       phase(g, 'market'); actor(a, ...FOUNDATIONS);
+      if (isBatchMarket(g)) batchActor(g,a.actor,'quote');
       check(a.price === null || lot(g, a.actor) > 0, 'No hay un lote verificado para cotizar.');
       d.quotes[a.actor] = a.price === null ? null : { price: number(a.price, 'Precio de cotización', 0, 10000) };
+      d.quoteDeclared[a.actor]=true;
       d.quoteMode = true;
       break;
     case 'finishFoundationTurn':
       phase(g, 'market'); actor(a, ...FOUNDATIONS);
+      if (isBatchMarket(g)) { batchActor(g,a.actor,'quote'); check(d.quoteDeclared[a.actor],'Publica o declina tu cotización antes de continuar.'); }
       check(!d.contracts.some(c => c.foundation === a.actor && c.status === 'pending'), 'Primero debe responder la contraparte de la oferta pendiente.');
       d.marketFinished[a.actor] = true;
       break;
     case 'reopenNegotiation':
       phase(g, 'market'); actor(a, 'Docente');
+      check(!isBatchMarket(g), 'Las ofertas confirmadas y los contratos son vinculantes. No se reabre este mercado.');
       d.marketFinished = { F1: false, F2: false };
       d.companyConfirmed = { A: false, B: false, C: false };
       break;
     case 'propose': {
       phase(g, 'market');
+      if (isBatchMarket(g)) { batchActor(g,a.actor,'bids'); check(a.actor===a.company,'Solo la empresa presenta su oferta de compra.'); }
       check(!d.quoteMode || FOUNDATIONS.every(f => d.marketFinished[f]), 'Ambas fundaciones deben presentar o declinar su cotización antes de comenzar las compras.');
       check(COMPANIES.includes(a.company) && FOUNDATIONS.includes(a.foundation), 'Contrapartes desconocidas.');
       actor(a, a.company, a.foundation);
@@ -244,15 +333,22 @@ function transition(original, action, legacyReplay = false) {
       check(!Object.hasOwn(a, 'advance') && (!Object.hasOwn(a, 'anticipo') || a.anticipo === 0), 'Los anticipos están deshabilitados.');
       check(a.quantity <= available(g, a.foundation), 'La cantidad supera el lote verificado disponible.');
       check(a.quantity <= remaining(g, a.company), 'La cantidad supera el 50 % disponible de la empresa.');
-      d.contracts.push({ id: nextId(g, 'C'), lot: `L-${d.year}-${a.foundation}`, company: a.company, foundation: a.foundation, quantity: a.quantity, price: a.price, proposer: a.actor, status: 'pending' });
+      if (isBatchMarket(g)) {
+        const commitment=companyCommitment(g,a.company,[a]);
+        check(commitment.cashAfterPayment>=0,'La caja no alcanza para pagar todas las ofertas al contado.');
+        check(commitment.worstClosingCash>=0,'Las ofertas dejarían la caja al cierre negativa en alguna combinación de aceptaciones.');
+      }
+      d.contracts.push({ id: nextId(g, 'C'), lot: `L-${d.year}-${a.foundation}`, company: a.company, foundation: a.foundation, quantity: a.quantity, price: a.price, proposer: a.actor, status: isBatchMarket(g)?'draft':'pending' });
       d.companyConfirmed[a.company] = false;
       break;
     }
     case 'accept': {
       phase(g, 'market');
+      if (isBatchMarket(g)) batchActor(g,a.actor,'sales');
       const c = d.contracts.find(c => c.id === a.id);
       check(c?.status === 'pending', 'La oferta ya no está pendiente.');
       actor(a, c.proposer === c.company ? c.foundation : c.company);
+      check(c.quantity<=available(g,c.foundation)+(isBatchMarket(g)?0:c.quantity),'No queda inventario suficiente para aceptar esta oferta completa.');
       const total = round(c.quantity * c.price);
       check(g.companies[c.company].cash >= total, 'La empresa no tiene caja para pagar al contado. Negocien cantidad o precio.');
       c.status = 'accepted';
@@ -265,6 +361,12 @@ function transition(original, action, legacyReplay = false) {
     case 'cancel': {
       phase(g, 'market');
       const c = d.contracts.find(c => c.id === a.id);
+      if (isBatchMarket(g)) {
+        check(c && ['draft','pending'].includes(c.status),'El contrato aceptado es definitivo y no se puede anular.');
+        if (c.status==='draft') {actor(a,c.company);batchActor(g,a.actor,'bids');c.status='cancelled';}
+        else {actor(a,c.foundation);batchActor(g,a.actor,'sales');c.status='rejected';}
+        break;
+      }
       check(c && live(c), 'Contrato no disponible.'); actor(a, c.company, c.foundation);
       if (accepted(c)) {
         const total = round(c.quantity * c.price);
@@ -275,14 +377,35 @@ function transition(original, action, legacyReplay = false) {
       c.status = 'cancelled'; d.companyConfirmed[c.company] = false;
       break;
     }
+    case 'submitBids': {
+      phase(g,'market');actor(a,...COMPANIES);check(isBatchMarket(g),'Acción exclusiva del mercado por etapas.');batchActor(g,a.actor,'bids');
+      const commitment=companyCommitment(g,a.actor);
+      check(commitment.cashAfterPayment>=0 && commitment.worstClosingCash>=0,'Revisa las ofertas: no pueden dejar caja negativa en ninguna combinación de aceptaciones.');
+      check(remaining(g,a.actor)>=0,'Las ofertas superan el límite de compensación.');
+      for (const c of d.contracts.filter(c=>c.company===a.actor && c.status==='draft')) c.status='pending';
+      d.bidsSubmitted[a.actor]=true;
+      if (COMPANIES.every(company=>d.bidsSubmitted[company])) {
+        for (const foundation of FOUNDATIONS) if (!d.contracts.some(c=>c.foundation===foundation&&c.status==='pending')) d.salesFinished[foundation]=true;
+        if (FOUNDATIONS.every(foundation=>d.salesFinished[foundation])) d.companyConfirmed={A:true,B:true,C:true};
+      }
+      break;
+    }
+    case 'finishSales':
+      phase(g,'market');actor(a,...FOUNDATIONS);check(isBatchMarket(g),'Acción exclusiva del mercado por etapas.');batchActor(g,a.actor,'sales');
+      for (const c of d.contracts.filter(c=>c.foundation===a.actor && c.status==='pending')) c.status='rejected';
+      d.salesFinished[a.actor]=true;
+      if (FOUNDATIONS.every(f=>d.salesFinished[f])) d.companyConfirmed={A:true,B:true,C:true};
+      break;
     case 'confirmCompany':
       phase(g, 'market'); actor(a, ...COMPANIES);
+      check(!isBatchMarket(g),'En este mercado confirma tus ofertas antes de las ventas.');
       check(!d.contracts.some(c => c.company === a.actor && c.status === 'pending'), 'Resuelva sus ofertas pendientes.');
       check(companyView(g, a.actor).closingCash >= 0, 'La empresa quedaría con caja negativa.');
       d.companyConfirmed[a.actor] = true;
       break;
     case 'close': {
       phase(g, 'market'); actor(a, 'Docente');
+      if (isBatchMarket(g)) check(FOUNDATIONS.every(f=>d.salesFinished[f]),'Ambas fundaciones deben finalizar las ventas.');
       check(COMPANIES.every(e => d.companyConfirmed[e]), `Falta confirmar las decisiones de: ${COMPANIES.filter(e => !d.companyConfirmed[e]).map(e => g.setup.names[e]).join(', ')}.`);
       assertMarket(g);
       const result = previewRound(g), ratings = automaticRatings(g, result);
@@ -334,12 +457,12 @@ export function scores(g) {
   return out;
 }
 export function exportGame(g) {
-  return { schema: 'tension-carbono', version: VERSION, setup: clone(g.setup), actions: clone(g.actions) };
+  return { schema: 'tension-carbono', version: g.version, setup: clone(g.setup), actions: clone(g.actions) };
 }
 export function importGame(data) {
-  check(data && data.schema === 'tension-carbono' && [VERSION, '2.1.0', '2.0.0'].includes(data.version), 'Formato incompatible. Use una partida JSON de Tensión de Carbono 2.0, 2.1 o 2.2.');
+  check(data && data.schema === 'tension-carbono' && [VERSION, '2.2.0', '2.1.0', '2.0.0'].includes(data.version), 'Formato incompatible. Use una partida JSON de Tensión de Carbono 2.x o 3.0.');
   check(Array.isArray(data.actions) && data.actions.length <= 2000, 'Bitácora inválida o demasiado extensa.');
-  let game = createGame(data.setup);
+  let game = createGame(data.setup,data.version===VERSION?VERSION:'2.2.0');
   let terminalState = null;
   const legacyReplay = data.version === '2.0.0';
   for (const action of data.actions) {

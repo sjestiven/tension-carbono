@@ -1,9 +1,9 @@
 import template from './demo.json' with { type: 'json' };
-import { createGame, applyAction, COMPANIES, FOUNDATIONS, isGameOver } from './engine.js';
+import { createGame, applyAction, COMPANIES, FOUNDATIONS, isGameOver, VERSION, isBatchMarket } from './engine.js';
 export const DEMO = template;
 // Usa exactamente el mismo motor y validaciones que cada control de la interfaz.
-export function playTemplate(rounds = template, setup) {
-  let game = createGame(setup);
+export function playTemplate(rounds = template, setup, version = VERSION) {
+  let game = createGame(setup,version);
   const act = a => { game = applyAction(game, a); };
   for (const [index, r] of rounds.entries()) {
     if (isGameOver(game)) break;
@@ -12,18 +12,38 @@ export function playTemplate(rounds = template, setup) {
     const subsidy = grants.some(p => p.aporte) ? 50 : 0;
     act({ type: 'policy', actor: 'Estado', tax: r.tarifa, subsidy });
     act({ type: 'publish', actor: 'Estado' });
-    for (const e of COMPANIES) act({ type: 'production', actor: e, quantity: r.produccion[e] });
+    for (const e of COMPANIES) {
+      act({ type: 'production', actor: e, quantity: r.produccion[e] });
+      if (isBatchMarket(game)) act({type:'confirmProduction',actor:e,lock:true});
+    }
     for (const f of FOUNDATIONS) for (const p of r.proyectos[f]) act({ type: 'addProject', actor: f, project: p.tipo });
     for (const f of FOUNDATIONS) act({ type: 'confirmProjects', actor: f });
     act({ type: 'confirmGrants', actor: 'Estado' });
     act({ type: 'execute', actor: 'Docente' });
     for (const f of FOUNDATIONS) act({ type: 'verify', actor: 'Docente', foundation: f, verified: r.verificado[f] });
     act({ type: 'openMarket', actor: 'Docente' });
+    if (isBatchMarket(game)) {
+      const order=game.draft.year%2?FOUNDATIONS:[...FOUNDATIONS].reverse();
+      for (const f of order) {
+        act({type:'publishQuote',actor:f,price:r.contratos.find(c=>c.fundacion===f)?.precio ?? null});
+        act({type:'finishFoundationTurn',actor:f});
+      }
+      for (const e of COMPANIES) {
+        for (const c of r.contratos.filter(c=>c.empresa===e)) act({type:'propose',actor:e,company:e,foundation:c.fundacion,quantity:c.cantidad,price:c.precio});
+        act({type:'submitBids',actor:e});
+      }
+      for (const f of order) {
+        if (game.draft.salesFinished[f]) continue;
+        for (const c of game.draft.contracts.filter(c=>c.foundation===f&&c.status==='pending')) act({type:'accept',actor:f,id:c.id});
+        act({type:'finishSales',actor:f});
+      }
+    } else {
     for (const c of r.contratos) {
       act({ type: 'propose', actor: c.fundacion, foundation: c.fundacion, company: c.empresa, quantity: c.cantidad, price: c.precio });
       act({ type: 'accept', actor: c.empresa, id: game.draft.contracts.at(-1).id });
     }
     for (const e of COMPANIES) act({ type: 'confirmCompany', actor: e });
+    }
     act({ type: 'close', actor: 'Docente' });
   }
   return game;

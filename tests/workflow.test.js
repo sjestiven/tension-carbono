@@ -1,7 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createGame, applyAction, exportGame, importGame, scores, available, remaining } from '../src/engine.js';
-import { DEMO, playTemplate } from '../src/demo.js';
+import { createGame as createCurrentGame, applyAction, exportGame, importGame, scores, available, remaining } from '../src/engine.js';
+import { DEMO, playTemplate as playCurrentTemplate } from '../src/demo.js';
+const createGame = setup => createCurrentGame(setup,'2.2.0');
+const playTemplate = (rounds,setup) => playCurrentTemplate(rounds,setup,'2.2.0');
 import { currentTurn, foundationOrder, projectIssues, projectOptionIssue, closingIssues } from '../src/workflow.js';
 
 const act = (game, type, actor, data = {}) => applyAction(game, { type, actor, ...data });

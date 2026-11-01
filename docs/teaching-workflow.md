@@ -1,6 +1,6 @@
 # Orientación de turnos guiados
 
-Esta orientación complementa el instructivo académico de la versión 2 con las reglas vigentes de la versión 2.2, revisadas el 1 de noviembre de 2026. Describe los turnos, la producción anual fija, la comparación de cotizaciones y el final anticipado por emisiones. Conserva los parámetros económicos y las fórmulas de cuentas y puntuación. El juego lo ofrece el Laboratorio de Economía Aplicada.
+Esta orientación complementa el instructivo académico de la versión 2 con las reglas vigentes de la versión 3.0, revisadas el 1 de noviembre de 2026. Describe los turnos, la producción anual fija, la comparación de cotizaciones y el final anticipado por emisiones. Conserva los parámetros económicos y las fórmulas de cuentas y puntuación. El juego lo ofrece el Laboratorio de Economía Aplicada.
 
 ## Registro e identificación para la investigación
 
@@ -21,20 +21,28 @@ Cada año sigue este recorrido:
 3. Las fundaciones F1 y F2 eligen y firman sus planes de proyectos. Pueden confirmar un plan sin inversiones nuevas.
 4. El Estado firma los convenios calculados con el porcentaje que ya publicó.
 5. La mesa docente ejecuta los proyectos y verifica o rechaza los dos lotes.
-6. Ambas fundaciones presentan sus cotizaciones antes de cualquier compra: F1 primero en años impares y F2 primero en años pares. Después las empresas A, B y C comparan precios e inventarios, negocian y confirman sus contratos del año.
+6. Ambas fundaciones presentan sus cotizaciones antes de cualquier compra: F1 primero en años impares y F2 primero en años pares. Después las empresas A, B y C comparan precios e inventarios, preparan y confirman ofertas vinculantes; por último las fundaciones deciden ventas y finalizan las ofertas pendientes.
 7. La mesa docente cierra el año. Si el acumulado supera 1.400 tCO₂e, todos pierden, se detiene el reloj y se abren los resultados finales sin permitir otra ronda. Si no supera el límite, revisa los resultados y puede iniciar el siguiente año hasta completar cuatro; el primer turno corresponde de nuevo al Estado.
 
 El límite se aplica a emisiones físicas acumuladas registradas, no a previsiones. Exactamente 1.400 tCO₂e permite continuar si aún faltan años. Ante una derrota anticipada, explique: «El presupuesto climático era una restricción compartida. Al superarlo, la economía termina; ahora analizamos qué decisiones llevaron al resultado». Los puntos al corte no otorgan victorias ni se extrapolan a años no jugados. Puede usarse el tiempo restante para comparar alternativas y argumentar con las cuentas exportadas. Una partida finalizada por emisiones también se puede cargar en Comparar mesas.
 
 La mesa docente aparece como turno actual cuando debe intervenir. No es necesario buscar un control debajo del mapa. Una franja breve al principio muestra emisiones acumuladas, impuesto y fondo público. Organizaciones despliega el valle y los nombres; Ruta del año despliega el recorrido. Ambos mantienen el espacio principal disponible para la cabina de decisión. Menú, en el encabezado, permite abrir u ocultar la navegación con una animación y recuerda la preferencia en este navegador. Al elegir una sección, el menú vuelve a cerrarse. Escape cierra el menú o el desplegable enfocado.
 
-## Propuestas y respuesta de la contraparte
+## Producción, ofertas y decisiones de venta
 
-Cada oferta abre temporalmente el turno de su contraparte. Esta acepta y paga o entrega los créditos, o rechaza la oferta; después se retoma el turno que estaba abierto. Así una empresa también puede solicitar créditos a una fundación cuyo turno principal ya terminó. El programa indica el regreso y conserva la reserva y el pago conforme a las reglas.
+Antes de fijar producción, explique la utilidad prevista: ingresos menos costos productivos, pago de créditos e impuesto. Al elegir producción todavía no se presuponen compras; la caja final suma a la caja inicial el resultado económico. Una pérdida anual no equivale a falta de caja. Se impide confirmar un nivel con caja final negativa sin compras inciertas; el Estado debe publicar una tarifa que deje al menos una opción viable a cada empresa. Esto evita depender de una venta que la fundación puede rechazar.
 
-La compra de créditos sigue siendo voluntaria. Finalizar un turno sin transacciones es una decisión válida. Si necesitan corregir acuerdos después de las confirmaciones empresariales, la mesa docente puede reabrir la negociación antes de cerrar el año. Los contratos se conservan hasta que se anulen y las empresas deben confirmar de nuevo. La producción permanece fija: se renegocian contratos, no la decisión productiva ya tomada. Los precios unitarios se ajustan en pasos de USD 0,50.
+Ambas fundaciones cotizan antes de comprar. Las empresas A, B y C preparan sus ofertas como borradores y revisan el pago, el ahorro de impuesto y la caja/ utilidad resultantes. Comprar créditos siempre reduce caja al aceptar; si el precio está por debajo del impuesto, puede aumentar utilidad. La previsión que incluye todas las ofertas no garantiza que todas sean aceptadas. El programa comprueba caja conjunta para ambos proveedores y solvencia para cualquier combinación de aceptaciones.
 
-Los créditos no se comparten entre fundaciones. Cada una dispone de su propio lote verificado. Lo que comparten es la demanda limitada de las empresas. Las cotizaciones se muestran juntas y no reservan inventario ni capacidad de compra; el contrato bilateral sí lo hace. La empresa elige expresamente un proveedor, sin una fundación preseleccionada. Esto permite comparar ambas alternativas antes de comprar, pero no garantiza ventas iguales ni obliga a repartir compras.
+Cada empresa puede retirar borradores y confirma expresamente el compromiso antes de entregar el dispositivo. Las ofertas confirmadas no se retiran. Las fundaciones reciben todas las propuestas dirigidas a ellas, ordenadas por precio para facilitar la comparación, y eligen a quién vender; la selección sigue siendo su decisión. Solo aceptan ofertas completas que caben en su inventario. Al finalizar ventas rechazan las restantes. No hay pago por una oferta rechazada; se liberan sus reservas. Una fundación sin ofertas se omite automáticamente. Después de ambas decisiones se pasa directamente al cierre docente; los contratos aceptados no se anulan ni se reabre el mercado.
+
+No hay reparto garantizado de ventas ni inventarios compartidos. Una empresa puede quedar sin créditos si su oferta no es elegida; tampoco puede elevar o redirigir la oferta ya confirmada. Para el primer ensayo, pida revisar cantidad, proveedor y precio antes de confirmar. En el debate compare quién vendió, a qué precios, qué ofertas quedaron sin atender y cómo cambió la utilidad de cada empresa. Esta mecánica enfatiza compromiso y selección entre compradores; reduce la práctica de renegociación bilateral. Los JSON antiguos 2.x siguen mostrando su recorrido original con cancelaciones.
+
+## Balance estatal y señal colectiva
+
+El Estado ve al inicio de cada nuevo año un balance del cierre anterior: trayectoria de emisiones, pérdidas empresariales, reducciones verificadas por fundación y fondo disponible. La evidencia detallada de la valoración queda desplegable y se conserva su puntuación histórica. Aclare que la evaluación automática no es un voto de los participantes ni una prueba de causalidad de la política. La fórmula estatal aún concede 80 puntos cuando cumple clima y producción; este cambio mejora la retroalimentación, no recalibra la dificultad de ganar.
+
+Los tonos otoñales, la barra y el texto muestran el presupuesto climático confirmado que toda la mesa consume. Una previsión del cierre sigue siendo provisional; no determina una derrota anticipada. Exactamente 1.400 sigue dentro del presupuesto. Las compras de créditos no restan otra vez emisiones físicas. Mantenga el año visible para interpretar cuánto presupuesto queda y evite confundir el color con una calificación individual.
 
 ## Cofinanciación y detalles
 

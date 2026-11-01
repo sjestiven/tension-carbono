@@ -6,7 +6,7 @@ export const ACTION_FIELDS = {
   confirmProjects:[],confirmGrants:[],execute:[],verify:['foundation','verified'],openMarket:[],
   production:['quantity'],confirmProduction:['lock'],publishQuote:['price'],finishFoundationTurn:[],
   reopenNegotiation:[],propose:['company','foundation','quantity','price'],accept:['id'],cancel:['id'],
-  confirmCompany:[],close:[],next:[],
+  confirmCompany:[],submitBids:[],finishSales:[],close:[],next:[],
 };
 export function hasStudentCodes(setup) {
   return ROLES.every(role => typeof setup?.studentCodes?.[role] === 'string' && setup.studentCodes[role].trim().length > 0);

@@ -8,6 +8,8 @@ Tensión de Carbono is a static React application built by Vite. It uses browser
 | `src/engine.js` | Rules, immutable transitions, accounting, scoring, import/export. |
 | `src/App.jsx` | Setup, role controls, negotiation, results, guide, persistence. |
 | `src/components/GuidedRound.jsx` | Ordered cabin controls, handoffs, validation feedback, and counterpart responses. |
+| `src/components/MarketDecisions.jsx` | Draft review, explicit binding confirmation, financial projections, and foundation selection. |
+| `src/components/PolicyBalance.jsx` | Compact prior-year feedback with optional scoring evidence. |
 | `src/components/ui.jsx` | Shared fields, buttons, statistics, and accessible contextual help. |
 | `src/components/GameNavigation.jsx` | Collapsible navigation content; its display preference is independent of game actions and exports. |
 | `src/workflow.js` | Derived interface turn, project-option explanations, and named prerequisites. |
@@ -28,9 +30,11 @@ Version 2.1 exports use the new terminal rule. The private legacy replay path va
 
 Vite generates `dist/` with relative asset URLs. React and Three.js have separate chunks; the scene is dynamically imported. Pages publishes only `dist/`. Source documents and tests do not become site assets.
 
-The version 2 engine, current rules, and academic guide define current behavior. `docs/antecedentes/` preserves earlier designs under their existing filenames.
+The version 3 engine, current rules, and teaching supplement define current behavior. `docs/rules-v2.2.md` preserves the bilateral specification. `docs/antecedentes/` preserves earlier designs under their existing filenames.
 
-The local guided-flow prototype adds replayable confirmation markers for annual company production, indicative foundation quotes, and foundation market turns. New production confirmations set an engine-enforced annual lock; older logs without the lock preserve their replay behavior. Both quotes precede company proposals and do not reserve stock or buyer capacity. `RoundOverview.jsx` contains the compact economy dashboard and route disclosure. The interface restricts cabin access to the derived current turn; pending offers preempt that turn until the counterpart responds. See `docs/ux-review.md` for compatibility with the older public implementation and the local verification scope.
+New games use version 3.0 binding batch offers. `batchMarketTurn()` enforces the market sequence in the engine; `currentTurn()` exposes it to React. All companies submit before foundation selection. Draft/pending offers reserve buyer capacity and cash but not seller stock. `companyCommitment()` checks both total upfront payment and worst-case closing cash, excluding uncertain tax-saving offers from the solvency guarantee. `purchasePreview()` reuses the same company accounting; views never post transactions. Accepted stock and money change in one transition. No-offer seller turns are skipped, pending offers expire on `finishSales`, and accepted contracts cannot be cancelled. `policyIssues()` and production confirmation prevent reliance on uncertain purchases for basic solvency. Historical 2.x imports replay under version 2.2, including refunds; exports preserve the game's rule version. The complete example can replay either mechanism with identical economic choices.
+
+`climateStatus()` derives confirmed budget consumption and a separately labeled engine projection. CSS and both valley renderers apply autumn accents without changing emission accounting or termination thresholds. `policyReview()` keeps balance summaries and rating contributions in the engine; React only formats the evidence. Scoring formulas are unchanged, including the known government score baseline. See `docs/version-3-evaluation.md` for the combined validation and remaining tradeoffs.
 
 ## Research boundary
 
