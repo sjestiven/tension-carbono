@@ -1,5 +1,11 @@
 # Validation history and current workspace status
 
+## Version 3.1 public release on 2 November 2026
+
+Application commit `e223ab6626332c057daad535fa7c0d9d39c1eb10` passed [Actions run 41396066288](https://github.com/sjestiven/tension-carbono/actions/runs/41396066288): locked installation, all 76 tests, production build and both successful build/deploy jobs. All eight files at the [live game](https://sjestiven.github.io/tension-carbono/) returned HTTP 200 and matched the final local `pilot-2026` build byte for byte.
+
+The public browser showed the 3.1 guide with grouped teacher review, automatic zero-contribution agreements, direct annual results/next-year navigation and paused results timer. The saved 3.0 table was preserved with its compatibility notice; the site was left at home. No synthetic `pilot-2026` session was submitted. Public guide evidence is `.local/validation/shared-table-guide-public.jpg`; asset hashes are in `shared-public-assets.json`. The local production-cabin screenshot is `shared-table-production-local.jpg`. A subsequent documentation-only record does not change deployed application assets.
+
 ## Version 3.1 local validation on 2 November 2026
 
 Locked installation and `npm run check` pass: 76 tests and production compilation. Both 3.0 and 3.1 run 32 deterministic mixed-market games, plus strict replay, no-supply/zero-grant/exhausted-stock transitions, receipts and imported mid-verification display. The four-year reference retains 1,345 emissions, 2,250 production and all six scores. Actual workflow ownership falls from 63 to 57 changes; this is not measured classroom time.
