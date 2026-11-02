@@ -18,24 +18,26 @@ export function playTemplate(rounds = template, setup, version = VERSION) {
     }
     for (const f of FOUNDATIONS) for (const p of r.proyectos[f]) act({ type: 'addProject', actor: f, project: p.tipo });
     for (const f of FOUNDATIONS) act({ type: 'confirmProjects', actor: f });
-    act({ type: 'confirmGrants', actor: 'Estado' });
+    if(!game.draft.stateConfirmed)act({ type: 'confirmGrants', actor: 'Estado' });
     act({ type: 'execute', actor: 'Docente' });
     for (const f of FOUNDATIONS) act({ type: 'verify', actor: 'Docente', foundation: f, verified: r.verificado[f] });
     act({ type: 'openMarket', actor: 'Docente' });
     if (isBatchMarket(game)) {
       const order=game.draft.year%2?FOUNDATIONS:[...FOUNDATIONS].reverse();
       for (const f of order) {
+        if(game.draft.phase!=='market'||game.draft.marketFinished[f])continue;
         act({type:'publishQuote',actor:f,price:r.contratos.find(c=>c.fundacion===f)?.precio ?? null});
         act({type:'finishFoundationTurn',actor:f});
       }
       for (const e of COMPANIES) {
+        if(game.draft.phase!=='market'||game.draft.bidsSubmitted[e])continue;
         for (const c of r.contratos.filter(c=>c.empresa===e)) act({type:'propose',actor:e,company:e,foundation:c.fundacion,quantity:c.cantidad,price:c.precio});
         act({type:'submitBids',actor:e});
       }
       for (const f of order) {
         if (game.draft.salesFinished[f]) continue;
         for (const c of game.draft.contracts.filter(c=>c.foundation===f&&c.status==='pending')) act({type:'accept',actor:f,id:c.id});
-        act({type:'finishSales',actor:f});
+        if(game.draft.phase==='market'&&!game.draft.salesFinished[f])act({type:'finishSales',actor:f});
       }
     } else {
     for (const c of r.contratos) {
@@ -44,7 +46,7 @@ export function playTemplate(rounds = template, setup, version = VERSION) {
     }
     for (const e of COMPANIES) act({ type: 'confirmCompany', actor: e });
     }
-    act({ type: 'close', actor: 'Docente' });
+    if(game.draft.phase==='market')act({ type: 'close', actor: 'Docente' });
   }
   return game;
 }

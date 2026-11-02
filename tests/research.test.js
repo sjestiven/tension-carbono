@@ -79,8 +79,11 @@ test('The database blocks public reads, unauthenticated writes, identity changes
     await db.exec("create role anon;create role authenticated;create schema auth;create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;");
     await db.exec(readFileSync(new URL('../supabase/migrations/202611010001_research.sql',import.meta.url),'utf8'));
     await db.exec(readFileSync(new URL('../supabase/migrations/202611010002_batch_market.sql',import.meta.url),'utf8'));
+    await db.exec(readFileSync(new URL('../supabase/migrations/20261102051505_automatic_action_origin.sql',import.meta.url),'utf8'));
     assert.equal((await db.query("select research.valid_event_data('engine_action','submitBids','{}') as valid")).rows[0].valid,true);
     assert.equal((await db.query("select research.valid_event_data('engine_action','finishSales','{}') as valid")).rows[0].valid,true);
+    assert.equal((await db.query("select research.valid_event_data('engine_action','close','{\"origin\":\"system\"}') as valid")).rows[0].valid,true);
+    assert.equal((await db.query("select research.valid_event_data('engine_action','close','{\"origin\":\"student\"}') as valid")).rows[0].valid,false);
     const tracker=recorder(); tracker.begin(createGame(setup),12);
     const payload=tracker.active().payload;
     const args=body=>[body.p_session,body.p_codes,body.p_events,body.p_rounds].map(JSON.stringify);
@@ -115,8 +118,12 @@ test('The database blocks public reads, unauthenticated writes, identity changes
     assert.equal(contracts.length,game.history.reduce((sum,round)=>sum+round.contracts.length,0));
     assert.ok(contracts.every(contract=>contract.accepted&&!contract.cancelled_or_rejected));
     const batchTracker=recorder();let batch=createCurrentGame(setup);batchTracker.begin(batch,8);
-    for(const action of playCurrentTemplate().actions){const next=applyAction(batch,action);batchTracker.applied(batch,next,[action]);batch=next;}
+    for(const action of playCurrentTemplate().actions.filter(action=>action.origin!=='system')){const next=applyAction(batch,action);batchTracker.applied(batch,next,[action]);batch=next;}
     const batchPayload=batchTracker.state.sessions[0].payload;
+    const events=batchPayload.p_events.filter(event=>event.kind==='engine_action');
+    assert.equal(events.length,batch.actions.length);
+    assert.equal(events.filter(event=>event.data.origin==='system').length,batch.actions.filter(action=>action.origin==='system').length);
+    assert.deepEqual(events.filter(event=>['execute','verify','openMarket'].includes(event.action_type)).slice(0,4).map(event=>[event.actor,event.phase]),[['Docente','projects'],['Docente','verification'],['Docente','verification'],['Docente','verification']]);
     await db.exec('set role authenticated');
     assert.equal((await rpc(batchPayload)).rows[0].revision,batchPayload.p_events.length);
     await db.exec('reset role');

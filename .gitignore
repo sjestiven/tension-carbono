@@ -19,3 +19,4 @@ coverage/
 /.idea/
 Thumbs.db
 *.tsbuildinfo
+/supabase/.temp/

@@ -8,7 +8,7 @@ group by game_version,outcome order by game_version,outcome;
 
 -- 2. Identified decision log. Keep this export restricted to the research team.
 select s.id as session_id,s.started_at,e.seq,e.year,e.phase,e.actor,
-       p.student_code,e.kind,e.action_type,e.data,e.elapsed_ms,e.visible_elapsed_ms
+       p.student_code,e.kind,e.action_type,coalesce(e.data->>'origin','player') as decision_origin,e.data,e.elapsed_ms,e.visible_elapsed_ms
 from research.sessions s join research.events e on e.session_id=s.id
 left join research.participants p on p.session_id=e.session_id and p.role=e.actor
 where s.study='pilot-2026'
@@ -46,7 +46,7 @@ with numbered as (
   select e.*,s.game_version,count(*) filter(where e.kind='engine_action' and e.action_type in ('addProject','propose'))
     over(partition by e.session_id order by e.seq) as engine_sequence
   from research.events e join research.sessions s on s.id=e.session_id
-  where s.study='pilot-2026' and s.game_version in ('2.2.0','3.0.0')
+  where s.study='pilot-2026' and s.game_version in ('2.2.0','3.0.0','3.1.0')
 ), proposals as (
   select *,concat('C-',year,'-',engine_sequence) as contract_id
   from numbered where kind='engine_action' and action_type='propose'

@@ -1,9 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createGame,applyAction,companyView,companyCommitment,purchasePreview,productionView,policyIssues,available,remaining,climateStatus,scores,exportGame,importGame,isGameOver,lot } from '../src/engine.js';
+import { createGame as createCurrentGame,applyAction,companyView,companyCommitment,purchasePreview,productionView,policyIssues,available,remaining,climateStatus,scores,exportGame,importGame,isGameOver,lot } from '../src/engine.js';
 import { currentTurn,projectOptionIssue,foundationOrder } from '../src/workflow.js';
-import { playTemplate,DEMO } from '../src/demo.js';
+import { playTemplate as playCurrentTemplate,DEMO } from '../src/demo.js';
 
+const createGame=(setup,version='3.0.0')=>createCurrentGame(setup,version);
+const playTemplate=(rounds,setup,version='3.0.0')=>playCurrentTemplate(rounds,setup,version);
 const act=(game,type,actor,data={})=>applyAction(game,{type,actor,...data});
 function market(tax=25,production={}) {
   let game=act(createGame(),'policy','Estado',{tax,subsidy:0});
@@ -152,10 +154,10 @@ test('Version 3 ends collectively at the first excessive year closing and replay
   assert.ok(Object.values(scores(game)).every(role=>!role.victory));assert.deepEqual(importGame(exportGame(game)),game);
 });
 
-test('Thirty-two deterministic mixed-market games stay solvent, resolve offers and remain replayable',()=>{
+for(const version of ['3.0.0','3.1.0'])test(`Thirty-two deterministic mixed-market games stay solvent and replayable (${version})`,()=>{
   for(let seed=1;seed<=32;seed++){
     let value=seed;const random=max=>{value=(value*1664525+1013904223)>>>0;return value%max;};
-    let game=createGame();
+    let game=createGame({},version);
     for(let year=1;year<=4&&!isGameOver(game);year++){
       if(year>1)game=act(game,'next','Docente');
       let tax=20+random(21);if(policyIssues(game,tax).length)tax=20;
@@ -169,11 +171,12 @@ test('Thirty-two deterministic mixed-market games stay solvent, resolve offers a
         const project=random(2)?'P1':'P2';if(random(3)&&!projectOptionIssue(game,foundation,project))game=act(game,'addProject',foundation,{project});
         game=act(game,'confirmProjects',foundation);
       }
-      game=act(game,'confirmGrants','Estado');game=act(game,'execute','Docente');
+      if(!game.draft.stateConfirmed)game=act(game,'confirmGrants','Estado');game=act(game,'execute','Docente');
       for(const foundation of ['F1','F2'])game=act(game,'verify','Docente',{foundation,verified:random(5)!==0});
       game=act(game,'openMarket','Docente');
-      for(const foundation of foundationOrder(game)){game=act(game,'publishQuote',foundation,{price:lot(game,foundation)?10+random(61)/2:null});game=act(game,'finishFoundationTurn',foundation);}
+      for(const foundation of foundationOrder(game)){if(game.draft.phase!=='market'||game.draft.marketFinished[foundation])continue;game=act(game,'publishQuote',foundation,{price:lot(game,foundation)?10+random(61)/2:null});game=act(game,'finishFoundationTurn',foundation);}
       for(const company of ['A','B','C']){
+        if(game.draft.phase!=='market'||game.draft.bidsSubmitted[company])continue;
         for(const foundation of ['F1','F2']){
           const price=5+random(91)/2;
           const preview=purchasePreview(game,company,{foundation,quantity:1,price});
@@ -183,11 +186,11 @@ test('Thirty-two deterministic mixed-market games stay solvent, resolve offers a
       }
       while(currentTurn(game).kind==='sales'){
         const foundation=currentTurn(game).role;
-        for(const contract of game.draft.contracts.filter(item=>item.foundation===foundation&&item.status==='pending'))game=act(game,contract.quantity<=available(game,foundation)&&random(2)?'accept':'cancel',foundation,{id:contract.id});
-        game=act(game,'finishSales',foundation);
+        for(const contract of game.draft.contracts.filter(item=>item.foundation===foundation&&item.status==='pending')){if(game.draft.phase!=='market'||game.draft.salesFinished[foundation])break;game=act(game,contract.quantity<=available(game,foundation)&&random(2)?'accept':'cancel',foundation,{id:contract.id});}
+        if(game.draft.phase==='market'&&!game.draft.salesFinished[foundation])game=act(game,'finishSales',foundation);
       }
-      for(const company of ['A','B','C']){assert.ok(game.companies[company].cash>=0);assert.ok(companyView(game,company).closingCash>=0);}
-      game=act(game,'close','Docente');assert.deepEqual(importGame(exportGame(game)),game);
+      for(const company of ['A','B','C']){assert.ok(game.companies[company].cash>=0);if(game.draft.phase==='market')assert.ok(companyView(game,company).closingCash>=0);}
+      if(game.draft.phase==='market')game=act(game,'close','Docente');assert.deepEqual(importGame(exportGame(game)),game);
     }
   }
 });

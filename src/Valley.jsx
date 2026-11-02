@@ -25,6 +25,7 @@ function MapFallback({game,onSelect}) {
 }
 
 export default function Valley({ game, onSelect }) {
+  const gameRef=useRef(game),draw=useRef(null);gameRef.current=game;
   const host = useRef(null), select = useRef(onSelect), [failed, setFailed] = useState(false);
   select.current = onSelect;
   const quantities = Object.values(game.draft.production).join('-');
@@ -33,7 +34,8 @@ export default function Valley({ game, onSelect }) {
   useEffect(() => {
     const container = host.current;
     const warmth=climate.ratio*.8;
-    const autumn=color=>new THREE.Color(color).lerp(new THREE.Color(0xb34d39),warmth).getHex();
+    const autumnSources=new Map();
+    const autumn=color=>{const result=new THREE.Color(color).lerp(new THREE.Color(0xb34d39),warmth).getHex();autumnSources.set(result,color);return result;};
     let renderer;
     try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); }
     catch { setFailed(true); return; }
@@ -47,7 +49,7 @@ export default function Valley({ game, onSelect }) {
     const camera = new THREE.PerspectiveCamera(34, 1, .1, 100);
     camera.position.set(15, 17, 19);
     const controls = new OrbitControls(camera, renderer.domElement);
-    controls.target.set(0, .7, 0);controls.enableDamping = true;controls.enableZoom = false;controls.enablePan = false;
+    controls.target.set(0, .7, 0);controls.enableDamping = false;controls.enableZoom = false;controls.enablePan = false;
     controls.minPolarAngle = .45;controls.maxPolarAngle = 1.2;
     scene.add(new THREE.HemisphereLight(0xfff8e5, 0x728e66, .95));
     const sun = new THREE.DirectionalLight(0xfff2d5, 1.3);sun.position.set(-8, 20, 10);sun.castShadow = true;
@@ -55,7 +57,7 @@ export default function Valley({ game, onSelect }) {
     const pickables = [], clouds = [];
     const mat = color => new THREE.MeshStandardMaterial({ color, roughness: .92, metalness: 0 });
     function mesh(geo, color, parent, x=0,y=0,z=0) {
-      const m=new THREE.Mesh(geo, typeof color==='number'?mat(color):color);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m;
+      const m=new THREE.Mesh(geo, typeof color==='number'?mat(color):color);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;if(autumnSources.has(color))m.userData.autumnBase=autumnSources.get(color);parent.add(m);return m;
     }
     const land=mesh(new THREE.CylinderGeometry(9.3,8.9,.7,64),autumn(0xa6ba8c),scene,0,-.4,0);
     mesh(new THREE.CylinderGeometry(9.4,9.5,.25,64),0xd2cbb2,scene,0,-.85,0);
@@ -78,16 +80,16 @@ export default function Valley({ game, onSelect }) {
         for(let k=0;k<3;k++) {
           const material=new THREE.MeshStandardMaterial({color:0xf5f4ec,transparent:true,opacity:.55,roughness:1});
           const c=mesh(new THREE.SphereGeometry(.24+k*.09,9,7),material,group,.6,2.4+k*.45,-.35);
-          clouds.push({m:c,base:2.3+k*.45,phase:k,volume:game.draft.production[role]/300});
+          clouds.push({m:c,base:2.3+k*.45,phase:k,role,volume:game.draft.production[role]/300});
         }
       } else if(role.startsWith('F')) {
         mesh(new THREE.BoxGeometry(.9,.6,.7),0xe3d9b7,group,.15,.35,.8);
         const roof=mesh(new THREE.ConeGeometry(.78,.45,4),0x59836b,group,.15,.88,.8);roof.rotation.y=Math.PI/4;
-        const n=5+Math.floor(game.foundations[role].capacity/20);
+        const n=10;
         for(let i=0;i<n;i++) {
           const angle=i*2.399,rad=.5+(i%3)*.4,x=Math.cos(angle)*rad,z=Math.sin(angle)*rad-.3;
-          mesh(new THREE.CylinderGeometry(.07,.1,.65,7),0x85715b,group,x,.35,z);
-          mesh(new THREE.ConeGeometry(.42,.95,7),autumn(i%2?0x648858:0x3e725c),group,x,1,z);
+          const trunk=mesh(new THREE.CylinderGeometry(.07,.1,.65,7),0x85715b,group,x,.35,z);trunk.userData.foundationTree=role;trunk.userData.treeIndex=i;
+          const leaf=mesh(new THREE.ConeGeometry(.42,.95,7),autumn(i%2?0x648858:0x3e725c),group,x,1,z);leaf.userData.foundationTree=role;leaf.userData.treeIndex=i;
         }
       } else {
         mesh(new THREE.BoxGeometry(1.8,.8,1.2),0xe5dabd,group,0,.45,0);
@@ -111,20 +113,32 @@ export default function Valley({ game, onSelect }) {
       if(hits[0])select.current(hits[0].object.userData.role);
     };
     renderer.domElement.addEventListener('pointerdown',pointerDown);renderer.domElement.addEventListener('click',click);
-    const resize=new ResizeObserver(()=>{ const w=container.clientWidth,h=container.clientHeight;renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix(); });resize.observe(container);
-    const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;let frame;
-    const animate=time=>{
-      frame=requestAnimationFrame(animate);controls.update();
-      if(!reduced)for(const c of clouds){c.m.position.y=c.base+Math.sin(time*.0007+c.phase)*.13;c.m.position.x=.6+Math.sin(time*.0004+c.phase)*.2;c.m.scale.setScalar(.7+c.volume*.4);}
+    let frame=null,visible=true;
+    const render=()=>{
+      frame=null;if(!visible)return;
+      const current=gameRef.current,ratio=climateStatus(current).ratio;
+      scene.traverse(object=>{
+        if(object.userData.autumnBase!==undefined)object.material.color.set(object.userData.autumnBase).lerp(new THREE.Color(0xb34d39),ratio*.8);
+        if(object.userData.foundationTree)object.visible=object.userData.treeIndex<5+Math.floor(current.foundations[object.userData.foundationTree].capacity/20);
+      });
+      for(const cloud of clouds)cloud.m.scale.setScalar(.7+current.draft.production[cloud.role]/300*.4);
       renderer.render(scene,camera);
-    };frame=requestAnimationFrame(animate);
+    };
+    const request=()=>{if(frame===null&&visible)frame=requestAnimationFrame(render);};draw.current=request;
+    const resize=new ResizeObserver(()=>{const w=container.clientWidth,h=container.clientHeight;if(!w||!h)return;renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix();request();});resize.observe(container);
+    controls.addEventListener('change',request);
+    const visibility=()=>{visible=document.visibilityState==='visible';if(!visible&&frame!==null){cancelAnimationFrame(frame);frame=null;}if(visible)request();};
+    document.addEventListener('visibilitychange',visibility);
+    const intersection=new IntersectionObserver(entries=>{visible=entries[0].isIntersecting&&document.visibilityState==='visible';if(visible)request();});intersection.observe(container);
+    request();
     return()=>{
-      cancelAnimationFrame(frame);resize.disconnect();controls.dispose();
+      draw.current=null;if(frame!==null)cancelAnimationFrame(frame);intersection.disconnect();document.removeEventListener('visibilitychange',visibility);controls.removeEventListener('change',request);resize.disconnect();controls.dispose();
       renderer.domElement.removeEventListener('pointerdown',pointerDown);renderer.domElement.removeEventListener('click',click);
       scene.traverse(o=>{o.geometry?.dispose(); if(o.material){const ms=Array.isArray(o.material)?o.material:[o.material];ms.forEach(m=>m.dispose());}});
       renderer.dispose();renderer.domElement.remove();
     };
-  },[quantities,capacities,climate.ratio]);
+  },[]);
+  useEffect(()=>draw.current?.(),[quantities,capacities,climate.ratio]);
   return <div className="valley-wrap"><div ref={host} className="valley" role="img" aria-label="Valle 3D con tres empresas, dos fundaciones y un Estado. Use las tarjetas inferiores para abrir cada rol." />
     {failed ? <div className="scene-fallback"><MapFallback game={game} onSelect={onSelect}/><small>Vista de mapa · 3D disponible en dispositivos con WebGL</small></div> : <span className="scene-hint">Arrastra para explorar el valle</span>}
   </div>;

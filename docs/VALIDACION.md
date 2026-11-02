@@ -1,5 +1,15 @@
 # Validation history and current workspace status
 
+## Version 3.1 local validation on 2 November 2026
+
+Locked installation and `npm run check` pass: 76 tests and production compilation. Both 3.0 and 3.1 run 32 deterministic mixed-market games, plus strict replay, no-supply/zero-grant/exhausted-stock transitions, receipts and imported mid-verification display. The four-year reference retains 1,345 emissions, 2,250 production and all six scores. Actual workflow ownership falls from 63 to 57 changes; this is not measured classroom time.
+
+A complete synthetic local browser year tested explicit State policy, fixed production, both projects, zero-grant omission, one teacher review with unselected verification radios, both quotes, binding purchase, direct empty baskets, seller acceptance, automatic closing/results and direct next-year handoff. Expected first-year values were 365 tCO2e, 20 purchased credits at USD 18, A profit USD 1,540, total tax USD 5,625 and reserve USD 1,687.50. No-motion mode and 375/320 px production layouts remained usable with no page-level horizontal overflow; temporary viewport overrides were reset. The compiled repository-subdirectory preview loads all eight files with matching bytes and reproduces the full example without captured warning/error logs.
+
+The third private-validator migration was applied to the connected Supabase project. The browser footer acknowledged the synthetic study `validation`; the server contains its 3.1 system-origin events. Participant schema reads remain denied. Security advisors have the same baseline notices: intentional deny-all private RLS tables and the authenticated, owner-checked ingestion RPC; password leak protection is irrelevant to this anonymous-only game flow. No new read grants or administrator keys were introduced.
+
+Evidence is kept outside Git under `.local/validation/shared-*`. The detailed design assessment and source references are in `interface-design-review.md`. OS reduced-motion emulation, a separate no-WebGL run, performance measurements on classroom devices and a six-student usability trial remain outstanding. No claim of complete WCAG compliance is made.
+
 ## Version 3.0 public release on 1 November 2026
 
 Final application commit `86b1c350aae21d5cefdbcadb3776045f4bdfd0fb` was published by [successful Actions run 41340482490](https://github.com/sjestiven/tension-carbono/actions/runs/41340482490), including locked installation, all 69 tests, production compilation, and deployment. The main implementation commit `eb44e268283cb3fa8ffaac71efc0ec71b90a14e6` had also passed [run 41340119619](https://github.com/sjestiven/tension-carbono/actions/runs/41340119619). Final online review found and corrected a stale guide paragraph before this final verification.

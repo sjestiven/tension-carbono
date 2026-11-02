@@ -1,4 +1,4 @@
-import { COMPANIES, FOUNDATIONS, PROJECTS, companyView, projectDetails, isGameOver, isBatchMarket, batchMarketTurn } from './engine.js';
+import { COMPANIES, FOUNDATIONS, PROJECTS, companyView, projectDetails, isGameOver, isBatchMarket, isStreamlined, batchMarketTurn } from './engine.js';
 
 export function roleName(game, role) {
   return role === 'Docente' ? 'Mesa docente' : game.setup.names[role];
@@ -26,9 +26,9 @@ export function currentTurn(game) {
     const company = COMPANIES.find(role => !d.productionPlanned[role]);
     if (company) return { role: company, kind: 'production', title: 'Elegir y confirmar la producción', next: COMPANIES[COMPANIES.indexOf(company) + 1] || 'F1' };
     const foundation = FOUNDATIONS.find(role => !d.projectConfirmed[role]);
-    if (foundation) return { role: foundation, kind: 'projects', title: 'Elegir y firmar los proyectos', next: foundation === 'F1' ? 'F2' : 'Estado' };
+    if (foundation) return { role: foundation, kind: 'projects', title: 'Elegir y firmar los proyectos', next: foundation === 'F1' ? 'F2' : isStreamlined(game)&&projectDetails(game).every(item=>item.grant===0)?'Docente':'Estado' };
     if (!d.stateConfirmed) return { role: 'Estado', kind: 'grants', title: 'Firmar los convenios públicos', next: 'Docente' };
-    return { role: 'Docente', kind: 'execute', title: 'Ejecutar los proyectos firmados', next: 'Docente' };
+    return { role: 'Docente', kind: 'execute', title: isStreamlined(game)?'Ejecutar y verificar los dos lotes':'Ejecutar los proyectos firmados', next: isStreamlined(game)?null:'Docente' };
   }
   if (d.phase === 'verification') return { role: 'Docente', kind: 'verify', title: 'Verificar los lotes y abrir el mercado', next: foundationOrder(game)[0] };
   if (d.phase === 'market') {

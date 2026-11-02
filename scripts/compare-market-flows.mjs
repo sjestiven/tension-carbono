@@ -13,7 +13,7 @@ function replayWithHandoffs(actions, version) {
 }
 
 function compare(rounds) {
-  const batch=playTemplate(rounds), actions=[];
+  const batch=playTemplate(rounds,undefined,'3.0.0'), actions=[];
   let legacy=createGame({},'2.2.0');
   const add=action=>{actions.push(action);legacy=applyAction(legacy,action);};
   for(const action of batch.actions){

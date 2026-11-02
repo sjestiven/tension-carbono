@@ -1,3 +1,12 @@
+# Release 3.1.0 — 2 November 2026
+
+- Group execution, two explicit lot verifications, and market opening in one teacher review.
+- Apply valid zero grants and skip unavailable quotes/supply automatically; finish exhausted/no-pending sellers and close the year directly into results.
+- Preserve positive-grant approval, production commitments, binding bids, seller discretion, accounting, scoring, and legacy replay.
+- Add six procedural 3D role avatars, committed-transfer receipts, bounded optional motion, and rendering on demand.
+- Improve supporting-text contrast, financial-label readability, focus, mobile hierarchy, and compact State feedback.
+- Distinguish system transitions in strict replay and private research ingestion; add the validator migration and mixed-market regression coverage.
+
 # Cambios de la versión 2
 
 ## Version 3.0 combined gameplay revision on 1 November 2026

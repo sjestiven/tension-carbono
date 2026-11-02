@@ -13,7 +13,7 @@ export function hasStudentCodes(setup) {
 }
 export function actionData(action) {
   if (!Object.hasOwn(ACTION_FIELDS, action.type)) throw Error('Unsupported research action');
-  return Object.fromEntries(ACTION_FIELDS[action.type].filter(key => Object.hasOwn(action,key)).map(key => [key,action[key]]));
+  return Object.fromEntries([...ACTION_FIELDS[action.type],...(action.origin==='system'?['origin']:[])].filter(key => Object.hasOwn(action,key)).map(key => [key,action[key]]));
 }
 export function roundData(game) {
   return game.history.map(round => ({year:round.year,emissions:round.emissions,cumulative_emissions:round.cumulative,

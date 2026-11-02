@@ -7,7 +7,7 @@ The application remains on GitHub Pages. Supabase stores research sessions in a 
 Project URL: `https://flqdtiyxwpwobgafebla.supabase.co`.
 
 1. Run `supabase/migrations/202611010001_research.sql` in the project's SQL Editor.
-   Then run `supabase/migrations/202611010002_batch_market.sql` to support `submitBids` and `finishSales` decisions in version 3.0. Both migrations preserve private tables and write-only participant access. Existing projects need only the second migration. The owner confirmed applying it on 1 November 2026.
+   Then run `supabase/migrations/202611010002_batch_market.sql` to support `submitBids` and `finishSales` decisions in version 3.0. Both migrations preserve private tables and write-only participant access. Then apply `20261102051505_automatic_action_origin.sql` for version 3.1. Existing projects apply only missing migrations. The third migration was applied through the connected project on 2 November 2026 and validated without granting participant reads. The owner confirmed applying it on 1 November 2026.
 2. Enable Anonymous Sign-Ins under Authentication / Sign In / Providers. These technical accounts own write-only sessions; they do not replace the six student codes.
 3. Copy `.env.example` to `.env.local` for local development. Set the project URL, its **publishable** key, and `VITE_RESEARCH_STUDY`. Never use a secret key, service-role key, or database password in browser configuration.
 4. In the GitHub repository, define Actions variables `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, and `RESEARCH_STUDY`. The Pages build reads them as public Vite configuration. Only the publishable key is included in the browser build.
@@ -51,3 +51,7 @@ If browser storage is cleared before a pending upload, the local queue and techn
 Run `npm ci` and `npm run check`. Tests use embedded PostgreSQL to execute the real migration, check write-only ingestion and owner isolation, reject identity changes and unexpected event fields, and verify deduplication. Recorder tests cover absent opt-in, personal-field removal, network failure/reload, in-flight acknowledgements, and withdrawal. A live synthetic probe must also verify the deployed project's actual Auth and API configuration.
 
 Official references: [anonymous authentication](https://supabase.com/docs/guides/auth/auth-anonymous), [API keys](https://supabase.com/docs/guides/getting-started/api-keys), [row-level security](https://supabase.com/docs/guides/database/postgres/row-level-security), and [database functions](https://supabase.com/docs/guides/database/functions).
+
+## Automatic transitions in version 3.1
+
+Engine action data includes `origin: system` only for generated transitions. Human action data omits that key. The recorder stores every committed frame with its actual pre-action phase/year and logical actor; do not interpret an automatic State/teacher/buyer entry as a new human choice or elapsed decision. The analysis action view exposes `decision_origin` and contract reconstruction accepts 3.1. Compare versions separately. The migration only extends the private event validator; ingestion and owner isolation remain unchanged.

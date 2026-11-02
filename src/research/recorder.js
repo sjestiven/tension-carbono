@@ -1,5 +1,6 @@
 import { ACTION_FIELDS, CONSENT_VERSION, actionData, hasStudentCodes, outcome, roundData } from './data.js';
 import { currentTurn } from '../workflow.js';
+import { committedFrames } from '../engine.js';
 
 const STORAGE_KEY = 'tension-carbono-research-v1';
 const empty = () => ({sessions:[],activeId:null});
@@ -57,7 +58,10 @@ export class ResearchRecorder {
   applied(before,after,actions) {
     if (!this.active()) return;
     this.game = before;
-    for (const action of actions) this.record('engine_action',actionData(action),action.actor,action.type);
+    for (const frame of committedFrames(before,after)) {
+      this.game={...before,draft:{...before.draft,year:frame.year,phase:frame.phase}};
+      this.record('engine_action',actionData(frame.action),frame.action.actor,frame.action.type);
+    }
     const row = this.active();
     if (!row) return;
     row.actionCount = after.actions.length; row.payload.p_rounds = roundData(after); this.game = after;

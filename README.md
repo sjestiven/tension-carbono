@@ -1,6 +1,6 @@
 # Tensión de Carbono
 
-A Spanish-language classroom simulation of a carbon credit market linked to a carbon tax. Three companies, two foundations, and a government negotiate through up to four annual rounds. Game version: **3.0.0**.
+A Spanish-language classroom simulation of a carbon credit market linked to a carbon tax. Three companies, two foundations, and a government negotiate through up to four annual rounds. Game version: **3.1.0**.
 
 **[Play Tensión de Carbono](https://sjestiven.github.io/tension-carbono/)** · [Source repository](https://github.com/sjestiven/tension-carbono)
 
@@ -88,6 +88,10 @@ The current engine and version 2 rules are authoritative. The root handoff and h
 
 The game separates project financing, verified reductions, credit trading, retirement, tax accounting, and physical emissions. Parameters are educational assumptions; verification does not implement real additionality, permanence, leakage, or certification.
 
-The role curtain supports sharing a computer; it does not authenticate participants. Export JSON before changing computers or browser origins. There is no multiplayer synchronization or server-side storage. See the teaching guide for the full limitations.
+The role curtain supports sharing a computer; it does not authenticate participants. Export JSON before changing computers or browser origins. There is no multiplayer synchronization; optional research collection uses private server-side storage. See the teaching guide for the full limitations.
 
 No project redistribution license has been selected. Academic PDF copies remain local references excluded from Git.
+
+## Shared-computer release 3.1
+
+New tables automatically apply valid zero-contribution agreements, skip impossible market steps, and settle the year when all sales finish. Teacher execution and two explicit lot-verification choices share one form; positive public grants retain State approval. Existing 3.0 and 2.x exports retain their original procedures. Six lightweight avatars, nonblocking settlement receipts, optional short motion, on-demand rendering, and stronger supporting-text contrast keep the decision cabin primary. See `docs/interface-design-review.md` and `docs/shared-computer-flow-and-motion.md` for evidence and limitations.

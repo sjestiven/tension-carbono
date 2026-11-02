@@ -1,5 +1,5 @@
 // Motor puro y determinista. Todas las decisiones pasan por applyAction.
-export const VERSION = '3.0.0';
+export const VERSION = '3.1.0';
 export const EMISSIONS_LIMIT = 1400;
 export const COMPANIES = ['A', 'B', 'C'];
 export const FOUNDATIONS = ['F1', 'F2'];
@@ -40,7 +40,7 @@ function draft(year) {
     fundStart: 0, executed: [], };
 }
 export function createGame(setup = {}, version = VERSION) {
-  check([VERSION, '2.2.0'].includes(version), 'Versión de reglas no compatible.');
+  check([VERSION, '3.0.0', '2.2.0'].includes(version), 'Versión de reglas no compatible.');
   check(setup && typeof setup === 'object' && !Array.isArray(setup), 'Configuración inválida.');
   const names = {}, players = {}, studentCodes = {};
   for (const key of ['team', ...ROLES]) names[key] = text(setup.names?.[key] ?? DEFAULT_NAMES[key], 'Nombre', 60);
@@ -80,12 +80,13 @@ function validateProjects(g, foundation) {
 }
 const live = c => c.status === 'pending' || c.status === 'accepted';
 const accepted = c => c.status === 'accepted';
-export const isBatchMarket = g => g.version === VERSION;
+export const isBatchMarket = g => ['3.0.0',VERSION].includes(g.version);
+export const isStreamlined = g => g.version === VERSION;
 const committed = c => ['draft','pending','accepted'].includes(c.status);
 export function batchMarketTurn(g) {
   const d = g.draft, order = d.year % 2 ? FOUNDATIONS : [...FOUNDATIONS].reverse();
   const seller = order.find(f => !d.marketFinished[f]);
-  if (seller) return {role:seller,kind:'quote',next:order[order.indexOf(seller)+1] || 'A'};
+  if (seller) return {role:seller,kind:'quote',next:(isStreamlined(g)?order.slice(order.indexOf(seller)+1).find(role=>lot(g,role)>0):order[order.indexOf(seller)+1]) || 'A'};
   const buyer = COMPANIES.find(e => !d.bidsSubmitted[e]);
   if (buyer) return {role:buyer,kind:'bids',next:COMPANIES[COMPANIES.indexOf(buyer)+1] || order.find(f=>d.contracts.some(c=>c.foundation===f&&['draft','pending'].includes(c.status))) || 'Docente'};
   const sales = order.find(f => !d.salesFinished[f]);
@@ -181,7 +182,7 @@ export function automaticRatings(g, result = previewRound(g)) {
       { name: 'Viabilidad empresarial', passed: result.companies[r].profit >= 0 && result.companies[r].closingCash >= 0, evidence: `Utilidad anual USD ${result.companies[r].profit}; caja USD ${result.companies[r].closingCash}.` },
     ] : [
       { name: 'Transparencia', passed: transparent, evidence: 'Tarifa y criterio publicados antes de ejecutar.' },
-      { name: 'Trato común', passed: fair, evidence: `Todos los convenios aplican el ${g.draft.subsidy} % común publicado.` },
+      { name: 'Trato común', passed: fair, evidence: `Todos los convenios aplican el ${g.draft.subsidy}% común publicado.` },
       { name: 'Impulso a proyectos', passed: result.foundations[r].reduction >= 20 * g.draft.year, evidence: `${result.foundations[r].reduction} de ${20 * g.draft.year} tCO₂e verificadas como meta anual de esta fundación.` },
     ];
     const count = criteria.filter(c => c.passed).length;
@@ -200,7 +201,7 @@ function assertMarket(g) {
   check(!g.draft.contracts.some(c => ['draft','pending'].includes(c.status)), 'Hay ofertas pendientes. Acéptenlas o rechácenlas antes de cerrar.');
   for (const e of COMPANIES) {
     const v = companyView(g, e);
-    check(v.credits <= .5 * v.emissions, `${e}: créditos superiores al 50 % de sus emisiones.`);
+    check(v.credits <= .5 * v.emissions, `${e}: créditos superiores al 50% de sus emisiones.`);
     check(v.closingCash >= 0, `${e}: caja final negativa. Revisen producción o contratos.`);
   }
   for (const f of FOUNDATIONS) check(sum(g.draft.contracts.filter(c => c.foundation === f && accepted(c)), c => c.quantity) <= lot(g, f), 'No se pueden vender créditos sin verificar.');
@@ -209,7 +210,60 @@ export function isGameOver(game) {
   return game.emissions > EMISSIONS_LIMIT || (game.history.length === 4 && game.draft.phase === 'results');
 }
 export function applyAction(original, action) {
-  return transition(original, action);
+  check(action?.origin!=='system','Los avances automáticos se generan dentro del motor.');
+  let game=transition(original,action);
+  if (!isStreamlined(game)) return game;
+  for(let step=0;step<24;step++) {
+    const automatic=automaticAction(game);
+    if(!automatic)return game;
+    game=transition(game,{...automatic,origin:'system'});
+  }
+  fail('No se pudo completar el avance automático.');
+}
+function automaticAction(g) {
+  if(isGameOver(g))return null;
+  const d=g.draft;
+  if(d.phase==='projects'&&!d.stateConfirmed&&COMPANIES.every(role=>d.productionPlanned[role])&&FOUNDATIONS.every(role=>d.projectConfirmed[role])) {
+    try { if(validateProjects(g).every(item=>item.grant===0))return {type:'confirmGrants',actor:'Estado'}; } catch { return null; }
+  }
+  if(d.phase!=='market')return null;
+  const turn=batchMarketTurn(g);
+  if(turn.kind==='quote'&&lot(g,turn.role)===0)return {type:d.quoteDeclared[turn.role]?'finishFoundationTurn':'publishQuote',actor:turn.role,...(!d.quoteDeclared[turn.role]?{price:null}:{})};
+  if(turn.kind==='bids'&&FOUNDATIONS.every(role=>lot(g,role)===0))return {type:'submitBids',actor:turn.role};
+  if(turn.kind==='sales'&&(!d.contracts.some(contract=>contract.foundation===turn.role&&contract.status==='pending')||available(g,turn.role)===0))return {type:'finishSales',actor:turn.role};
+  if(turn.kind==='close')return {type:'close',actor:'Docente'};
+  return null;
+}
+export function committedFrames(before,after) {
+  let state=before;
+  return after.actions.slice(before.actions.length).map(action=>{
+    const frame={action,year:state.draft.year,phase:state.draft.phase,before:state};
+    state=transition(state,action);
+    frame.after=state;
+    return frame;
+  });
+}
+export function transactionEffects(before,after) {
+  const effects=[];
+  for(const frame of committedFrames(before,after)) {
+    const action=frame.action;
+    if(action.type==='accept'||action.type==='cancel') {
+      const contract=(action.type==='accept'?frame.after:frame.before).draft.contracts.find(item=>item.id===action.id&&item.status==='accepted');
+      if(contract)effects.push({kind:action.type==='accept'?'purchase':'refund',from:action.type==='accept'?contract.company:contract.foundation,to:action.type==='accept'?contract.foundation:contract.company,quantity:contract.quantity,amount:round(Math.abs(frame.before.companies[contract.company].cash-frame.after.companies[contract.company].cash))});
+    }
+    if(action.type==='execute')for(const foundation of FOUNDATIONS) {
+      const projects=frame.after.draft.executed.filter(project=>project.foundation===foundation);
+      const grant=sum(projects,project=>project.grant);
+      if(grant>0)effects.push({kind:'grant',from:'Estado',to:foundation,amount:grant});
+      if(projects.length)effects.push({kind:'project',from:foundation,to:foundation,count:projects.length,amount:sum(projects,project=>PROJECTS[project.type].cost)});
+    }
+    if(action.type==='close') {
+      const result=frame.after.history.at(-1);
+      for(const company of COMPANIES)if(result.companies[company].tax>0)effects.push({kind:'tax',from:company,to:'Estado',amount:result.companies[company].tax});
+      effects.push({kind:'climate',from:'Estado',to:'Estado',year:result.year,tax:result.tax,reserve:result.reserve,cumulative:result.cumulative});
+    }
+  }
+  return effects;
 }
 function transition(original, action, legacyReplay = false) {
   check(action && typeof action === 'object' && !Array.isArray(action), 'Acción inválida.');
@@ -290,7 +344,7 @@ function transition(original, action, legacyReplay = false) {
       check(!d.productionLocked[a.actor], 'La producción ya está confirmada y no puede cambiar durante este año. Puedes revisar contratos, cantidades y precios antes del cierre.');
       check(typeof a.quantity === 'number' && Object.hasOwn(PRODUCTION, a.quantity), 'Producción no permitida.');
       const used = sum(d.contracts.filter(c => c.company === a.actor && live(c)), c => c.quantity);
-      check(used <= a.quantity * INTENSITY[a.actor] * .5, 'La nueva producción deja contratos por encima del 50 %. Cancélelos primero.');
+      check(used <= a.quantity * INTENSITY[a.actor] * .5, 'La nueva producción deja contratos por encima del 50%. Cancélelos primero.');
       d.production[a.actor] = a.quantity; d.companyConfirmed[a.actor] = false;
       if (d.phase === 'projects') d.productionPlanned[a.actor] = false;
       break;
@@ -332,7 +386,7 @@ function transition(original, action, legacyReplay = false) {
       number(a.quantity, 'Créditos', 1, 100, true); number(a.price, 'Precio', 0, 10000);
       check(!Object.hasOwn(a, 'advance') && (!Object.hasOwn(a, 'anticipo') || a.anticipo === 0), 'Los anticipos están deshabilitados.');
       check(a.quantity <= available(g, a.foundation), 'La cantidad supera el lote verificado disponible.');
-      check(a.quantity <= remaining(g, a.company), 'La cantidad supera el 50 % disponible de la empresa.');
+      check(a.quantity <= remaining(g, a.company), 'La cantidad supera el 50% disponible de la empresa.');
       if (isBatchMarket(g)) {
         const commitment=companyCommitment(g,a.company,[a]);
         check(commitment.cashAfterPayment>=0,'La caja no alcanza para pagar todas las ofertas al contado.');
@@ -460,9 +514,19 @@ export function exportGame(g) {
   return { schema: 'tension-carbono', version: g.version, setup: clone(g.setup), actions: clone(g.actions) };
 }
 export function importGame(data) {
-  check(data && data.schema === 'tension-carbono' && [VERSION, '2.2.0', '2.1.0', '2.0.0'].includes(data.version), 'Formato incompatible. Use una partida JSON de Tensión de Carbono 2.x o 3.0.');
+  check(data && data.schema === 'tension-carbono' && [VERSION, '3.0.0', '2.2.0', '2.1.0', '2.0.0'].includes(data.version), 'Formato incompatible. Use una partida JSON de Tensión de Carbono 2.x o 3.x.');
   check(Array.isArray(data.actions) && data.actions.length <= 2000, 'Bitácora inválida o demasiado extensa.');
-  let game = createGame(data.setup,data.version===VERSION?VERSION:'2.2.0');
+  let game = createGame(data.setup,[VERSION,'3.0.0'].includes(data.version)?data.version:'2.2.0');
+  if(isStreamlined(game)) {
+    const canonical=actions=>JSON.stringify(actions.map(action=>Object.entries(action).sort(([left],[right])=>left.localeCompare(right))));
+    for(let index=0;index<data.actions.length;) {
+      const next=applyAction(game,data.actions[index]);
+      const generated=next.actions.slice(game.actions.length);
+      check(canonical(generated)===canonical(data.actions.slice(index,index+generated.length)),'La bitácora no coincide con el avance automático de esta versión.');
+      game=next;index+=generated.length;
+    }
+    return game;
+  }
   let terminalState = null;
   const legacyReplay = data.version === '2.0.0';
   for (const action of data.actions) {

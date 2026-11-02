@@ -4,6 +4,7 @@ import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { createServer } from 'vite';
 import { playTemplate, DEMO } from '../src/demo.js';
+import {createGame,applyAction} from '../src/engine.js';
 
 test('The completed-game results render all roles and both foundation inventories', async () => {
   const server = await createServer({
@@ -26,6 +27,13 @@ test('The completed-game results render all roles and both foundation inventorie
     assert.match(losingHtml,/La partida termina en el año 3/);
     assert.match(losingHtml,/1.590/);
     assert.equal((losingHtml.match(/Derrota colectiva/g)||[]).length,6);
+    const {default:GuidedRound}=await server.ssrLoadModule('/src/components/GuidedRound.jsx');
+    let verification=createGame();
+    for(const action of playTemplate().actions.filter(action=>action.origin!=='system')){verification=applyAction(verification,action);if(action.type==='execute')break;}
+    const review=renderToString(React.createElement(GuidedRound,{game:verification,role:'Docente',choose:()=>{},send:()=>{},hide:()=>{},onResults:()=>{}})).replace(/<[^>]*>/g,'');
+    assert.equal((review.match(/Capacidad instalada: 20 tCO₂e\/año/g)||[]).length,2);
+    assert.ok(!review.includes('Capacidad instalada: 40'));
+    assert.match(review,/Confirmar ejecución y verificaciones/);
   } finally {
     await server.close();
   }

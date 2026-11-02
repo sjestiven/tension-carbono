@@ -1,6 +1,6 @@
 # Reglas del juego Tensión de Carbono 3
 
-Reglas vigentes: versión 3.0.0, revisión del 1 de noviembre de 2026.
+Reglas vigentes: versión 3.1.0, revisión del 2 de noviembre de 2026.
 
 ## Identificación y registro de partidas
 
@@ -12,9 +12,9 @@ El pie de página informa si hay datos pendientes o confirmados por el servidor.
 
 ## Recorrido guiado
 
-La interfaz indica un turno obligatorio y el siguiente participante. El orden inicial de cada año es: Estado publica la política; empresas A, B y C confirman su producción; fundaciones F1 y F2 firman sus proyectos; Estado firma los convenios; mesa docente ejecuta y verifica. Los botones de confirmar guardan la decisión y muestran el relevo. No es necesario buscar el control docente al final del mapa.
+La interfaz indica un turno obligatorio y el siguiente participante. El orden inicial de cada año es: Estado publica la política; empresas A, B y C confirman su producción; fundaciones F1 y F2 firman sus proyectos; Estado firma los convenios con aporte público; mesa docente ejecuta y verifica. Si el aporte total es cero y los planes son válidos, el motor aplica el convenio sin pedir un segundo turno estatal. La revisión docente reúne ejecución, dos decisiones explícitas de verificación y apertura del mercado en un formulario; ningún lote viene aprobado de antemano. Los botones de confirmar guardan la decisión y muestran el relevo. No es necesario buscar el control docente al final del mapa.
 
-En el mercado ambas fundaciones publican primero sus cotizaciones indicativas, sin ventas ni reservas. Cotiza primero F1 en años impares y F2 en años pares. Después las empresas A, B y C preparan borradores dirigidos a una fundación, con cantidad y precio. Pueden retirarlos hasta confirmar sus ofertas vinculantes. Las tres empresas deben confirmar antes de que las fundaciones comparen y seleccionen compradores. Las fundaciones deciden en el mismo orden alternado, pueden rechazar ofertas y no están obligadas a vender. Al finalizar sus ventas, rechazan las ofertas restantes. Una fundación sin ofertas no requiere un turno de venta. La mesa docente cierra directamente cuando ambas terminan; no se repiten las confirmaciones empresariales ni se reabre el mercado. La producción confirmada y los contratos aceptados son definitivos durante el año. Las partidas 2.x conservan sus reglas bilaterales originales; véase `rules-v2.2.md`.
+En el mercado ambas fundaciones publican primero sus cotizaciones indicativas, sin ventas ni reservas. Cotiza primero F1 en años impares y F2 en años pares. Después las empresas A, B y C preparan borradores dirigidos a una fundación, con cantidad y precio. Pueden retirarlos hasta confirmar sus ofertas vinculantes. Las tres empresas deben confirmar antes de que las fundaciones comparen y seleccionen compradores. Las fundaciones deciden en el mismo orden alternado, pueden rechazar ofertas y no están obligadas a vender. Al finalizar sus ventas, rechazan las ofertas restantes. Una fundación sin ofertas no requiere un turno de venta. El motor cierra automáticamente cuando ambas terminan y abre resultados; no se repiten las confirmaciones empresariales ni se reabre el mercado. La producción confirmada y los contratos aceptados son definitivos durante el año. Las partidas 2.x conservan sus reglas bilaterales originales; véase `rules-v2.2.md`.
 
 «Cofinanciación pública» y «apoyo público» son el mismo porcentaje. Se publica una vez y después se muestra al firmar convenios. Renegociarlo es una acción expresa que exige nuevas firmas. Los botones Detalles explican las selecciones mediante un cuadro flotante al usar el cursor, el teclado o un toque. Los requisitos pendientes identifican a cada participante y bloquean el avance antes de ejecutar una acción incompleta.
 
@@ -40,7 +40,7 @@ Empresas A, B y C comienzan con USD 5.000 cada una. Sus intensidades son 0,40, 0
 
 Se vende todo a USD 50/t. Cada empresa confirma su producción antes de los proyectos: esa decisión queda fija durante todo el año, incluso al reabrir la negociación. Puede elegir una producción diferente al comenzar el año siguiente. El Estado publica una tarifa común entera entre USD 20 y 40/tCO₂e. Las bandas baja 20–25, media 26–32 y alta 33–40 son intervalos de elección, no tramos progresivos. La tarifa no se modifica en ese año. Antes de publicarla debe existir al menos un nivel de producción con caja final no negativa para cada empresa, según su caja actual y sin depender de compras de créditos inciertas. Una empresa solo confirma un nivel que cumpla esa solvencia básica. Puede registrar pérdida anual si su caja la cubre. La interfaz muestra impuesto, utilidad después de impuestos y caja al cierre antes de confirmar.
 
-Cada empresa puede retirar créditos enteros hasta el 50 % de sus emisiones anuales. Si el tope es fraccionario, se utiliza su parte entera inferior. No hay préstamos ni caja negativa; los créditos se pagan con la caja disponible al aceptar. Los ingresos, costos productivos e impuesto se liquidan al cerrar.
+Cada empresa puede retirar créditos enteros hasta el 50% de sus emisiones anuales. Si el tope es fraccionario, se utiliza su parte entera inferior. No hay préstamos ni caja negativa; los créditos se pagan con la caja disponible al aceptar. Los ingresos, costos productivos e impuesto se liquidan al cerrar.
 
 ## Proyectos y convenios
 
@@ -51,21 +51,21 @@ Cada empresa puede retirar créditos enteros hasta el 50 % de sus emisiones anua
 
 Los costos los fija el catálogo docente. Incluyen la operación hasta el año 4. Los proyectos se pueden repetir y generan reducciones desde su año de ejecución, si se verifica el lote anual. Su capacidad instalada no puede superar 100 por fundación y los ámbitos no se superponen.
 
-Al cierre, el 30 % del recaudo se reserva para proyectos del año siguiente y el 70 % pasa al presupuesto general. El saldo del fondo no utilizado se conserva. El Estado publica un porcentaje común de apoyo de 0 a 50 % del costo de cada proyecto nuevo. Puede renegociar ese porcentaje antes de ejecutar, con nuevas confirmaciones. La suma de aportes no puede superar el fondo inicial de la ronda.
+Al cierre, el 30% del recaudo se reserva para proyectos del año siguiente y el 70% pasa al presupuesto general. El saldo del fondo no utilizado se conserva. El Estado publica un porcentaje común de apoyo de 0 a 50% del costo de cada proyecto nuevo. Puede renegociar ese porcentaje antes de ejecutar, con nuevas confirmaciones. La suma de aportes no puede superar el fondo inicial de la ronda.
 
-La fundación debe tener dinero para ejecutar antes de vender. El aporte público no compra créditos ni propiedad para el Estado. Cada fundación confirma su plan y el Estado confirma los convenios. El docente ejecuta después de las tres firmas y de validar cajas, topes y fondos.
+La fundación debe tener dinero para ejecutar antes de vender. El aporte público no compra créditos ni propiedad para el Estado. Cada fundación confirma su plan y el Estado confirma los convenios. El docente ejecuta después de confirmar los planes y convenios y de validar cajas, topes y fondos. Los convenios válidos sin aporte se aplican automáticamente, sin atribuir una decisión adicional al estudiante del Estado.
 
-El Estado aprueba la financiación cuando se aplica el porcentaje común publicado, hay fondo suficiente, cada fundación puede pagar su parte y respeta su capacidad máxima de 100 tCO₂e/año. Si no se cumple, devuelve el plan para corregirlo o renegocia el porcentaje común antes de nuevas firmas. No certifica las reducciones: esa función corresponde a la mesa docente en la verificación. En el año 1, con fondo cero, firma convenios con aporte público de cero.
+El Estado aprueba la financiación cuando se aplica el porcentaje común publicado, hay fondo suficiente, cada fundación puede pagar su parte y respeta su capacidad máxima de 100 tCO₂e/año. Si no se cumple, devuelve el plan para corregirlo o renegocia el porcentaje común antes de nuevas firmas. No certifica las reducciones: esa función corresponde a la mesa docente en la verificación. En el año 1, con fondo cero, el motor aplica los convenios sin aporte público. Con aporte no nulo se conserva la firma explícita del Estado.
 
 ## Etapas y negociación
 
 1. **Política pública.** El Estado elige y publica tarifa y porcentaje de apoyo.
 2. **Proyectos.** Las empresas confirman su producción definitiva del año; las fundaciones proponen inversiones y acuerdan convenios. Se firman y ejecutan los proyectos.
 3. **Verificación.** El docente comprueba financiación, ejecución y línea base; verifica o rechaza expresamente cada lote. Es una simulación, no auditoría ambiental real.
-4. **Mercado.** Ambas fundaciones cotizan antes de las ofertas de compra. Cada empresa prepara y confirma sus ofertas; las cotizaciones no reservan y los borradores se pueden retirar. Confirmar reserva la caja necesaria para pagar todas las ofertas y capacidad de compensación hasta el 50 % de las emisiones empresariales, sumando ambos proveedores. La solvencia al cierre se comprueba incluso si solo se aceptan las ofertas costosas y se rechazan las que ahorrarían impuesto. Las ofertas no reservan inventario del vendedor antes de su decisión: pueden competir por el mismo lote. Cada oferta individual debe caber completa en el lote verificado; solo la fundación destinataria puede aceptarla o rechazarla después de todas las confirmaciones empresariales. Aceptar consume inventario, paga al contado una sola vez y crea un contrato definitivo; no hay aceptación parcial, anticipos, reventa, anulación posterior ni ventas garantizadas. Finalizar ventas rechaza las ofertas pendientes y libera sus reservas. Los precios se seleccionan en pasos de USD 0,50. La previsión distingue pago, ahorro tributario, utilidad y caja. Comprar por debajo de la tarifa puede aumentar la utilidad aunque reduzca la caja.
-5. **Resultados.** Las empresas confirman sus planes; el docente cierra cuando no hay ofertas pendientes. Se liquidan producción e impuestos, se retiran los créditos y se calcula la evaluación estatal. Se revisan los resultados y se pasa al siguiente año.
+4. **Mercado.** Ambas fundaciones cotizan antes de las ofertas de compra. Cada empresa prepara y confirma sus ofertas; las cotizaciones no reservan y los borradores se pueden retirar. Confirmar reserva la caja necesaria para pagar todas las ofertas y capacidad de compensación hasta el 50% de las emisiones empresariales, sumando ambos proveedores. La solvencia al cierre se comprueba incluso si solo se aceptan las ofertas costosas y se rechazan las que ahorrarían impuesto. Las ofertas no reservan inventario del vendedor antes de su decisión: pueden competir por el mismo lote. Cada oferta individual debe caber completa en el lote verificado; solo la fundación destinataria puede aceptarla o rechazarla después de todas las confirmaciones empresariales. Aceptar consume inventario, paga al contado una sola vez y crea un contrato definitivo; no hay aceptación parcial, anticipos, reventa, anulación posterior ni ventas garantizadas. Finalizar ventas rechaza las ofertas pendientes y libera sus reservas. Los precios se seleccionan en pasos de USD 0,50. La previsión distingue pago, ahorro tributario, utilidad y caja. Comprar por debajo de la tarifa puede aumentar la utilidad aunque reduzca la caja.
+5. **Resultados.** Cuando las tres empresas han confirmado sus ofertas y las fundaciones terminaron, el motor cierra automáticamente. Se liquidan producción e impuestos, se retiran los créditos y se calcula la evaluación estatal. Se revisan los resultados y se pasa al siguiente año.
 
-En la revisión previa al cierre pueden corregirse los contratos, pero no la producción ya confirmada. Un error rechaza la acción sin modificar el estado previo. No se puede ofrecer un lote no verificado. Los créditos sin venta vencen; las reducciones verificadas sí cuentan en la meta física. Los proyectos instalados continúan aunque su lote de un año no se verifique.
+Los borradores se corrigen antes de confirmarlos; las fundaciones pueden rechazar ofertas pendientes. Los contratos aceptados y la producción confirmada no se corrigen durante ese año. Un error rechaza la acción sin modificar el estado previo. No se puede ofrecer un lote no verificado. Los créditos sin venta vencen; las reducciones verificadas sí cuentan en la meta física. Los proyectos instalados continúan aunque su lote de un año no se verifique.
 
 ## Dos cuentas distintas
 
@@ -83,14 +83,14 @@ Los créditos no se descuentan de nuevo de las emisiones físicas. Con emisiones
 
 Al cerrar cada año se registran las emisiones físicas reales del equipo. Si el acumulado supera 1.400 tCO₂e, todos pierden y la partida termina inmediatamente: se muestran los resultados y no se permiten más decisiones ni abrir otro año. Alcanzar exactamente 1.400 no provoca derrota. Las previsiones de producción no finalizan la partida antes de contabilizar el año, porque todavía deben ejecutarse y verificarse las reducciones externas. Sin derrota anticipada, se completan los cuatro años y gana cada rol con al menos 70/100. El Estado además debe alcanzar 1.800 t de producción acumulada. No existe un ganador absoluto.
 
-En una derrota anticipada, los resultados y los puntos describen solo los años cerrados hasta el corte. Ningún rol gana, independientemente de sus puntos. Se pueden revisar y exportar las cuentas para la discusión docente. Las partidas antiguas de la versión 2.0 se importan validando todas sus decisiones y se ajustan al primer cierre que superó el límite; las nuevas exportaciones usan la versión 2.1.
+En una derrota anticipada, los resultados y los puntos describen solo los años cerrados hasta el corte. Ningún rol gana, independientemente de sus puntos. Se pueden revisar y exportar las cuentas para la discusión docente. Las partidas antiguas de la versión 2.0 se importan validando todas sus decisiones y se ajustan al primer cierre que superó el límite; la exportación conserva la versión de reglas validada de cada mesa.
 
 ### Empresas
 
 | Componente | Condiciones ordenadas | Puntos respectivos |
 |---|---|---|
-| Margen acumulado utilidad/ingresos | ≥10 %; ≥5 % y <10 %; positivo <5 %; no positivo | 40; 25; 10; 0 |
-| Cobertura créditos/emisiones acumuladas | ≥40 %; ≥25 % y <40 %; positiva <25 %; nula | 40; 30; **5**; 0 |
+| Margen acumulado utilidad/ingresos | ≥10%; ≥5% y <10%; positivo <5%; no positivo | 40; 25; 10; 0 |
+| Cobertura créditos/emisiones acumuladas | ≥40%; ≥25% y <40%; positiva <25%; nula | 40; 30; **5**; 0 |
 | Solvencia | Caja no negativa y obligaciones liquidadas durante toda la partida | 20; en otro caso 0 |
 
 ### Fundaciones
@@ -98,7 +98,7 @@ En una derrota anticipada, los resultados y los puntos describen solo los años 
 | Componente | Condiciones ordenadas | Puntos respectivos |
 |---|---|---|
 | Reducción acumulada | ≥200; ≥100 y <200; positiva <100; nula | 40; 25; 10; 0 |
-| Vendidos/emitidos | ≥70 %; ≥40 % y <70 %; positiva <40 %; nula o sin emisión | 30; 20; 10; 0 |
+| Vendidos/emitidos | ≥70%; ≥40% y <70%; positiva <40%; nula o sin emisión | 30; 20; 10; 0 |
 | Caja y contratos | Liquidados y caja ≥USD 1.000; liquidados y caja no negativa menor de 1.000; otro caso | 30; 15; 0 |
 
 ### Estado
@@ -107,7 +107,7 @@ En una derrota anticipada, los resultados y los puntos describen solo los años 
 |---|---|---:|
 | Ambiente | Dentro de 1.400 tCO₂e | 30 |
 | Producción | ≥1.800 t acumuladas | 20 |
-| Financiación | Reserva 30 %, aportes y límites respetados | 20 |
+| Financiación | Reserva 30%, aportes y límites respetados | 20 |
 | Publicación | Política y criterio públicos durante la partida | 10 |
 | Valoración | 10 + V/2, donde V suma veinte valoraciones | 0–20 |
 
@@ -132,15 +132,23 @@ Estos umbrales hacen operativa la lista pendiente del informe. Son elecciones pe
 
 Sesión propuesta de 90 minutos: 12 de contextualización; 8 de ensayo; hasta cuatro rondas de 12; 17 de discusión y 5 de respuesta individual. El reloj permite elegir 12, 8 o 4 minutos por año. La duración se conserva entre años y al recargar este navegador. Cambiarla reinicia y pausa el reloj; reiniciar solo el reloj conserva la duración elegida. Arranca automáticamente al abrir la cabina inicial del Estado cada año y se detiene al terminar la partida. Es orientativo: llegar a cero no cierra la ronda ni provoca derrota. Si la partida termina antes por emisiones, el tiempo restante puede dedicarse al análisis.
 
-Los puntos no son la nota académica. Rúbrica: 30 % distinción proyecto, financiación y crédito; 30 % justificación con datos; 25 % cuenta fiscal frente a física; 15 % mejora y participación. La respuesta final explica una decisión, una alternativa y consecuencias con dos datos.
+Los puntos no son la nota académica. Rúbrica: 30% distinción proyecto, financiación y crédito; 30% justificación con datos; 25% cuenta fiscal frente a física; 15% mejora y participación. La respuesta final explica una decisión, una alternativa y consecuencias con dos datos.
 
 Modo operativo: un computador por mesa. Los participantes se alternan y negocian presencialmente. La vista docente compara hasta cinco JSON completos; no conecta mesas en red. Cada equipo debe exportar su partida antes de abandonar el navegador.
 
 
 ## Señal del presupuesto climático colectivo
 
-La ambientación pasa de verde a ocre, terracota y rojo otoñal según emisiones físicas acumuladas confirmadas: menos del 50 %, 50–75 %, 75–90 % y 90–100 % del presupuesto de 1.400. Sobrepasar el 100 % al cierre muestra derrota colectiva. Son bandas visuales, no nuevos umbrales de derrota ni una representación científica del otoño. La interfaz conserva texto y controles legibles, muestra el presupuesto restante y etiqueta como provisional cualquier previsión del cierre. El contexto del año y la referencia 350 × año se mantienen separados. Comprar créditos no descuenta de nuevo las emisiones físicas ni vuelve verde el valle.
+La ambientación pasa de verde a ocre, terracota y rojo otoñal según emisiones físicas acumuladas confirmadas: menos del 50%, 50–75%, 75–90% y 90–100% del presupuesto de 1.400. Sobrepasar el 100% al cierre muestra derrota colectiva. Son bandas visuales, no nuevos umbrales de derrota ni una representación científica del otoño. La interfaz conserva texto y controles legibles, muestra el presupuesto restante y etiqueta como provisional cualquier previsión del cierre. El contexto del año y la referencia 350 × año se mantienen separados. Comprar créditos no descuenta de nuevo las emisiones físicas ni vuelve verde el valle.
 
 ## Compatibilidad de partidas
 
-Las nuevas mesas usan reglas 3.0. Los JSON 2.0, 2.1 y 2.2 se validan con reglas bilaterales 2.2; las bitácoras 2.0 se validan completas y se conservan hasta el primer cierre terminal, como antes. Exportar conserva la versión de reglas de la mesa. Reiniciar prepara una mesa nueva 3.0 y requiere volver a confirmar los participantes y la autorización de investigación.
+Las nuevas mesas usan reglas 3.1. Las partidas 3.0 conservan el recorrido manual anterior, documentado en `rules-v3.0.md`. Los JSON 2.0, 2.1 y 2.2 se validan con reglas bilaterales 2.2; las bitácoras 2.0 se validan completas y se conservan hasta el primer cierre terminal, como antes. Exportar conserva la versión de reglas de la mesa. Reiniciar prepara una mesa nueva 3.1 y requiere volver a confirmar los participantes y la autorización de investigación.
+
+## Fluidez en un computador y efectos visuales
+
+Una fundación sin lote verificado no tiene que cotizar. Si no hay oferta verificada de ninguna fundación, se omiten los formularios de compra y se cierra el año con cero compras; no se inventan decisiones comerciales. Con lotes disponibles, cada empresa confirma expresamente incluso si decide no comprar. Si una fundación agota el inventario o resuelve su última oferta, finaliza automáticamente; las ofertas que no caben tras agotar inventario quedan rechazadas y liberan sus reservas. Si todavía quedan ofertas e inventario, conserva la decisión de aceptarlas, rechazarlas o finalizar sin vender. No se automatiza la asignación al mayor precio.
+
+El cierre abre directamente resultados. Un solo control permite pasar al año siguiente después de la discusión colectiva; el reloj se pausa en resultados. Los avances del motor se distinguen con `origin: system` en la bitácora y en el registro de investigación. No se cuentan como nuevas elecciones de los estudiantes.
+
+Seis avatares identifican Estado, A/B/C y F1/F2 con etiquetas y posiciones estables. Los efectos de hasta 450 ms muestran transferencias ya confirmadas; las cifras cambian inmediatamente y nunca dependen de que termine la animación. Una propuesta no mueve dinero. El comprobante de la última operación conserva importes, créditos y cuentas fiscales. Los efectos se pueden desactivar y respetan el movimiento reducido del sistema; en pantalla estrecha quedan etiquetas estáticas. Recargar, importar o revisar resultados no repite pagos.
