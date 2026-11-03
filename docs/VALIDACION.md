@@ -1,5 +1,11 @@
 # Validation history and current workspace status
 
+## Version 3.1.2 public release on 3 November 2026
+
+Application commit `36ede1a4b1f1f3f6125cbe02dcc76e47590ee87c` passed [Actions run 41644312669](https://github.com/sjestiven/tension-carbono/actions/runs/41644312669). All 76 tests passed, and all eight files at the [public game](https://sjestiven.github.io/tension-carbono/) matched the validated build.
+
+The classroom scenario uses Postobón, Cristalería Peldar, Cementos Argos, Fundación Natura and Fundación Omacha. A replay check confirmed that saved games with the previous preset names load the new labels and retain their actions and custom names. The setup explains that game figures are simulated.
+
 ## Version 3.1.1 public release on 3 November 2026
 
 Application commit `a71107c7946391d31bf614d74c0905713c262f49` passed [Actions run 41641810139](https://github.com/sjestiven/tension-carbono/actions/runs/41641810139) with all 76 tests, production build and Pages deployment. All eight files at the [public game](https://sjestiven.github.io/tension-carbono/) returned HTTP 200 and matched the validated local build. The public browser opened the new home menu.
