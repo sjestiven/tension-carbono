@@ -1,3 +1,5 @@
+import { AVATAR_GENDERS } from './table_setup.js';
+
 // Motor puro y determinista. Todas las decisiones pasan por applyAction.
 export const VERSION = '3.1.0';
 export const EMISSIONS_LIMIT = 1400;
@@ -52,7 +54,14 @@ export function createGame(setup = {}, version = VERSION) {
     check(typeof code === 'string' && code.trim().length <= 40, 'Código de estudiante inválido: máximo 40 caracteres.');
     studentCodes[key] = code.trim();
   }
-  return { version, setup: { names, players, studentCodes }, history: [], actions: [], seq: 0,
+  const avatarGenders = Object.fromEntries(ROLES.flatMap(role => {
+    const choice = setup.avatarGenders?.[role];
+    return typeof choice === 'string' && Object.hasOwn(AVATAR_GENDERS, choice) ? [[role, choice]] : [];
+  }));
+  const profile = {};
+  if (Object.keys(avatarGenders).length) profile.avatarGenders = avatarGenders;
+  if (setup.tableConfigured === true) profile.tableConfigured = true;
+  return { version, setup: { names, players, studentCodes, ...profile }, history: [], actions: [], seq: 0,
     companies: Object.fromEntries(COMPANIES.map(e => [e, { cash: 5000, income: 0, profit: 0, emissions: 0, credits: 0, solvent: true }])),
     foundations: Object.fromEntries(FOUNDATIONS.map(f => [f, { cash: 1000, capacity: 0, reductions: 0, issued: 0, sold: 0, projects: [] }])),
     treasury: { fund: 0, general: 0, tax: 0, grants: 0, votes: 0, published: true },

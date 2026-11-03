@@ -4,7 +4,9 @@ Esta orientación complementa el instructivo académico de la versión 2 con las
 
 ## Registro e identificación para la investigación
 
-Al iniciar cada mesa, solicite los seis códigos de estudiante en los campos de los agentes. Son identificaciones: el registro no es anónimo. Explique al equipo el propósito de analizar decisiones e interfaz para mejorar el juego. La casilla de autorización está desmarcada inicialmente y jugar sin enviar datos sigue siendo posible. Los nombres personales no se envían a Supabase. Los códigos quedan separados de los eventos en una tabla privada, vinculados por una sesión aleatoria y el rol.
+Al iniciar la clase, reparta los cinco alias entre las mesas para evitar duplicados. Cada partida conserva su alias y tiene un identificador de sesión propio. Los nombres visibles y la apariencia de los avatares son opcionales. Presente los sectores empresariales como ejemplos ficticios de distinta intensidad de emisiones y los nombres de las fundaciones como referencias educativas.
+
+Pida los seis códigos solo si el equipo autoriza el registro. Explique que el equipo puede jugar sin completar códigos. El registro privado vincula el alias y las decisiones con los códigos por rol. Registra también las opciones de avatar elegidas al inicio, que describen preferencias de personalización. Las decisiones de avatar sin selección explícita quedan vacías en el análisis.
 
 El pie de página distingue datos pendientes de datos confirmados. Una falla de conexión no impide jugar. El equipo puede detener la captura futura desde ese diálogo; los datos ya enviados requieren gestión del investigador en Supabase. Los códigos quedan fijos durante una sesión registrada para no atribuir decisiones a otra persona. Para otro grupo, reinicie y confirme de nuevo los participantes. Los JSON exportados contienen los códigos y no son archivos públicos.
 
@@ -30,7 +32,7 @@ La mesa docente aparece como turno actual cuando debe intervenir. No es necesari
 
 ## Producción, ofertas y decisiones de venta
 
-Antes de fijar producción, explique la utilidad prevista: ingresos menos costos productivos, pago de créditos e impuesto. Al elegir producción todavía no se presuponen compras; la caja final suma a la caja inicial el resultado económico. Una pérdida anual no equivale a falta de caja. Se impide confirmar un nivel con caja final negativa sin compras inciertas; el Estado debe publicar una tarifa que deje al menos una opción viable a cada empresa. Esto evita depender de una venta que la fundación puede rechazar.
+Antes de fijar producción, compare emisiones y utilidad entre los cinco niveles. Luego revise los dos bloques de la selección: resultado del año y caja y margen de compensación. Explique la utilidad prevista: ingresos menos costos productivos, pago de créditos e impuesto. Al elegir producción todavía no se presuponen compras; la caja final suma a la caja inicial el resultado económico. Una pérdida anual no equivale a falta de caja. Se impide confirmar un nivel con caja final negativa sin compras inciertas; el Estado debe publicar una tarifa que deje al menos una opción viable a cada empresa. Esto evita depender de una venta que la fundación puede rechazar.
 
 Ambas fundaciones cotizan antes de comprar. Las empresas A, B y C preparan sus ofertas como borradores y revisan el pago, el ahorro de impuesto y la caja/ utilidad resultantes. Comprar créditos siempre reduce caja al aceptar; si el precio está por debajo del impuesto, puede aumentar utilidad. La previsión que incluye todas las ofertas no garantiza que todas sean aceptadas. El programa comprueba caja conjunta para ambos proveedores y solvencia para cualquier combinación de aceptaciones.
 

@@ -1,6 +1,7 @@
 import { ROLES, isGameOver } from '../engine.js';
+import { AVATAR_GENDERS, teamAliasForName } from '../table_setup.js';
 
-export const CONSENT_VERSION = '2026-11-01';
+export const CONSENT_VERSION = '2026-11-03';
 export const ACTION_FIELDS = {
   policy:['tax','subsidy'],publish:[],subsidy:['subsidy'],addProject:['project'],removeProject:['id'],
   confirmProjects:[],confirmGrants:[],execute:[],verify:['foundation','verified'],openMarket:[],
@@ -10,6 +11,17 @@ export const ACTION_FIELDS = {
 };
 export function hasStudentCodes(setup) {
   return ROLES.every(role => typeof setup?.studentCodes?.[role] === 'string' && setup.studentCodes[role].trim().length > 0);
+}
+export function sessionProfile(setup) {
+  const teamAlias = teamAliasForName(setup.names.team);
+  const avatarGenders = Object.fromEntries(ROLES.flatMap(role => {
+    const choice = setup.avatarGenders?.[role];
+    return typeof choice === 'string' && Object.hasOwn(AVATAR_GENDERS, choice) ? [[role, choice]] : [];
+  }));
+  return {
+    ...(teamAlias && { team_alias: teamAlias }),
+    ...(Object.keys(avatarGenders).length && { avatar_genders: avatarGenders }),
+  };
 }
 export function actionData(action) {
   if (!Object.hasOwn(ACTION_FIELDS, action.type)) throw Error('Unsupported research action');

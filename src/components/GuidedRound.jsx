@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Check, Factory, GraduationCap, Landmark, LockKeyhole, ShieldCheck, Trees, X } from 'lucide-react';
-import { COMPANIES, FOUNDATIONS, INTENSITY, PROJECTS, PRODUCTION, available, companyView, purchasePreview, policyIssues, isBatchMarket, isStreamlined, lot, previewRound, projectDetails, remaining } from '../engine.js';
+import { COMPANIES, FOUNDATIONS, INTENSITY, PROJECTS, PRODUCTION, available, companyView, productionView, purchasePreview, policyIssues, isBatchMarket, isStreamlined, lot, previewRound, projectDetails, remaining } from '../engine.js';
 import { closingIssues, currentTurn, foundationOrder, projectIssues, projectOptionIssue, roleName } from '../workflow.js';
 import { Button, Field, Help, Stat } from './ui.jsx';
 
@@ -27,12 +27,62 @@ function Continue({ game, turn, children, ...props }) {
 
 function Production({ game, role, send }) {
   const view = companyView(game, role);
-  return <><div className="field-heading"><h3>Nivel de producción</h3><Help label="Nivel de producción">Toneladas de producto que venderás este año. Al aumentar la producción cambian ingresos, costos y emisiones. Elegir un nivel prepara la decisión. Al confirmar no podrás cambiarla durante ese año, ni siquiera al reabrir los contratos.</Help></div>
-    <div className="production-options">{Object.entries(PRODUCTION).map(([quantity, option]) => <button type="button" key={quantity} disabled={view.credits > Math.floor(+quantity * INTENSITY[role] * .5)} aria-pressed={view.production === +quantity} className={view.production === +quantity ? 'selected' : ''} onClick={() => send({ type: 'production', actor: role, quantity: +quantity })}><strong>{quantity} t</strong><small>{option.label}</small></button>)}</div>
-    {view.credits > Math.floor(100 * INTENSITY[role] * .5) && <p className="muted small">Los niveles deshabilitados dejarían tus créditos por encima del 50% permitido. Anula los contratos correspondientes si necesitas bajar a esos niveles.</p>}
-    <p className="selection-status" role="status"><Check size={15}/>Selección actual: {view.production} t. Al confirmar queda fija hasta el próximo año.</p>
-    <p className="production-facts">Ingresos: <strong>{money(view.income)}</strong> · Producción: <strong>{money(view.cost)}</strong> · Emisiones propias: <strong>{number(view.emissions)} tCO₂e</strong> · Máximo de créditos: <strong>{Math.floor(view.emissions*.5)}</strong></p>
-    <section className={`financial-preview ${view.profit<0?'financial-warning':''}`} aria-label="Resultado esperado de producción" aria-live="polite"><h3>Resultado esperado después de impuestos</h3><div className="mini-grid"><Stat label="Impuesto esperado sin nuevas compras" value={money(view.tax)}/><Stat label="Utilidad esperada después de impuestos" value={money(view.profit)}/><Stat label="Caja prevista al cierre" value={money(view.closingCash)}/></div><p>Utilidad = ingresos − producción − compra de créditos − impuesto. Esta previsión no supone compras futuras. La caja inicial no forma parte de la utilidad.</p>{view.profit<0&&<p className="notice-text">Este nivel genera una pérdida prevista. Revisa si tu caja puede cubrirla; elige otro nivel antes de confirmar si la caja al cierre sería negativa.</p>}</section>
+  const options = Object.entries(PRODUCTION).map(([quantity, option]) => ({
+    label: option.label,
+    ...productionView(game, role, Number(quantity)),
+  }));
+  const creditLimit = Math.floor(view.emissions * .5);
+
+  return <>
+    <div className="field-heading">
+      <h3>Compara los niveles de producción</h3>
+      <Help label="Nivel de producción">Cada opción proyecta la utilidad con la tarifa del año y sin nuevas compras de créditos. Puedes elegir otra cantidad hasta confirmar.</Help>
+    </div>
+    <p className="production-context"><strong>Tarifa del año:</strong> {money(game.draft.tax)} por tCO₂e · <strong>Intensidad de tu empresa:</strong> {number(INTENSITY[role])} tCO₂e por tonelada producida.</p>
+    <div className="production-options production-comparison" role="group" aria-label="Niveles de producción">
+      {options.map(option => {
+        const selected = view.production === option.production;
+        const overCreditLimit = view.credits > Math.floor(option.emissions * .5);
+        return <button type="button" key={option.production} disabled={overCreditLimit}
+          aria-pressed={selected} className={selected ? 'selected' : ''}
+          onClick={() => send({ type: 'production', actor: role, quantity: option.production })}>
+          <strong>{option.production} t</strong>
+          <small>{option.label}</small>
+          <span>{number(option.emissions)} tCO₂e</span>
+          <span className={option.profit < 0 ? 'negative' : undefined}>{money(option.profit)} de utilidad</span>
+          {isBatchMarket(game) && option.closingCash < 0 && <span className="negative">Caja insuficiente</span>}
+        </button>;
+      })}
+    </div>
+    {options.some(option => view.credits > Math.floor(option.emissions * .5)) &&
+      <p className="muted small">Los niveles deshabilitados excederían el límite de créditos con tus contratos actuales.</p>}
+    <section className="production-breakdown" aria-label="Proyección de la selección" aria-live="polite">
+      <h3>Proyección para {view.production} t</h3>
+      <div className="production-accounts">
+        <div>
+          <h4>Resultado del año</h4>
+          <dl>
+            <div><dt>Ingresos por ventas</dt><dd>{money(view.income)}</dd></div>
+            <div><dt>Costos de producción</dt><dd>−{money(view.cost)}</dd></div>
+            {view.spend > 0 && <div><dt>Créditos comprados</dt><dd>−{money(view.spend)}</dd></div>}
+            <div><dt>Impuesto previsto</dt><dd>−{money(view.tax)}</dd></div>
+            <div className="account-total"><dt>Utilidad después de impuestos</dt><dd className={view.profit < 0 ? 'negative' : undefined}>{money(view.profit)}</dd></div>
+          </dl>
+        </div>
+        <div>
+          <h4>Caja y margen de compensación</h4>
+          <dl>
+            <div><dt>Caja disponible hoy</dt><dd>{money(game.companies[role].cash)}</dd></div>
+            <div><dt>Emisiones propias</dt><dd>{number(view.emissions)} tCO₂e</dd></div>
+            <div><dt>Límite de créditos (50%)</dt><dd>{creditLimit}</dd></div>
+            <div className="account-total"><dt>Caja prevista al cierre</dt><dd className={view.closingCash < 0 ? 'negative' : undefined}>{money(view.closingCash)}</dd></div>
+          </dl>
+        </div>
+      </div>
+      <p className="small muted">La proyección excluye nuevas compras. La caja al cierre incorpora el saldo disponible hoy.</p>
+      {view.closingCash < 0 && <p className="notice-text">La caja al cierre sería negativa. Elige un nivel que puedas financiar.</p>}
+      {view.closingCash >= 0 && view.profit < 0 && <p className="notice-text">Este nivel genera una pérdida prevista que tu caja puede cubrir.</p>}
+    </section>
   </>;
 }
 
@@ -179,7 +229,7 @@ export default function GuidedRound({ game, role, choose, send, hide, onResults,
     <section className="turn-banner" aria-label="Turno actual"><div><span className="eyebrow">{turn.kind === 'finished' ? 'Partida finalizada' : `Año ${d.year} de 4 · turno actual`}</span><h1><RoleIcon role={turn.role} size={25}/>{roleName(game, turn.role)}</h1><p>{turn.title}. {turn.next && <span>Después continúa: <strong>{nextLabel}</strong>.</span>}</p></div>{cast}{!active && <Button kind="primary" onClick={() => choose(turn.role)}>Continuar con {roleName(game, turn.role)}<ArrowRight size={18}/></Button>}</section>
     <div className="guided-layout"><section className="private-panel guided-panel" aria-label="Cabina del participante"><div className="panel-title"><div><span className="eyebrow">{active ? turn.kind === 'reply' ? 'Respuesta de la contraparte' : 'Decisión del turno' : 'Siguiente paso'}</span><h2>{turn.title}</h2></div>{active && <button className="icon-btn" aria-label="Ocultar cabina y pasar" onClick={hide}><LockKeyhole size={19}/></button>}</div>
       {!active ? <div className="guided-locked"><RoleIcon role={turn.role} size={32}/><h3>Es el turno de {roleName(game, turn.role)}</h3><p>Usa «Continuar con {roleName(game, turn.role)}» en el encabezado. Registra la decisión y confirma para pasar al siguiente participante.</p></div> : <div className="panel-body" key={`${d.year}-${turn.kind}-${turn.role}-${turn.contract?.id || ''}`}>
-        {turn.kind === 'policy' ? <Policy {...{game, turn, send}}/> : turn.kind === 'production' ? <><Production game={game} role={turn.role} send={send}/><p>Revisa la selección antes de confirmar: será tu producción definitiva de este año. {isBatchMarket(game)?'Las ofertas podrán revisarse antes de confirmarlas; los contratos aceptados serán definitivos.':'Los contratos sí podrán renegociarse.'}</p><Continue game={game} turn={turn} disabled={isBatchMarket(game)&&companyView(game,turn.role).closingCash<0} onClick={() => send({ type: 'confirmProduction', actor: turn.role, lock: true })}>Confirmar {d.production[turn.role]} t y continuar con {nextLabel}</Continue></> : turn.kind === 'projects' ? <Projects {...{game, turn, send}}/> : turn.kind === 'grants' ? <Grants {...{game, turn, send}}/> : turn.kind === 'execute' ? (isStreamlined(game)?<TeacherReview {...{game,send}}/>:<Execute {...{game, send}}/>) : turn.kind === 'verify' ? (isStreamlined(game)?<TeacherReview {...{game,send}}/>:<Verify {...{game, send}}/>) : turn.kind === 'bids' ? <Bidding {...{game,turn,send}}><QuoteComparison game={game}/><TradeForm game={game} role={turn.role} send={send}/></Bidding> : turn.kind === 'sales' ? <Sales {...{game,turn,send}}><AcceptedContracts game={game} role={turn.role} send={send}/></Sales> : turn.kind === 'reply' ? <Reply {...{game, turn, send}}/> : turn.kind === 'quote' ? <Quotes {...{game, turn, send}}/> : turn.kind === 'trade' ? <Trading {...{game, turn, send}}/> : turn.kind === 'close' ? <Close {...{game, send}}/> : <><p>Año {d.year} cerrado. Emisiones acumuladas: <strong>{number(game.emissions)} de 1.400 tCO₂e</strong>. Revisa las cuentas antes de continuar.</p><Button kind="primary" className="full" onClick={onResults}>{turn.kind==='finished'?'Ver resultados finales':'Ver resultados del año'}</Button>{turn.kind === 'next' && <Button kind="primary full" onClick={() => send({ type: 'next', actor: 'Docente' })}>Empezar año {d.year + 1} y continuar con el Estado<ArrowRight size={17}/></Button>}{turn.kind === 'finished' && <p>La partida terminó. La sección Resultados muestra el desenlace y los puntos acumulados de los seis roles.</p>}</>}
+        {turn.kind === 'policy' ? <Policy {...{game, turn, send}}/> : turn.kind === 'production' ? <><Production game={game} role={turn.role} send={send}/><p className="production-commitment">La producción queda fija para este año al confirmar.</p><Continue game={game} turn={turn} disabled={isBatchMarket(game)&&companyView(game,turn.role).closingCash<0} onClick={() => send({ type: 'confirmProduction', actor: turn.role, lock: true })}>Confirmar {d.production[turn.role]} t y continuar con {nextLabel}</Continue></> : turn.kind === 'projects' ? <Projects {...{game, turn, send}}/> : turn.kind === 'grants' ? <Grants {...{game, turn, send}}/> : turn.kind === 'execute' ? (isStreamlined(game)?<TeacherReview {...{game,send}}/>:<Execute {...{game, send}}/>) : turn.kind === 'verify' ? (isStreamlined(game)?<TeacherReview {...{game,send}}/>:<Verify {...{game, send}}/>) : turn.kind === 'bids' ? <Bidding {...{game,turn,send}}><QuoteComparison game={game}/><TradeForm game={game} role={turn.role} send={send}/></Bidding> : turn.kind === 'sales' ? <Sales {...{game,turn,send}}><AcceptedContracts game={game} role={turn.role} send={send}/></Sales> : turn.kind === 'reply' ? <Reply {...{game, turn, send}}/> : turn.kind === 'quote' ? <Quotes {...{game, turn, send}}/> : turn.kind === 'trade' ? <Trading {...{game, turn, send}}/> : turn.kind === 'close' ? <Close {...{game, send}}/> : <><p>Año {d.year} cerrado. Emisiones acumuladas: <strong>{number(game.emissions)} de 1.400 tCO₂e</strong>. Revisa las cuentas antes de continuar.</p><Button kind="primary" className="full" onClick={onResults}>{turn.kind==='finished'?'Ver resultados finales':'Ver resultados del año'}</Button>{turn.kind === 'next' && <Button kind="primary full" onClick={() => send({ type: 'next', actor: 'Docente' })}>Empezar año {d.year + 1} y continuar con el Estado<ArrowRight size={17}/></Button>}{turn.kind === 'finished' && <p>La partida terminó. La sección Resultados muestra el desenlace y los puntos acumulados de los seis roles.</p>}</>}
       </div>}
     </section></div>
   </>;

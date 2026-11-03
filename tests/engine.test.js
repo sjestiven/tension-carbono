@@ -16,6 +16,9 @@ test('Student codes retain leading zeros and survive export without changing eco
   const old={...exportGame(createGame()),version:'2.1.0'};
   delete old.setup.studentCodes;
   assert.equal(importGame(old).setup.studentCodes.A,'');
+  const unrecorded = createGame({names:{team:'Hyrule'},players:{A:'Alex'},avatarGenders:{A:'other'},tableConfigured:true});
+  assert.deepEqual(importGame(exportGame(unrecorded)).setup, unrecorded.setup);
+  assert.ok(Object.values(unrecorded.setup.studentCodes).every(code => code === ''));
 });
 
 test('The public example replays the same state as the source template', () => {

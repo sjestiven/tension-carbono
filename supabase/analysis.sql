@@ -7,9 +7,11 @@ from research.sessions where study = 'pilot-2026'
 group by game_version,outcome order by game_version,outcome;
 
 -- 2. Identified decision log. Keep this export restricted to the research team.
-select s.id as session_id,s.started_at,e.seq,e.year,e.phase,e.actor,
+select s.id as session_id,s.started_at,profile.data->>'team_alias' as team_alias,
+       profile.data->'avatar_genders'->>e.actor as initial_avatar_gender,e.seq,e.year,e.phase,e.actor,
        p.student_code,e.kind,e.action_type,coalesce(e.data->>'origin','player') as decision_origin,e.data,e.elapsed_ms,e.visible_elapsed_ms
 from research.sessions s join research.events e on e.session_id=s.id
+left join research.events profile on profile.session_id=s.id and profile.seq=1 and profile.kind='session_started'
 left join research.participants p on p.session_id=e.session_id and p.role=e.actor
 where s.study='pilot-2026'
 order by s.started_at,s.id,e.seq;

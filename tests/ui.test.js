@@ -34,6 +34,13 @@ test('The completed-game results render all roles and both foundation inventorie
     assert.equal((review.match(/Capacidad instalada: 20 tCO₂e\/año/g)||[]).length,2);
     assert.ok(!review.includes('Capacidad instalada: 40'));
     assert.match(review,/Confirmar ejecución y verificaciones/);
+    const production = applyAction(createGame({names:{B:'21'}}),{type:'publish',actor:'Estado'});
+    const comparison = renderToString(React.createElement(GuidedRound,{game:production,role:'A',choose:()=>{},send:()=>{},hide:()=>{},onResults:()=>{}})).replace(/<[^>]*>/g,'');
+    assert.match(comparison,/100 tBajo40 tCO₂eUSD 600 de utilidad/);
+    assert.match(comparison,/300 tMuy alto120 tCO₂eUSD 1.600 de utilidad/);
+    assert.match(comparison,/Impuesto previsto−USD 2.000/);
+    assert.match(comparison,/Caja disponible hoyUSD 5.000/);
+    assert.match(comparison,/Empresa B · 21/);
   } finally {
     await server.close();
   }

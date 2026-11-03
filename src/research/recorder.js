@@ -1,4 +1,4 @@
-import { ACTION_FIELDS, CONSENT_VERSION, actionData, hasStudentCodes, outcome, roundData } from './data.js';
+import { ACTION_FIELDS, CONSENT_VERSION, actionData, hasStudentCodes, outcome, roundData, sessionProfile } from './data.js';
 import { currentTurn } from '../workflow.js';
 import { committedFrames } from '../engine.js';
 
@@ -41,7 +41,7 @@ export class ResearchRecorder {
       p_codes:structuredClone(game.setup.studentCodes),p_events:[],p_rounds:[],
     }};
     this.state.sessions.push(row); this.state.activeId = row.payload.p_session.id; this.state.currentRecordId = this.state.activeId; this.game = game;
-    this.visibleSince = this.now(); this.record('session_started');
+    this.visibleSince = this.now(); this.record('session_started', sessionProfile(game.setup));
     return true;
   }
   record(kind,data={},actor,actionType=null) {
