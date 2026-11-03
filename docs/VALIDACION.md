@@ -1,5 +1,11 @@
 # Validation history and current workspace status
 
+## Version 3.1.3 public release on 3 November 2026
+
+Application commit `736467d592aa5d4bfac8662362116dcee0512048` passed [Actions run 41647101160](https://github.com/sjestiven/tension-carbono/actions/runs/41647101160). All 77 tests passed, and all eight files at the [public game](https://sjestiven.github.io/tension-carbono/) matched the validated build.
+
+Browser checks covered opening the home menu by keyboard, dismissing it with Escape and an outside pointer action, switching and persisting motion modes, and rotating the valley. The guided example opened in year 1, showed each annual balance and final scores, allowed backward navigation, and returned to a saved game with its published policy and next turn intact. The renderer uses refresh-driven orbit damping, a limited pixel ratio and cached shadows. A frame-rate benchmark was outside this validation.
+
 ## Version 3.1.2 public release on 3 November 2026
 
 Application commit `36ede1a4b1f1f3f6125cbe02dcc76e47590ee87c` passed [Actions run 41644312669](https://github.com/sjestiven/tension-carbono/actions/runs/41644312669). All 76 tests passed, and all eight files at the [public game](https://sjestiven.github.io/tension-carbono/) matched the validated build.
