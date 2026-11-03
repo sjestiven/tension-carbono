@@ -7,7 +7,7 @@ import { Button, Stat } from './ui.jsx';
 const Valley = lazy(() => import('../Valley.jsx'));
 const format = value => new Intl.NumberFormat('es-CO', { maximumFractionDigits: 2 }).format(value);
 
-export default function RoundOverview({ game, turn, choose, overviewRef }) {
+export default function RoundOverview({ game, turn, choose, overviewRef, motionEnabled }) {
   const [open, setOpen] = useState(null);
   const container = useRef();
   const routeTrigger = useRef();
@@ -38,7 +38,7 @@ export default function RoundOverview({ game, turn, choose, overviewRef }) {
       <button ref={organizationsTrigger} type="button" className="organizations-trigger" aria-expanded={open === 'organizations'} aria-controls={`${panelId}-organizations`} onClick={() => setOpen(open === 'organizations' ? null : 'organizations')}><Trees size={16}/>Organizaciones</button>
       <button ref={routeTrigger} type="button" className="route-trigger" aria-expanded={open === 'route'} aria-controls={`${panelId}-route`} onClick={() => setOpen(open === 'route' ? null : 'route')}><Map size={16}/>Ruta del año <span>{step + 1}/7</span></button>
       {open === 'route' && <section id={`${panelId}-route`} className="route-popover" aria-label="Ruta del año"><div className="field-heading"><h2>Ruta del año {game.draft.year}</h2><button className="icon-btn" aria-label="Cerrar ruta del año" onClick={close}><X size={18}/></button></div><ol className="turn-route">{steps.map((label, index) => <li key={label} aria-current={index === step ? 'step' : undefined} className={index === step ? 'active' : ''}>{label}</li>)}</ol><p>{isBatchMarket(game)?'La producción confirmada queda fija. Revisa borradores antes de confirmar: las ofertas son vinculantes y los contratos aceptados no se anulan.':'La producción confirmada queda fija. Los contratos se pueden rechazar, anular o renegociar antes del cierre.'}</p><Button className="full" onClick={close}>Volver a la decisión<ArrowRight size={15}/></Button></section>}
-      {open === 'organizations' && <section id={`${panelId}-organizations`} className="route-popover organizations-popover" aria-label="Organizaciones de la mesa"><div className="field-heading"><h2>Organizaciones de la mesa</h2><button className="icon-btn" aria-label="Cerrar organizaciones" onClick={close}><X size={18}/></button></div><Suspense fallback={<p>Preparando el valle…</p>}><Valley game={game} onSelect={role => { close(); choose(role); }}/></Suspense><div className="organization-labels">{ROLES.map(role => <span key={role} className={role === turn.role ? 'active' : ''}>{roleName(game, role)}</span>)}</div><p>Turno actual: <strong>{roleName(game, turn.role)}</strong>. La cabina inferior indica la decisión pendiente.</p></section>}
+      {open === 'organizations' && <section id={`${panelId}-organizations`} className="route-popover organizations-popover" aria-label="Organizaciones de la mesa"><div className="field-heading"><h2>Organizaciones de la mesa</h2><button className="icon-btn" aria-label="Cerrar organizaciones" onClick={close}><X size={18}/></button></div><Suspense fallback={<p>Preparando el valle…</p>}><Valley game={game} motionEnabled={motionEnabled} onSelect={role => { close(); choose(role); }}/></Suspense><div className="organization-labels">{ROLES.map(role => <span key={role} className={role === turn.role ? 'active' : ''}>{roleName(game, role)}</span>)}</div><p>Turno actual: <strong>{roleName(game, turn.role)}</strong>. La cabina inferior indica la decisión pendiente.</p></section>}
     </div>
   </section>;
 }

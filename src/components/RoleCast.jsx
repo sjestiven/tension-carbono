@@ -85,7 +85,7 @@ export default function RoleCast({game,activeRole,receipt,motionEnabled}) {
     const tokenMaterial=new THREE.MeshBasicMaterial({color:0xd09a34}),creditMaterial=new THREE.MeshBasicMaterial({color:0x2e7956});
     const transfers=Array.from({length:3},()=>({token:add(tokenGeometry,tokenMaterial,scene,0,.7,.5),credit:add(creditGeometry,creditMaterial,scene,0,.7,.5)}));
     let frame=null,visible=true;
-    function render(time=performance.now()) {
+    function render() {
       frame=null;
       if(!visible)return;
       const state=latest.current,elapsed=state.receipt?Date.now()-state.receipt.createdAt:1000;
@@ -95,7 +95,8 @@ export default function RoleCast({game,activeRole,receipt,motionEnabled}) {
       if(animating) {
         const entries=state.receipt.entries.filter(entry=>ROLES.includes(entry.from)&&ROLES.includes(entry.to)&&entry.from!==entry.to);
         entries.slice(0,3).forEach((entry,index)=>{
-          const {token,credit}=transfers[index],start=ROLES.indexOf(entry.from),end=ROLES.indexOf(entry.to),t=elapsed/450;
+          const {token,credit}=transfers[index],start=ROLES.indexOf(entry.from),end=ROLES.indexOf(entry.to);
+          const progress=elapsed/450,t=progress*progress*(3-2*progress);
           token.visible=true;token.position.set(THREE.MathUtils.lerp(figures[start].position.x,figures[end].position.x,t),.7+Math.sin(t*Math.PI)*(.3+index*.08),.5);
           if(['purchase','refund'].includes(entry.kind)){credit.visible=true;credit.position.set(THREE.MathUtils.lerp(figures[end].position.x,figures[start].position.x,t),.6-Math.sin(t*Math.PI)*.12,.55);}
         });

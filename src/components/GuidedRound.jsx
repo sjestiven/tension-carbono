@@ -215,7 +215,7 @@ function Close({ game, send }) {
   return <><p>Las tres empresas confirmaron sus decisiones. Revisa el resumen y cierra el año para liquidar producción, impuestos y créditos.</p><div className="mini-grid"><Stat label="Emisión física anual" value={`${number(result.emissions)} tCO₂e`}/><Stat label="Recaudo anual" value={money(result.tax)}/></div><Issues issues={issues}/><Button kind="primary full" disabled={Boolean(issues.length)} onClick={() => send({ type: 'close', actor: 'Docente' })}>Cerrar año {game.draft.year} y ver resultados<ShieldCheck size={17}/></Button>{!isBatchMarket(game)&&<details className="correction-options"><summary>Hace falta renegociar antes del cierre</summary><p>Reabre las cotizaciones y los contratos. Los acuerdos se conservan hasta que una parte los anule; las empresas vuelven a confirmar. La producción permanece fija.</p><Button onClick={() => send({ type: 'reopenNegotiation', actor: 'Docente' })}>Reabrir negociación</Button></details>}</>;
 }
 
-export default function GuidedRound({ game, role, choose, send, hide, onResults, cast }) {
+export default function GuidedRound({ game, role, choose, send, hide, onResults, cast, motionEnabled }) {
   const turn = currentTurn(game);
   const d = game.draft;
   const active = role === turn.role;
@@ -225,7 +225,7 @@ export default function GuidedRound({ game, role, choose, send, hide, onResults,
   }, [active, turn.role, turn.kind, turn.contract?.id]);
   const nextLabel = isStreamlined(game)&&turn.next==='Docente'&&['bids','sales'].includes(turn.kind)?'Resultados del año':turn.next ? roleName(game, turn.next) : 'Partida finalizada';
   return <>
-    <RoundOverview {...{game,turn,choose,overviewRef:overview}}/>
+    <RoundOverview {...{game,turn,choose,motionEnabled,overviewRef:overview}}/>
     <section className="turn-banner" aria-label="Turno actual"><div><span className="eyebrow">{turn.kind === 'finished' ? 'Partida finalizada' : `Año ${d.year} de 4 · turno actual`}</span><h1><RoleIcon role={turn.role} size={25}/>{roleName(game, turn.role)}</h1><p>{turn.title}. {turn.next && <span>Después continúa: <strong>{nextLabel}</strong>.</span>}</p></div>{cast}{!active && <Button kind="primary" onClick={() => choose(turn.role)}>Continuar con {roleName(game, turn.role)}<ArrowRight size={18}/></Button>}</section>
     <div className="guided-layout"><section className="private-panel guided-panel" aria-label="Cabina del participante"><div className="panel-title"><div><span className="eyebrow">{active ? turn.kind === 'reply' ? 'Respuesta de la contraparte' : 'Decisión del turno' : 'Siguiente paso'}</span><h2>{turn.title}</h2></div>{active && <button className="icon-btn" aria-label="Ocultar cabina y pasar" onClick={hide}><LockKeyhole size={19}/></button>}</div>
       {!active ? <div className="guided-locked"><RoleIcon role={turn.role} size={32}/><h3>Es el turno de {roleName(game, turn.role)}</h3><p>Usa «Continuar con {roleName(game, turn.role)}» en el encabezado. Registra la decisión y confirma para pasar al siguiente participante.</p></div> : <div className="panel-body" key={`${d.year}-${turn.kind}-${turn.role}-${turn.contract?.id || ''}`}>

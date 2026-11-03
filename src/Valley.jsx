@@ -24,8 +24,9 @@ function MapFallback({game,onSelect}) {
   </svg>;
 }
 
-export default function Valley({ game, onSelect }) {
+export default function Valley({ game, onSelect, motionEnabled }) {
   const gameRef=useRef(game),draw=useRef(null);gameRef.current=game;
+  const motion=useRef(motionEnabled);motion.current=motionEnabled;
   const host = useRef(null), select = useRef(onSelect), [failed, setFailed] = useState(false);
   select.current = onSelect;
   const quantities = Object.values(game.draft.production).join('-');
@@ -39,9 +40,10 @@ export default function Valley({ game, onSelect }) {
     let renderer;
     try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); }
     catch { setFailed(true); return; }
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     renderer.setClearColor(0xe9eee4, 1);
     renderer.shadowMap.enabled = true;
+    renderer.shadowMap.autoUpdate = false;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.outputEncoding = THREE.sRGBEncoding;
     container.appendChild(renderer.domElement);
@@ -49,7 +51,8 @@ export default function Valley({ game, onSelect }) {
     const camera = new THREE.PerspectiveCamera(34, 1, .1, 100);
     camera.position.set(15, 17, 19);
     const controls = new OrbitControls(camera, renderer.domElement);
-    controls.target.set(0, .7, 0);controls.enableDamping = false;controls.enableZoom = false;controls.enablePan = false;
+    controls.target.set(0, .7, 0);controls.enableDamping = motion.current;controls.enableZoom = false;controls.enablePan = false;
+    controls.dampingFactor = .22;
     controls.minPolarAngle = .45;controls.maxPolarAngle = 1.2;
     scene.add(new THREE.HemisphereLight(0xfff8e5, 0x728e66, .95));
     const sun = new THREE.DirectionalLight(0xfff2d5, 1.3);sun.position.set(-8, 20, 10);sun.castShadow = true;
@@ -113,32 +116,46 @@ export default function Valley({ game, onSelect }) {
       if(hits[0])select.current(hits[0].object.userData.role);
     };
     renderer.domElement.addEventListener('pointerdown',pointerDown);renderer.domElement.addEventListener('click',click);
-    let frame=null,visible=true;
-    const render=()=>{
-      frame=null;if(!visible)return;
-      const current=gameRef.current,ratio=climateStatus(current).ratio;
-      scene.traverse(object=>{
-        if(object.userData.autumnBase!==undefined)object.material.color.set(object.userData.autumnBase).lerp(new THREE.Color(0xb34d39),ratio*.8);
-        if(object.userData.foundationTree)object.visible=object.userData.treeIndex<5+Math.floor(current.foundations[object.userData.foundationTree].capacity/20);
-      });
-      for(const cloud of clouds)cloud.m.scale.setScalar(.7+current.draft.production[cloud.role]/300*.4);
+    let frame=null,intersects=true,lastTime=null,lastGame;
+    const autumnTint=new THREE.Color(0xb34d39);
+    const isVisible=()=>intersects&&document.visibilityState==='visible';
+    function render(time) {
+      if(!isVisible()){frame=null;return;}
+      const elapsed=lastTime===null?1000/60:Math.min(time-lastTime,50);
+      controls.enableDamping=motion.current;
+      controls.dampingFactor=1-Math.pow(.78,elapsed/(1000/60));
+      const moving=controls.update();
+      const current=gameRef.current;
+      if(current!==lastGame){
+        const ratio=climateStatus(current).ratio;
+        scene.traverse(object=>{
+          if(object.userData.autumnBase!==undefined)object.material.color.set(object.userData.autumnBase).lerp(autumnTint,ratio*.8);
+          if(object.userData.foundationTree)object.visible=object.userData.treeIndex<5+Math.floor(current.foundations[object.userData.foundationTree].capacity/20);
+        });
+        for(const cloud of clouds)cloud.m.scale.setScalar(.7+current.draft.production[cloud.role]/300*.4);
+        renderer.shadowMap.needsUpdate=true;
+        lastGame=current;
+      }
       renderer.render(scene,camera);
-    };
-    const request=()=>{if(frame===null&&visible)frame=requestAnimationFrame(render);};draw.current=request;
+      frame=null;
+      lastTime=motion.current&&moving?time:null;
+      if(lastTime!==null)request();
+    }
+    const request=()=>{if(frame===null&&isVisible())frame=requestAnimationFrame(render);};draw.current=request;
     const resize=new ResizeObserver(()=>{const w=container.clientWidth,h=container.clientHeight;if(!w||!h)return;renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix();request();});resize.observe(container);
     controls.addEventListener('change',request);
-    const visibility=()=>{visible=document.visibilityState==='visible';if(!visible&&frame!==null){cancelAnimationFrame(frame);frame=null;}if(visible)request();};
+    const visibility=()=>{if(!isVisible()&&frame!==null){cancelAnimationFrame(frame);frame=null;lastTime=null;}if(isVisible())request();};
     document.addEventListener('visibilitychange',visibility);
-    const intersection=new IntersectionObserver(entries=>{visible=entries[0].isIntersecting&&document.visibilityState==='visible';if(visible)request();});intersection.observe(container);
+    const intersection=new IntersectionObserver(entries=>{intersects=entries[0].isIntersecting;visibility();});intersection.observe(container);
     request();
     return()=>{
       draw.current=null;if(frame!==null)cancelAnimationFrame(frame);intersection.disconnect();document.removeEventListener('visibilitychange',visibility);controls.removeEventListener('change',request);resize.disconnect();controls.dispose();
       renderer.domElement.removeEventListener('pointerdown',pointerDown);renderer.domElement.removeEventListener('click',click);
       scene.traverse(o=>{o.geometry?.dispose(); if(o.material){const ms=Array.isArray(o.material)?o.material:[o.material];ms.forEach(m=>m.dispose());}});
-      renderer.dispose();renderer.domElement.remove();
+      sun.shadow.map?.dispose();renderer.dispose();renderer.domElement.remove();
     };
   },[]);
-  useEffect(()=>draw.current?.(),[quantities,capacities,climate.ratio]);
+  useEffect(()=>draw.current?.(),[quantities,capacities,climate.ratio,motionEnabled]);
   return <div className="valley-wrap"><div ref={host} className="valley" role="img" aria-label="Valle 3D con tres empresas, dos fundaciones y un Estado. Use las tarjetas inferiores para abrir cada rol." />
     {failed ? <div className="scene-fallback"><MapFallback game={game} onSelect={onSelect}/><small>Vista de mapa · 3D disponible en dispositivos con WebGL</small></div> : <span className="scene-hint">Arrastra para explorar el valle</span>}
   </div>;

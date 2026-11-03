@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createGame as createCurrentGame, applyAction, scores, exportGame, importGame, automaticRatings, lot, projectDetails, companyView, available, remaining, VERSION, isGameOver } from '../src/engine.js';
-import { playTemplate as playCurrentTemplate, DEMO } from '../src/demo.js';
+import { playTemplate as playCurrentTemplate, exampleYears, DEMO } from '../src/demo.js';
 const createGame = setup => createCurrentGame(setup,'2.2.0');
 const playTemplate = (rounds,setup) => playCurrentTemplate(rounds,setup,'2.2.0');
 const act = (g, type, actor, data = {}) => applyAction(g, { type, actor, ...data });
@@ -27,6 +27,15 @@ test('The public example replays the same state as the source template', () => {
     'utf8',
   ));
   assert.deepEqual(importGame(example), playTemplate(DEMO, example.setup));
+});
+
+test('The guided example exposes each annual closure without future decisions or scores', () => {
+  const years = exampleYears();
+  assert.deepEqual(years.map(game => game.history.length), [1, 2, 3, 4]);
+  for (const [index, game] of years.entries()) {
+    assert.deepEqual(game, playCurrentTemplate(DEMO.slice(0, index + 1)));
+    assert.equal(isGameOver(game), index === years.length - 1);
+  }
 });
 
 function market({ tax = 20, project = 'P1', verified = true } = {}) {

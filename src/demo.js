@@ -2,7 +2,7 @@ import template from './demo.json' with { type: 'json' };
 import { createGame, applyAction, COMPANIES, FOUNDATIONS, isGameOver, VERSION, isBatchMarket } from './engine.js';
 export const DEMO = template;
 // Usa exactamente el mismo motor y validaciones que cada control de la interfaz.
-export function playTemplate(rounds = template, setup, version = VERSION) {
+export function playTemplate(rounds = template, setup, version = VERSION, onYearClosed) {
   let game = createGame(setup,version);
   const act = a => { game = applyAction(game, a); };
   for (const [index, r] of rounds.entries()) {
@@ -47,6 +47,13 @@ export function playTemplate(rounds = template, setup, version = VERSION) {
     for (const e of COMPANIES) act({ type: 'confirmCompany', actor: e });
     }
     if(game.draft.phase==='market')act({ type: 'close', actor: 'Docente' });
+    onYearClosed?.(game);
   }
   return game;
+}
+
+export function exampleYears(setup) {
+  const years = [];
+  playTemplate(template, setup, VERSION, game => years.push(game));
+  return years;
 }

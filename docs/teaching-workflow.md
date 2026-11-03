@@ -14,6 +14,9 @@ Las consultas para analizar decisiones, tiempos, producción, precios y resultad
 
 ## Preparación y primera decisión
 
+
+Antes de jugar, abra **Ver partida de ejemplo año a año** desde el inicio. En cada año la clase revisa política, producción, proyectos verificados, mercado y balance antes de avanzar. Pida al grupo que identifique qué cambia al pasar al siguiente año y explique por qué los créditos modifican el impuesto y la verificación modifica la cuenta física. El recorrido ofrece cuentas detalladas en cada cierre y puntajes al finalizar, con la mesa guardada disponible al volver al inicio.
+
 El juego abre en el inicio y conserva la mesa guardada hasta que se decida continuar o reiniciar. Al crear la mesa, el programa anuncia el turno del Estado. El cronómetro permite 12, 8 o 4 minutos e inicia automáticamente al abrir su cabina inicial, una vez por año; puede pausarse. La duración se recuerda entre años. Cambiarla reinicia y pausa el reloj; llegar a cero no termina la ronda. Cada participante abre su turno, toma decisiones y utiliza el botón de confirmar o continuar. Elegir un nivel de producción muestra la selección actual; confirmar fija esa producción hasta el año siguiente y termina el turno. Al cambiar de participante, la cortina indica a quién entregar el dispositivo y la tarea pendiente.
 
 Cada año sigue este recorrido:
