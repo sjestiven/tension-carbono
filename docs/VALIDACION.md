@@ -1,5 +1,13 @@
 # Validation history and current workspace status
 
+## Version 3.1.1 public release on 3 November 2026
+
+Application commit `a71107c7946391d31bf614d74c0905713c262f49` passed [Actions run 41641810139](https://github.com/sjestiven/tension-carbono/actions/runs/41641810139) with all 76 tests, production build and Pages deployment. All eight files at the [public game](https://sjestiven.github.io/tension-carbono/) returned HTTP 200 and matched the validated local build. The public browser opened the new home menu.
+
+Browser checks covered setup from the home menu, all five aliases, a named avatar, entry without student codes, mandatory codes after opt-in and both 200 t and 250 t production previews. At USD 25 per tonne of emissions, 250 t and 300 t yield the same USD 1,600 profit for company A, while the former emits 20 tCO2e less. The turn banner scrolls in normal document flow. The local screenshot is `.local/validation/Cabina de producción - Comparación y avatares.jpg`.
+
+The connected database accepted a synthetic `validation` profile with the alias `hyrule` and the company A avatar choice `other`. The browser confirmed receipt. The validator rejects free text in the profile, and participant access to the research schema remains denied. The embedded database test verifies the new profile, legacy consent records and analysis extraction. No real student codes were used.
+
 ## Version 3.1 public release on 2 November 2026
 
 Application commit `e223ab6626332c057daad535fa7c0d9d39c1eb10` passed [Actions run 41396066288](https://github.com/sjestiven/tension-carbono/actions/runs/41396066288): locked installation, all 76 tests, production build and both successful build/deploy jobs. All eight files at the [live game](https://sjestiven.github.io/tension-carbono/) returned HTTP 200 and matched the final local `pilot-2026` build byte for byte.
