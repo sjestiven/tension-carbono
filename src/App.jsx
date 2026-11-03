@@ -61,7 +61,7 @@ function Setup({ initial, onSubmit, onClose, starting, researchEnabled }) {
             {Object.entries(TEAM_ALIASES).map(([key, name]) => <option key={key} value={key}>{name}</option>)}
           </select>
         </Field>
-        <p className="small muted">Las empresas son ficticias. Los nombres de las fundaciones son referencias educativas y sus decisiones y cuentas son simuladas.</p>
+        <p className="small muted">Las organizaciones son referencias educativas. Las emisiones, los impuestos y las decisiones corresponden a la simulación.</p>
       </> : <p className="muted">Equipo {names.team}. Puedes actualizar el nombre visible y la apariencia de cada avatar.</p>}
       {researchEnabled && starting && <label className="research-consent">
         <input type="checkbox" checked={consent} onChange={event => { setConsent(event.target.checked); setError(''); }} />

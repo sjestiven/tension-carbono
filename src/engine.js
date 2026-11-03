@@ -1,4 +1,4 @@
-import { AVATAR_GENDERS } from './table_setup.js';
+import { AVATAR_GENDERS, currentScenarioName } from './table_setup.js';
 
 // Motor puro y determinista. Todas las decisiones pasan por applyAction.
 export const VERSION = '3.1.0';
@@ -45,7 +45,10 @@ export function createGame(setup = {}, version = VERSION) {
   check([VERSION, '3.0.0', '2.2.0'].includes(version), 'Versión de reglas no compatible.');
   check(setup && typeof setup === 'object' && !Array.isArray(setup), 'Configuración inválida.');
   const names = {}, players = {}, studentCodes = {};
-  for (const key of ['team', ...ROLES]) names[key] = text(setup.names?.[key] ?? DEFAULT_NAMES[key], 'Nombre', 60);
+  for (const key of ['team', ...ROLES]) {
+    const name = text(setup.names?.[key] ?? DEFAULT_NAMES[key], 'Nombre', 60);
+    names[key] = currentScenarioName(key, name);
+  }
   for (const key of ROLES) {
     const name = setup.players?.[key] ?? '';
     check(typeof name === 'string' && name.length <= 60, 'Nombre de participante inválido.');
