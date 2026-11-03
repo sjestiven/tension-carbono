@@ -1,5 +1,9 @@
 # Validation history and current workspace status
 
+## Rules 3.2.0 public release
+
+Application commit `c74af2618f5fba2540a9903f7bd8a802fd19d63b` passed the build and deployment jobs in [Actions run 41718973264](https://github.com/sjestiven/tension-carbono/actions/runs/41718973264). All 79 local tests passed. The [public game](https://sjestiven.github.io/tension-carbono/) returned HTTP 200 and served the JavaScript bundle with the 3.2.0 rules, production progress, and emissions by role.
+
 ## Version 3.1.3 public release on 3 November 2026
 
 Application commit `736467d592aa5d4bfac8662362116dcee0512048` passed [Actions run 41647101160](https://github.com/sjestiven/tension-carbono/actions/runs/41647101160). All 77 tests passed, and all eight files at the [public game](https://sjestiven.github.io/tension-carbono/) matched the validated build.
