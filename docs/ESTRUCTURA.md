@@ -16,7 +16,8 @@ The application is extracted directly into the workspace root. See the root READ
 | `docs/deployment.md` | Publication and live verification. |
 | `docs/REGLAS.md` | Current Spanish game rules. |
 | `docs/VALIDACION.md`, `docs/CAMBIOS.md` | Validation and change history. |
-| `docs/Instructivo_Academico_Tension_de_Carbono_v2.docx` | Current teaching guide. |
+| `docs/Instructivo académico - Tensión de Carbono 3.2.docx` | Teaching guide update for the three-round rules. |
+| `docs/Instructivo_Academico_Tension_de_Carbono_v2.docx` | Original teaching guide for version 2. |
 | `docs/antecedentes/` | Preserved historical documents and interpretation notice. |
 | `docs/references/` | Bibliography and ignored PDF copies. |
 | `CONTEXTO_PARA_CODEX.md` | Original handoff snapshot. |

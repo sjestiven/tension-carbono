@@ -1,14 +1,60 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createGame,applyAction,exportGame,importGame,scores,transactionEffects,committedFrames} from '../src/engine.js';
+import {createGame,applyAction,exportGame,importGame,scores,transactionEffects,committedFrames,available,emissionsByRole,isGameOver} from '../src/engine.js';
 import {currentTurn} from '../src/workflow.js';
-import {playTemplate} from '../src/demo.js';
+import {DEMO,playTemplate} from '../src/demo.js';
 import {transactionReceipt} from '../src/motion.js';
 
 const act=(game,type,actor,data={})=>applyAction(game,{type,actor,...data});
+
+test('Three rounds retain installed capacity but never carry unsold credits into the next lot', () => {
+  const rounds = structuredClone(DEMO.slice(0,3));
+  for (const round of rounds) round.contratos = [];
+  rounds[1].proyectos = { F1:[], F2:[] };
+  rounds[2].proyectos = { F1:[], F2:[] };
+  const markets = [];
+  let game = createGame();
+  const played = playTemplate(rounds);
+  for (const action of played.actions.filter(action => action.origin !== 'system')) {
+    game = applyAction(game, action);
+    if (action.type === 'confirmProjects' && action.actor === 'F2') {
+      assert.equal(currentTurn(game).kind, 'quote');
+      markets.push(available(game, 'F1'));
+    }
+    if (game.draft.phase === 'results') assert.equal(available(game, 'F1'), 0);
+  }
+  assert.deepEqual(markets,[20,20,20]);
+  assert.equal(game.foundations.F1.issued,60);
+  assert.equal(game.foundations.F1.sold,0);
+  assert.deepEqual(importGame(exportGame(game)),game);
+});
+
+test('Three-round cap is inclusive and the role totals reconcile with the physical account', () => {
+  const rounds = Array.from({length:4}, () => ({
+    tarifa:20, produccion:{A:100,B:100,C:100}, proyectos:{F1:[],F2:[]}, contratos:[],
+  }));
+  const boundary = playTemplate(rounds);
+  assert.equal(boundary.history.length,3);
+  assert.equal(boundary.emissions,1050);
+  assert.ok(isGameOver(boundary));
+  assert.equal(scores(boundary).Estado.components[0],30);
+  assert.equal(scores(boundary).Estado.productionMet,false);
+  assert.throws(() => act(boundary,'next','Docente'), /terminó/);
+  for (const round of rounds) round.produccion = {A:300,B:300,C:300};
+  const loss = playTemplate(rounds);
+  assert.equal(loss.history.length,2);
+  assert.equal(loss.emissions,1300);
+  assert.ok(Object.values(scores(loss)).every(role => !role.victory));
+  const demo = playTemplate();
+  assert.ok(scores(demo).Estado.productionMet);
+  assert.equal(Object.values(emissionsByRole(demo)).reduce((sum, role) => sum+role.emissions,0),demo.emissions);
+  for (const result of demo.history) {
+    assert.equal(Object.values(emissionsByRole(demo,result)).reduce((sum, role) => sum+role.emissions,0),result.emissions);
+  }
+});
 function beforeAction(predicate) {
-  let game=createGame();
-  for(const action of playTemplate().actions.filter(item=>item.origin!=='system')) {
+  let game=createGame({},'3.1.0');
+  for(const action of playTemplate(undefined,undefined,game.version).actions.filter(item=>item.origin!=='system')) {
     if(predicate(game,action))return game;
     game=applyAction(game,action);
   }
@@ -58,7 +104,7 @@ test('The final sale settles once, completes seller bookkeeping and shows a clos
 });
 
 test('The streamlined replay retains economic outcomes and validates system-generated history',()=>{
-  const game=playTemplate(),old=playTemplate(undefined,undefined,'3.0.0');
+  const game=playTemplate(undefined,undefined,'3.1.0'),old=playTemplate(undefined,undefined,'3.0.0');
   for(const key of ['companies','foundations','treasury','emissions','production'])assert.deepEqual(game[key],old[key]);
   assert.deepEqual(scores(game),scores(old));assert.deepEqual(importGame(exportGame(game)),game);
   const corrupted=exportGame(game);corrupted.actions=corrupted.actions.filter(action=>!(action.type==='confirmGrants'&&action.origin==='system'));

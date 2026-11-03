@@ -1,8 +1,12 @@
 import { AVATAR_GENDERS, currentScenarioName } from './table_setup.js';
 
 // Motor puro y determinista. Todas las decisiones pasan por applyAction.
-export const VERSION = '3.1.0';
-export const EMISSIONS_LIMIT = 1400;
+export const VERSION = '3.2.0';
+const GAME_VERSIONS = [VERSION, '3.1.0', '3.0.0', '2.2.0'];
+const CURRENT_RULES = { rounds: 3, emissionsLimit: 1050, productionTarget: 1350, reductionHigh: 150, reductionMedium: 75, automaticVerification: true };
+const LEGACY_RULES = { rounds: 4, emissionsLimit: 1400, productionTarget: 1800, reductionHigh: 200, reductionMedium: 100, automaticVerification: false };
+export const gameRules = game => !game || game.version === VERSION ? CURRENT_RULES : LEGACY_RULES;
+const FOUNDATION_BASELINE = 100;
 export const COMPANIES = ['A', 'B', 'C'];
 export const FOUNDATIONS = ['F1', 'F2'];
 export const ROLES = ['Estado', ...COMPANIES, ...FOUNDATIONS];
@@ -42,7 +46,7 @@ function draft(year) {
     fundStart: 0, executed: [], };
 }
 export function createGame(setup = {}, version = VERSION) {
-  check([VERSION, '3.0.0', '2.2.0'].includes(version), 'Versión de reglas no compatible.');
+  check(GAME_VERSIONS.includes(version), 'Versión de reglas no compatible.');
   check(setup && typeof setup === 'object' && !Array.isArray(setup), 'Configuración inválida.');
   const names = {}, players = {}, studentCodes = {};
   for (const key of ['team', ...ROLES]) {
@@ -92,8 +96,8 @@ function validateProjects(g, foundation) {
 }
 const live = c => c.status === 'pending' || c.status === 'accepted';
 const accepted = c => c.status === 'accepted';
-export const isBatchMarket = g => ['3.0.0',VERSION].includes(g.version);
-export const isStreamlined = g => g.version === VERSION;
+export const isBatchMarket = g => g.version !== '2.2.0';
+export const isStreamlined = g => [VERSION, '3.1.0'].includes(g.version);
 const committed = c => ['draft','pending','accepted'].includes(c.status);
 export function batchMarketTurn(g) {
   const d = g.draft, order = d.year % 2 ? FOUNDATIONS : [...FOUNDATIONS].reverse();
@@ -110,7 +114,10 @@ function batchActor(g, role, kind) {
   check(turn.role === role && turn.kind === kind, `Ahora corresponde ${turn.role}: ${turn.kind === 'bids' ? 'confirmar ofertas' : turn.kind === 'sales' ? 'decidir las ventas' : 'presentar cotización'}.`);
 }
 export function lot(g, f) { return g.draft.verified[f] ? g.foundations[f].capacity : 0; }
-export function available(g, f) { return lot(g, f) - sum(g.draft.contracts.filter(c => c.foundation === f && (isBatchMarket(g) ? accepted(c) : live(c))), c => c.quantity); }
+export function available(g, f) {
+  if (g.draft.phase === 'results' && gameRules(g).automaticVerification) return 0;
+  return lot(g, f) - sum(g.draft.contracts.filter(c => c.foundation === f && (isBatchMarket(g) ? accepted(c) : live(c))), c => c.quantity);
+}
 export function remaining(g, e) { return Math.floor(g.draft.production[e] * INTENSITY[e] * .5) - sum(g.draft.contracts.filter(c => c.company === e && (isBatchMarket(g) ? committed(c) : live(c))), c => c.quantity); }
 export function companyView(g, e) {
   const d = g.draft, q = d.production[e], production = PRODUCTION[q];
@@ -173,14 +180,28 @@ export function purchasePreview(g, company, {foundation,quantity,price,contractI
   return {valid:!issues.length,issues,baseline,...result,maxQuantity,maximum,payment:validPrice&&validQuantity?round(quantity*price):null,taxSavings:result?round(before.tax-result.projected.tax):null,profitChange:result?round(result.projected.profit-before.profit):null};
 }
 export function climateStatus(g) {
-  const ratio = g.emissions / EMISSIONS_LIMIT;
-  return {ratio:Math.max(0,Math.min(1,ratio)),remaining:round(Math.max(0,EMISSIONS_LIMIT-g.emissions)),band:ratio>1?'defeat':ratio>=.9?'red':ratio>=.75?'terracotta':ratio>=.5?'ochre':'green',reference:350*g.draft.year,projected:previewRound(g).cumulative};
+  const { emissionsLimit, rounds } = gameRules(g);
+  const ratio = g.emissions / emissionsLimit;
+  return {ratio:Math.max(0,Math.min(1,ratio)),remaining:round(Math.max(0,emissionsLimit-g.emissions)),band:ratio>1?'defeat':ratio>=.9?'red':ratio>=.75?'terracotta':ratio>=.5?'ochre':'green',reference:emissionsLimit/rounds*g.draft.year,projected:previewRound(g).cumulative};
+}
+
+export function emissionsByRole(game, result) {
+  const years = result ? 1 : game.history.length;
+  const companies = result?.companies ?? game.companies;
+  const foundations = result?.foundations ?? game.foundations;
+  return Object.fromEntries(ROLES.map(role => {
+    if (role === 'Estado') return [role, { emissions: 0, baseline: 0, reductions: 0 }];
+    if (COMPANIES.includes(role)) return [role, { emissions: round(companies[role].emissions), baseline: 0, reductions: 0 }];
+    const baseline = FOUNDATION_BASELINE * years;
+    const reductions = result ? foundations[role].reduction : foundations[role].reductions;
+    return [role, { emissions: baseline - reductions, baseline, reductions }];
+  }));
 }
 export function previewRound(g) {
   const companies = Object.fromEntries(COMPANIES.map(e => [e, companyView(g, e)]));
   const foundations = Object.fromEntries(FOUNDATIONS.map(f => [f, { reduction: lot(g, f), sold: sum(g.draft.contracts.filter(c => c.foundation === f && accepted(c)), c => c.quantity), cash: g.foundations[f].cash }]));
   const gross = sum(Object.values(companies), x => x.emissions), reduction = sum(Object.values(foundations), x => x.reduction);
-  const tax = sum(Object.values(companies), x => x.tax), emissions = gross + 200 - reduction;
+  const tax = sum(Object.values(companies), x => x.tax), emissions = gross + FOUNDATIONS.length * FOUNDATION_BASELINE - reduction;
   return { companies, foundations, gross, reduction, emissions, cumulative: g.emissions + emissions, tax: round(tax), production: sum(Object.values(companies), x => x.production), credits: sum(Object.values(companies), x => x.credits), reserve: round(tax * .3) };
 }
 export function automaticRatings(g, result = previewRound(g)) {
@@ -203,11 +224,12 @@ export function automaticRatings(g, result = previewRound(g)) {
 }
 export function policyReview(g,result=g.history.at(-1)) {
   if (!result) return null;
+  const { rounds } = gameRules(g);
   const ratingTotal=sum(Object.values(result.ratings),item=>item.value);
   return {onPath:result.cumulative<=350*result.year,reference:350*result.year,
     losing:COMPANIES.filter(role=>result.companies[role].profit<0),
     lagging:FOUNDATIONS.filter(role=>result.foundations[role].reduction<20*result.year),
-    ratingTotal,scoreDelta:ratingTotal/2};
+    ratingTotal,scoreDelta:ratingTotal*2/rounds};
 }
 function assertMarket(g) {
   check(!g.draft.contracts.some(c => ['draft','pending'].includes(c.status)), 'Hay ofertas pendientes. Acéptenlas o rechácenlas antes de cerrar.');
@@ -219,7 +241,8 @@ function assertMarket(g) {
   for (const f of FOUNDATIONS) check(sum(g.draft.contracts.filter(c => c.foundation === f && accepted(c)), c => c.quantity) <= lot(g, f), 'No se pueden vender créditos sin verificar.');
 }
 export function isGameOver(game) {
-  return game.emissions > EMISSIONS_LIMIT || (game.history.length === 4 && game.draft.phase === 'results');
+  const { emissionsLimit, rounds } = gameRules(game);
+  return game.emissions > emissionsLimit || (game.history.length >= rounds && game.draft.phase === 'results');
 }
 export function applyAction(original, action) {
   check(action?.origin!=='system','Los avances automáticos se generan dentro del motor.');
@@ -237,6 +260,16 @@ function automaticAction(g) {
   const d=g.draft;
   if(d.phase==='projects'&&!d.stateConfirmed&&COMPANIES.every(role=>d.productionPlanned[role])&&FOUNDATIONS.every(role=>d.projectConfirmed[role])) {
     try { if(validateProjects(g).every(item=>item.grant===0))return {type:'confirmGrants',actor:'Estado'}; } catch { return null; }
+  }
+  if (gameRules(g).automaticVerification) {
+    if (d.phase === 'projects' && d.stateConfirmed && COMPANIES.every(role => d.productionLocked[role]) && FOUNDATIONS.every(role => d.projectConfirmed[role])) {
+      return { type:'execute', actor:'Docente' };
+    }
+    if (d.phase === 'verification') {
+      const foundation = FOUNDATIONS.find(role => d.verified[role] === null);
+      return foundation ? { type:'verify', actor:'Docente', foundation, verified:g.foundations[foundation].capacity > 0 }
+        : { type:'openMarket', actor:'Docente' };
+    }
   }
   if(d.phase!=='market')return null;
   const turn=batchMarketTurn(g);
@@ -495,7 +528,7 @@ function transition(original, action, legacyReplay = false) {
       break;
     }
     case 'next':
-      phase(g, 'results'); actor(a, 'Docente'); check(d.year < 4, 'La partida ya terminó.');
+      phase(g, 'results'); actor(a, 'Docente'); check(d.year < gameRules(g).rounds, 'La partida ya terminó.');
       g.draft = draft(d.year + 1); g.draft.tax = d.tax; g.draft.subsidy = d.subsidy;
       break;
     default: fail('Acción desconocida.');
@@ -504,8 +537,9 @@ function transition(original, action, legacyReplay = false) {
   return g;
 }
 export function scores(g) {
-  check(isGameOver(g), 'Los puntos finales se calculan después de cuatro rondas o de una derrota ambiental.');
-  const climate = g.emissions <= EMISSIONS_LIMIT, out = {};
+  const { rounds, emissionsLimit, productionTarget, reductionHigh, reductionMedium } = gameRules(g);
+  check(isGameOver(g), 'Los puntos finales se calculan al terminar las rondas o tras una derrota ambiental.');
+  const climate = g.emissions <= emissionsLimit, out = {};
   for (const e of COMPANIES) {
     const s = g.companies[e], margin = s.income ? s.profit / s.income : 0, coverage = s.emissions ? s.credits / s.emissions : 0;
     const components = [margin >= .1 - 1e-9 ? 40 : margin >= .05 - 1e-9 ? 25 : margin > 0 ? 10 : 0,
@@ -514,21 +548,22 @@ export function scores(g) {
   }
   for (const f of FOUNDATIONS) {
     const s = g.foundations[f], fraction = s.issued ? s.sold / s.issued : 0;
-    const components = [s.reductions >= 200 ? 40 : s.reductions >= 100 ? 25 : s.reductions > 0 ? 10 : 0,
+    const components = [s.reductions >= reductionHigh ? 40 : s.reductions >= reductionMedium ? 25 : s.reductions > 0 ? 10 : 0,
       fraction >= .7 - 1e-9 ? 30 : fraction >= .4 - 1e-9 ? 20 : fraction > 0 ? 10 : 0, s.cash >= 1000 ? 30 : s.cash >= 0 ? 15 : 0];
     out[f] = { points: sum(components), components, fraction, victory: climate && sum(components) >= 70 };
   }
-  const components = [climate ? 30 : 0, g.production >= 1800 ? 20 : 0, 20, g.treasury.published ? 10 : 0, 10 + g.treasury.votes / 2];
-  out.Estado = { points: sum(components), components, victory: climate && g.production >= 1800 && sum(components) >= 70, productionMet: g.production >= 1800 };
+  const productionMet = g.production >= productionTarget;
+  const components = [climate ? 30 : 0, productionMet ? 20 : 0, 20, g.treasury.published ? 10 : 0, 10 + g.treasury.votes * 2 / rounds];
+  out.Estado = { points: sum(components), components, victory: climate && productionMet && sum(components) >= 70, productionMet };
   return out;
 }
 export function exportGame(g) {
   return { schema: 'tension-carbono', version: g.version, setup: clone(g.setup), actions: clone(g.actions) };
 }
 export function importGame(data) {
-  check(data && data.schema === 'tension-carbono' && [VERSION, '3.0.0', '2.2.0', '2.1.0', '2.0.0'].includes(data.version), 'Formato incompatible. Use una partida JSON de Tensión de Carbono 2.x o 3.x.');
+  check(data && data.schema === 'tension-carbono' && [...GAME_VERSIONS, '2.1.0', '2.0.0'].includes(data.version), 'Formato incompatible. Use una partida JSON de Tensión de Carbono 2.x o 3.x.');
   check(Array.isArray(data.actions) && data.actions.length <= 2000, 'Bitácora inválida o demasiado extensa.');
-  let game = createGame(data.setup,[VERSION,'3.0.0'].includes(data.version)?data.version:'2.2.0');
+  let game = createGame(data.setup,GAME_VERSIONS.includes(data.version)?data.version:'2.2.0');
   if(isStreamlined(game)) {
     const canonical=actions=>JSON.stringify(actions.map(action=>Object.entries(action).sort(([left],[right])=>left.localeCompare(right))));
     for(let index=0;index<data.actions.length;) {

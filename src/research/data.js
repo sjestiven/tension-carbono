@@ -1,4 +1,4 @@
-import { ROLES, isGameOver } from '../engine.js';
+import { ROLES, isGameOver, gameRules } from '../engine.js';
 import { AVATAR_GENDERS, teamAliasForName } from '../table_setup.js';
 
 export const CONSENT_VERSION = '2026-11-03';
@@ -33,5 +33,5 @@ export function roundData(game) {
     tax_rate:round.taxRate,subsidy:round.subsidy}));
 }
 export function outcome(game) {
-  return !isGameOver(game) ? 'in_progress' : game.emissions > 1400 ? 'climate_defeat' : 'completed';
+  return !isGameOver(game) ? 'in_progress' : game.emissions > gameRules(game).emissionsLimit ? 'climate_defeat' : 'completed';
 }

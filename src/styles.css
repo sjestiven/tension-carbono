@@ -118,7 +118,6 @@
 .app[data-climate=red],.app[data-climate=defeat] { --climate-accent:#a03532; --climate-setting:#f9e9e5; --climate-leaf:#b34d39; --climate-land:#caa18a; }
 .app[data-climate=defeat] { --climate-accent:#812923; --climate-setting:#f3e0db; }
 .climate-budget { grid-column:1; grid-row:2; display:flex; flex-wrap:wrap; align-items:center; gap:5px 12px; font-size:11px; color:var(--climate-accent); }
-.climate-budget progress { width:78px; height:6px; accent-color:var(--climate-accent); flex-shrink:0; }
 .round-dashboard { row-gap:7px; }
 .round-toolbar { grid-column:2; grid-row:1 / span 2; }
 .financial-preview,.policy-balance,.commitment-confirmation { margin:18px 0; padding:16px 18px; border:1px solid #d4dfcb; border-radius:9px; background:#f5f8ef; }
@@ -185,7 +184,19 @@ button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visi
 /* Compact round dashboard and comparable seller quotations. */
 /* Keep the annual context secondary to the active decision. */
 .round-dashboard { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:16px; align-items:center; padding:11px 14px; margin-bottom:14px; background:#fffefa; border:1px solid var(--line); border-radius:10px; scroll-margin-top:16px; }
-.overview-metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:0; }
+.overview-metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:0; }
+.overview-meter { display:grid; gap:3px; padding:0 12px; border-right:1px solid var(--line); }
+.overview-meter:first-child { padding-left:0; }
+.overview-meter span,.overview-meter small { font-size:11px; color:#4d604f; }
+.overview-meter strong { font-size:18px; line-height:1.25; }
+.overview-meter progress { width:100%; max-width:142px; height:6px; accent-color:var(--climate-accent); }
+.production-meter progress { accent-color:#356754; }
+.emissions-breakdown { display:grid; gap:10px; }
+.emissions-breakdown p { margin:0; }
+.emissions-role { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:3px 12px; padding:6px 0; border-bottom:1px solid var(--line); font-size:13px; }
+.emissions-role meter,.emissions-role small { grid-column:1 / -1; }
+.emissions-role meter { width:100%; height:10px; }
+.emissions-role small { color:#4d604f; }
 .overview-metrics .stat { justify-content:center; gap:4px; padding:0 16px; min-height:0; border:0; border-radius:0; background:none; }
 .overview-metrics .stat:first-child { padding-left:0; }
 .overview-metrics .stat:not(:last-child) { border-right:1px solid var(--line); }
@@ -245,9 +256,13 @@ button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visi
 .turn-banner h1 { font-size:23px; margin:3px 0 6px; }
 @media(max-width:1000px) {
  .round-dashboard { grid-template-columns:1fr; gap:10px; }
- .round-toolbar { padding-top:8px; border-top:1px solid var(--line); }
+ .round-toolbar { grid-column:1; grid-row:auto; flex-wrap:wrap; padding-top:8px; border-top:1px solid var(--line); }
+ .climate-budget { grid-row:auto; }
 }
 @media(max-width:600px) {
+ .overview-metrics { grid-template-columns:repeat(2,minmax(0,1fr)); row-gap:8px; }
+ .overview-meter:nth-child(2) { border:0; }
+ .overview-metrics .stat:nth-child(3) { padding-left:0; }
  .overview-metrics .stat { padding:0 9px; }
  .overview-metrics .stat strong { font-size:16px; }
  .overview-metrics .stat>span { font-size:10px; }

@@ -1,8 +1,13 @@
 import template from './demo.json' with { type: 'json' };
 import { createGame, applyAction, COMPANIES, FOUNDATIONS, isGameOver, VERSION, isBatchMarket } from './engine.js';
 export const DEMO = template;
+const currentTemplate = [
+  { ...template[0], produccion: { ...template[0].produccion, A: 150 } },
+  ...template.slice(1, 3),
+];
 // Usa exactamente el mismo motor y validaciones que cada control de la interfaz.
-export function playTemplate(rounds = template, setup, version = VERSION, onYearClosed) {
+export function playTemplate(rounds, setup, version = VERSION, onYearClosed) {
+  rounds ??= version === VERSION ? currentTemplate : template;
   let game = createGame(setup,version);
   const act = a => { game = applyAction(game, a); };
   for (const [index, r] of rounds.entries()) {
@@ -19,9 +24,11 @@ export function playTemplate(rounds = template, setup, version = VERSION, onYear
     for (const f of FOUNDATIONS) for (const p of r.proyectos[f]) act({ type: 'addProject', actor: f, project: p.tipo });
     for (const f of FOUNDATIONS) act({ type: 'confirmProjects', actor: f });
     if(!game.draft.stateConfirmed)act({ type: 'confirmGrants', actor: 'Estado' });
-    act({ type: 'execute', actor: 'Docente' });
-    for (const f of FOUNDATIONS) act({ type: 'verify', actor: 'Docente', foundation: f, verified: r.verificado[f] });
-    act({ type: 'openMarket', actor: 'Docente' });
+    if(game.draft.phase==='projects')act({ type: 'execute', actor: 'Docente' });
+    if(game.draft.phase==='verification') {
+      for (const f of FOUNDATIONS) act({ type: 'verify', actor: 'Docente', foundation: f, verified: r.verificado[f] });
+      act({ type: 'openMarket', actor: 'Docente' });
+    }
     if (isBatchMarket(game)) {
       const order=game.draft.year%2?FOUNDATIONS:[...FOUNDATIONS].reverse();
       for (const f of order) {
@@ -54,6 +61,6 @@ export function playTemplate(rounds = template, setup, version = VERSION, onYear
 
 export function exampleYears(setup) {
   const years = [];
-  playTemplate(template, setup, VERSION, game => years.push(game));
+  playTemplate(undefined, setup, VERSION, game => years.push(game));
   return years;
 }

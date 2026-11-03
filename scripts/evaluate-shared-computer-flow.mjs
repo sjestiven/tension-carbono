@@ -24,8 +24,8 @@ function summarize(sequence) {
 }
 const closing=visit=>visit.role==='Docente'&&visit.kind==='close';
 const grants=visit=>visit.role==='Estado'&&visit.kind==='grants';
-const streamlined=playTemplate();
-let replay=createGame();const humanVisits=[];
+const streamlined=playTemplate(undefined,undefined,'3.1.0');
+let replay=createGame({},streamlined.version);const humanVisits=[];
 for(const action of streamlined.actions.filter(action=>action.origin!=='system')) {
   if(action.type!=='next')humanVisits.push({role:currentTurn(replay).role});
   replay=applyAction(replay,action);

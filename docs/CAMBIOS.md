@@ -1,3 +1,9 @@
+# Rules 3.2.0
+
+- Shorten new games to three rounds with a 1,050 tCO₂e budget and a 1,350 t production target. Scale cumulative reduction thresholds and preserve the State rating range.
+- Execute signed plans and validate annual lots automatically. Keep prior replays on their original rules.
+- Show progress toward both collective targets, emissions by role, and potential revenue while entering a credit quote. Expire each year's unsold inventory at closing.
+
 # Release 3.1.0 — 2 November 2026
 
 - Group execution, two explicit lot verifications, and market opening in one teacher review.

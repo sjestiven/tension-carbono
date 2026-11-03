@@ -42,13 +42,13 @@ select game_version,year,phase,actor,kind,count(*) as observations,avg(observed_
 from intervals where observed_interval_ms >= 0
 group by game_version,year,phase,actor,kind order by game_version,year,phase,actor;
 
--- 7. Offer reconstruction for engines 2.2 and 3.0: their ID counter advances on project
+-- 7. Offer reconstruction: the supported engines advance their ID counter on project
 -- additions and proposals. Live collection starts before the first action.
 with numbered as (
   select e.*,s.game_version,count(*) filter(where e.kind='engine_action' and e.action_type in ('addProject','propose'))
     over(partition by e.session_id order by e.seq) as engine_sequence
   from research.events e join research.sessions s on s.id=e.session_id
-  where s.study='pilot-2026' and s.game_version in ('2.2.0','3.0.0','3.1.0')
+  where s.study='pilot-2026' and s.game_version in ('2.2.0','3.0.0','3.1.0','3.2.0')
 ), proposals as (
   select *,concat('C-',year,'-',engine_sequence) as contract_id
   from numbered where kind='engine_action' and action_type='propose'

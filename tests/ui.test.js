@@ -19,21 +19,30 @@ test('The completed-game results render all roles and both foundation inventorie
     assert.match(html, /Resultados de la partida/);
     for (const name of ['Estado', 'Empresa A', 'Empresa B', 'Empresa C', 'Fundación Bosque', 'Fundación Horizonte']) assert.ok(html.includes(name), name);
     assert.match(html, /Oferta y demanda de créditos/);
-    assert.match(html, /95,5/);
+    assert.match(html, /Emisiones por rol/);
     const rounds=structuredClone(DEMO);
     for (const round of rounds) round.produccion={A:300,B:300,C:300};
     const losingHtml=renderToString(React.createElement(Results,{game:playTemplate(rounds)}));
     assert.match(losingHtml,/Partida terminada por emisiones/);
-    assert.match(losingHtml,/La partida termina en el año 3/);
-    assert.match(losingHtml,/1.590/);
+    assert.match(losingHtml,/La partida termina en el año 2/);
+    assert.match(losingHtml,/1.140/);
     assert.equal((losingHtml.match(/Derrota colectiva/g)||[]).length,6);
     const {default:GuidedRound}=await server.ssrLoadModule('/src/components/GuidedRound.jsx');
-    let verification=createGame();
-    for(const action of playTemplate().actions.filter(action=>action.origin!=='system')){verification=applyAction(verification,action);if(action.type==='execute')break;}
+    let verification=createGame({},'3.1.0');
+    for(const action of playTemplate(undefined,undefined,verification.version).actions.filter(action=>action.origin!=='system')){verification=applyAction(verification,action);if(action.type==='execute')break;}
     const review=renderToString(React.createElement(GuidedRound,{game:verification,role:'Docente',choose:()=>{},send:()=>{},hide:()=>{},onResults:()=>{}})).replace(/<[^>]*>/g,'');
     assert.equal((review.match(/Capacidad instalada: 20 tCO₂e\/año/g)||[]).length,2);
     assert.ok(!review.includes('Capacidad instalada: 40'));
     assert.match(review,/Confirmar ejecución y verificaciones/);
+    let market = createGame();
+    for (const action of playTemplate().actions.filter(action => action.origin !== 'system')) {
+      market = applyAction(market, action);
+      if (action.type === 'confirmProjects' && action.actor === 'F2') break;
+    }
+    const quote = renderToString(React.createElement(GuidedRound,{game:market,role:'F1',choose:()=>{},send:()=>{},hide:()=>{},onResults:()=>{}})).replace(/<[^>]*>/g,'');
+    assert.match(quote,/Ingreso proyectado si vendes todo el lote al precio indicadoUSD 360/);
+    assert.match(quote,/Producción acumulada/);
+    assert.doesNotMatch(quote,/Ejecutar y verificar los dos lotes/);
     const production = applyAction(createGame({names:{B:'21'}}),{type:'publish',actor:'Estado'});
     const comparison = renderToString(React.createElement(GuidedRound,{game:production,role:'A',choose:()=>{},send:()=>{},hide:()=>{},onResults:()=>{}})).replace(/<[^>]*>/g,'');
     assert.match(comparison,/100 tBajo40 tCO₂eUSD 600 de utilidad/);

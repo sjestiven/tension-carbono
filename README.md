@@ -1,6 +1,6 @@
 # Tensión de Carbono
 
-A Spanish-language classroom simulation of a carbon credit market linked to a carbon tax. Three companies, two foundations, and a government negotiate through up to four annual rounds. Application version **3.1.3**. Economic rules **3.1.0**.
+A Spanish-language classroom simulation of a carbon credit market linked to a carbon tax. Three companies, two foundations, and a government negotiate through up to three annual rounds. Economic rules **3.2.0**.
 
 **[Play Tensión de Carbono](https://sjestiven.github.io/tension-carbono/)** · [Source repository](https://github.com/sjestiven/tension-carbono)
 
@@ -75,7 +75,8 @@ The workflow installs locked dependencies, tests, builds, and deploys `dist/`. R
 ## Documentation
 
 - [Current rules](docs/REGLAS.md)
-- [Current academic teaching guide](docs/Instructivo_Academico_Tension_de_Carbono_v2.docx)
+- [Academic guide update for version 3.2](<docs/Instructivo académico - Tensión de Carbono 3.2.docx>)
+- [Original academic teaching guide for version 2](docs/Instructivo_Academico_Tension_de_Carbono_v2.docx)
 - [Local guided workflow teaching supplement](docs/teaching-workflow.md)
 - [Validation evidence and limits](docs/VALIDACION.md)
 - [Changes from the earlier prototype](docs/CAMBIOS.md)

@@ -1,4 +1,4 @@
-import { COMPANIES, FOUNDATIONS, PROJECTS, companyView, projectDetails, isGameOver, isBatchMarket, isStreamlined, batchMarketTurn } from './engine.js';
+import { COMPANIES, FOUNDATIONS, PROJECTS, companyView, projectDetails, isGameOver, isBatchMarket, isStreamlined, batchMarketTurn, gameRules } from './engine.js';
 
 export function roleName(game, role) {
   if (role === 'Docente') return 'Mesa docente';
@@ -24,14 +24,16 @@ function marketOwner(game) {
 // This derives the interface sequence; financial rules remain in the engine.
 export function currentTurn(game) {
   const d = game.draft;
-  if (isGameOver(game)) return { role: 'Docente', kind: 'finished', title: game.emissions > 1400 ? 'Partida terminada por emisiones' : 'Revisar los resultados finales', next: null };
+  const { emissionsLimit, automaticVerification } = gameRules(game);
+  if (isGameOver(game)) return { role: 'Docente', kind: 'finished', title: game.emissions > emissionsLimit ? 'Partida terminada por emisiones' : 'Revisar los resultados finales', next: null };
   if (d.phase === 'policy') return { role: 'Estado', kind: 'policy', title: 'Publicar la política', next: 'A' };
   if (d.phase === 'projects') {
     const company = COMPANIES.find(role => !d.productionPlanned[role]);
     if (company) return { role: company, kind: 'production', title: 'Elegir y confirmar la producción', next: COMPANIES[COMPANIES.indexOf(company) + 1] || 'F1' };
     const foundation = FOUNDATIONS.find(role => !d.projectConfirmed[role]);
-    if (foundation) return { role: foundation, kind: 'projects', title: 'Elegir y firmar los proyectos', next: foundation === 'F1' ? 'F2' : isStreamlined(game)&&projectDetails(game).every(item=>item.grant===0)?'Docente':'Estado' };
-    if (!d.stateConfirmed) return { role: 'Estado', kind: 'grants', title: 'Firmar los convenios públicos', next: 'Docente' };
+    const afterSignatures = automaticVerification ? null : 'Docente';
+    if (foundation) return { role: foundation, kind: 'projects', title: 'Elegir y firmar los proyectos', next: foundation === 'F1' ? 'F2' : isStreamlined(game)&&projectDetails(game).every(item=>item.grant===0)?afterSignatures:'Estado' };
+    if (!d.stateConfirmed) return { role: 'Estado', kind: 'grants', title: 'Firmar los convenios públicos', next: afterSignatures };
     return { role: 'Docente', kind: 'execute', title: isStreamlined(game)?'Ejecutar y verificar los dos lotes':'Ejecutar los proyectos firmados', next: isStreamlined(game)?null:'Docente' };
   }
   if (d.phase === 'verification') return { role: 'Docente', kind: 'verify', title: 'Verificar los lotes y abrir el mercado', next: foundationOrder(game)[0] };
@@ -45,7 +47,7 @@ export function currentTurn(game) {
     if (pending) return { role: pending.proposer === pending.company ? pending.foundation : pending.company, kind: 'reply', title: 'Responder una propuesta', next: owner.role, contract: pending };
     return owner;
   }
-  return { role: 'Docente', kind: d.year < 4 ? 'next' : 'finished', title: d.year < 4 ? 'Revisar el año y continuar' : 'Revisar los resultados finales', next: d.year < 4 ? 'Estado' : null };
+  return { role: 'Docente', kind: 'next', title: 'Revisar el año y continuar', next: 'Estado' };
 }
 
 export function projectIssues(game, { signatures = false } = {}) {

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { COMPANIES, EMISSIONS_LIMIT, FOUNDATIONS, PROJECTS } from '../engine.js';
+import { COMPANIES, gameRules, FOUNDATIONS, PROJECTS } from '../engine.js';
 import { exampleYears } from '../demo.js';
 import { SCENARIO_NAMES, TEAM_ALIASES } from '../table_setup.js';
 import { foundationOrder } from '../workflow.js';
@@ -41,7 +41,7 @@ export default function GuidedExample({ Results, onExit }) {
         <ul>{COMPANIES.map(role => <li key={role}>{names[role]} produce <strong>{round.companies[role].production} t</strong> y emite {round.companies[role].emissions} tCO₂e.</li>)}</ul>
       </li>
       <li>
-        <h2>Fundaciones y mesa docente preparan los créditos</h2>
+        <h2>Las fundaciones firman y el juego emite los créditos</h2>
         <ul>{FOUNDATIONS.map(role => {
           const projects = round.projects.filter(project => project.foundation === role);
           return <li key={role}><strong>{names[role]}</strong>. {projects.length
@@ -60,13 +60,14 @@ export default function GuidedExample({ Results, onExit }) {
         <h2>Balance del año {round.year}</h2>
         <div className="example-metrics">
           <Stat label="Emisiones del año" value={`${number(round.emissions)} tCO₂e`} />
-          <Stat label="Presupuesto climático usado" value={`${number(round.cumulative)} / ${number(EMISSIONS_LIMIT)} tCO₂e`} />
+          <Stat label="Presupuesto climático usado" value={`${number(round.cumulative)} / ${number(gameRules(game).emissionsLimit)} tCO₂e`} />
+          <Stat label="Producción frente a la meta" value={`${number(game.production)} / ${number(gameRules(game).productionTarget)} t`} />
           <Stat label="Impuesto recaudado" value={money(round.tax)} />
           <Stat label={finalYear ? 'Fondo público al cierre' : 'Fondo público para el próximo año'} value={money(round.fund)} />
         </div>
         <p>{finalYear
           ? 'El detalle incluye los puntajes de cada rol y el resultado climático de la partida.'
-          : 'El saldo del fondo y las emisiones acumuladas pasan al próximo año. Los proyectos instalados pueden generar nuevos créditos si se verifican.'}</p>
+          : 'El fondo y las emisiones acumuladas pasan al próximo año. Los créditos sin vender vencen y la capacidad instalada genera un lote nuevo.'}</p>
         <details key={round.year}>
           <summary>{finalYear ? 'Ver cuentas y puntajes finales' : 'Ver cuentas detalladas del año'}</summary>
           <Results game={game} embedded />

@@ -31,9 +31,10 @@ test('The public example replays the same state as the source template', () => {
 
 test('The guided example exposes each annual closure without future decisions or scores', () => {
   const years = exampleYears();
-  assert.deepEqual(years.map(game => game.history.length), [1, 2, 3, 4]);
+  assert.deepEqual(years.map(game => game.history.length), [1, 2, 3]);
   for (const [index, game] of years.entries()) {
-    assert.deepEqual(game, playCurrentTemplate(DEMO.slice(0, index + 1)));
+    assert.deepEqual(importGame(exportGame(game)), game);
+    assert.equal(game.draft.year, index + 1);
     assert.equal(isGameOver(game), index === years.length - 1);
   }
 });
@@ -228,7 +229,7 @@ test('Legacy losing logs are fully validated and migrated to their first losing 
   assert.throws(()=>importGame({...legacy,actions:[...legacy.actions,{type:'close',actor:'Docente'}]}),/etapa/);
 });
 test('No hay victoria prematura ni quinta ronda', () => {
-  assert.throws(()=>scores(createGame()),/cuatro/);rejects(playTemplate(),{type:'next',actor:'Docente'},/terminó/);
+  assert.throws(()=>scores(createGame()),/terminar las rondas/);rejects(playTemplate(),{type:'next',actor:'Docente'},/terminó/);
 });
 test('Exportar e importar reproduce la partida por sus decisiones', () => {
   const g=playTemplate();assert.deepEqual(importGame(JSON.parse(JSON.stringify(exportGame(g)))),g);
