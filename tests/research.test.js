@@ -5,6 +5,7 @@ import { PGlite } from '@electric-sql/pglite';
 import { createGame as createCurrentGame, applyAction, ROLES } from '../src/engine.js';
 import { ResearchRecorder } from '../src/research/recorder.js';
 import { actionData } from '../src/research/data.js';
+import { TEAM_ALIASES } from '../src/table_setup.js';
 import { playTemplate as playCurrentTemplate } from '../src/demo.js';
 const createGame = setup => createCurrentGame(setup,'2.2.0');
 const playTemplate = (rounds,setup) => playCurrentTemplate(rounds,setup,'2.2.0');
@@ -81,6 +82,7 @@ test('The database blocks public reads, unauthenticated writes, identity changes
     await db.exec(readFileSync(new URL('../supabase/migrations/202611010002_batch_market.sql',import.meta.url),'utf8'));
     await db.exec(readFileSync(new URL('../supabase/migrations/20261102051505_automatic_action_origin.sql',import.meta.url),'utf8'));
     await db.exec(readFileSync(new URL('../supabase/migrations/20261103130310_session_profile.sql',import.meta.url),'utf8'));
+    await db.exec(readFileSync(new URL('../supabase/migrations/20261103213831_latin_american_team_aliases.sql',import.meta.url),'utf8'));
     assert.equal((await db.query("select research.valid_event_data('engine_action','submitBids','{}') as valid")).rows[0].valid,true);
     assert.equal((await db.query("select research.valid_event_data('engine_action','finishSales','{}') as valid")).rows[0].valid,true);
     assert.equal((await db.query("select research.valid_event_data('engine_action','close','{\"origin\":\"system\"}') as valid")).rows[0].valid,true);
@@ -120,11 +122,11 @@ test('The database blocks public reads, unauthenticated writes, identity changes
     assert.equal(contracts.length,game.history.reduce((sum,round)=>sum+round.contracts.length,0));
     assert.ok(contracts.every(contract=>contract.accepted&&!contract.cancelled_or_rejected));
     const batchTracker=recorder();
-    let batch=createCurrentGame({ ...setup, names:{team:'Pueblo Paleta'}, avatarGenders:{A:'other',B:'private text'} });
+    let batch=createCurrentGame({ ...setup, names:{team:'México'}, avatarGenders:{A:'other',B:'private text'} });
     batchTracker.begin(batch,8);
     for(const action of playCurrentTemplate().actions.filter(action=>action.origin!=='system')){const next=applyAction(batch,action);batchTracker.applied(batch,next,[action]);batch=next;}
     const batchPayload=batchTracker.state.sessions[0].payload;
-    assert.deepEqual(batchPayload.p_events[0].data,{team_alias:'pallet_town',avatar_genders:{A:'other'}});
+    assert.deepEqual(batchPayload.p_events[0].data,{team_alias:'mexico',avatar_genders:{A:'other'}});
     const events=batchPayload.p_events.filter(event=>event.kind==='engine_action');
     assert.equal(events.length,batch.actions.length);
     assert.equal(events.filter(event=>event.data.origin==='system').length,batch.actions.filter(action=>action.origin==='system').length);
@@ -133,7 +135,11 @@ test('The database blocks public reads, unauthenticated writes, identity changes
     assert.equal((await rpc(batchPayload)).rows[0].revision,batchPayload.p_events.length);
     await db.exec('reset role');
     const combined=await db.exec(readFileSync(new URL('../supabase/analysis.sql',import.meta.url),'utf8').replaceAll("'pilot-2026'","'validation'"));
-    assert.ok(combined[1].rows.some(row=>row.session_id===batchPayload.p_session.id&&row.team_alias==='pallet_town'&&row.initial_avatar_gender==='other'));
+    assert.ok(combined[1].rows.some(row=>row.session_id===batchPayload.p_session.id&&row.team_alias==='mexico'&&row.initial_avatar_gender==='other'));
+    for (const alias of [...Object.keys(TEAM_ALIASES), 'pallet_town', 'hyrule', 'wakanda', 'springfield', 'gravity_falls']) {
+      const result = await db.query("select research.valid_event_data('session_started',null,$1::jsonb) as valid",[JSON.stringify({team_alias:alias})]);
+      assert.equal(result.rows[0].valid,true,alias);
+    }
     for (const data of [{team_alias:'private text'}, {avatar_genders:{A:'private text'}}, {avatar_genders:{name:'woman'}}]) {
       const result = await db.query("select research.valid_event_data('session_started',null,$1::jsonb) as valid",[JSON.stringify(data)]);
       assert.equal(result.rows[0].valid,false);

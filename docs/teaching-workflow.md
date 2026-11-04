@@ -4,7 +4,7 @@ Esta orientación complementa el instructivo académico con las reglas vigentes 
 
 ## Registro e identificación para la investigación
 
-Al iniciar la clase, reparta los cinco alias entre las mesas para evitar duplicados. Cada partida conserva su alias y tiene un identificador de sesión propio. Los nombres visibles y la apariencia de los avatares son opcionales. Presente a las empresas y fundaciones como referencias educativas. Explique que las intensidades de emisiones y las cuentas se asignan para el ejercicio.
+Al iniciar la clase, reparta los cinco nombres de países entre las mesas para evitar duplicados. Cada partida conserva su nombre de equipo y tiene un identificador de sesión propio. Los nombres visibles y la apariencia de los avatares son opcionales. Las empresas representan los sectores de bebidas azucaradas, tecnología y cemento. Explique que las intensidades de emisiones y las cuentas se asignan para el ejercicio.
 
 Pida los seis códigos solo si el equipo autoriza el registro. Explique que el equipo puede jugar sin completar códigos. El registro privado vincula el alias y las decisiones con los códigos por rol. Registra también las opciones de avatar elegidas al inicio, que describen preferencias de personalización. Las decisiones de avatar sin selección explícita quedan vacías en el análisis.
 

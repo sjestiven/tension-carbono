@@ -29,7 +29,10 @@ function Modal({title,children,onClose,wide=false}){
   return <div className="modal-backdrop" onClick={onClose}><section className={`modal ${wide?'wide':''}`} role="dialog" aria-modal="true" aria-label={title} tabIndex={-1} ref={el} onClick={e=>e.stopPropagation()}><div className="modal-head"><h2>{title}</h2><button className="icon-btn" aria-label="Cerrar ventana" onClick={onClose}><X size={20}/></button></div>{children}</section></div>;
 }
 function Setup({ initial, onSubmit, onClose, starting, researchEnabled }) {
-  const [alias, setAlias] = useState(() => teamAliasForName(initial?.names.team) ?? '');
+  const [alias, setAlias] = useState(() => {
+    const savedAlias = teamAliasForName(initial?.names.team);
+    return Object.hasOwn(TEAM_ALIASES, savedAlias) ? savedAlias : '';
+  });
   const [players, setPlayers] = useState(initial?.players ?? {});
   const [avatarGenders, setAvatarGenders] = useState(initial?.avatarGenders ?? {});
   const [studentCodes, setStudentCodes] = useState({});
@@ -56,13 +59,13 @@ function Setup({ initial, onSubmit, onClose, starting, researchEnabled }) {
   return <Modal title={starting ? 'Confirma los participantes' : 'Personalizar participantes'} onClose={onClose} wide>
     <form onSubmit={submit}>
       {starting ? <>
-        <Field label="Nombre del equipo" help="Acuerden un alias distinto por mesa si juegan en la misma clase.">
+        <Field label="Nombre del equipo" help="Elijan un país distinto por mesa si juegan en la misma clase.">
           <select required value={alias} onChange={event => setAlias(event.target.value)}>
-            <option value="">Selecciona un equipo</option>
+            <option value="">Selecciona un país</option>
             {Object.entries(TEAM_ALIASES).map(([key, name]) => <option key={key} value={key}>{name}</option>)}
           </select>
         </Field>
-        <p className="small muted">Las organizaciones son referencias educativas. Las emisiones, los impuestos y las decisiones corresponden a la simulación.</p>
+        <p className="small muted">Los sectores y las fundaciones son referencias educativas. Las emisiones, los impuestos y las decisiones corresponden a la simulación.</p>
       </> : <p className="muted">Equipo {names.team}. Puedes actualizar el nombre visible y la apariencia de cada avatar.</p>}
       {researchEnabled && starting && <label className="research-consent">
         <input type="checkbox" checked={consent} onChange={event => { setConsent(event.target.checked); setError(''); }} />

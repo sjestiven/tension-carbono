@@ -10,7 +10,7 @@ const number = value => new Intl.NumberFormat('es-CO', { maximumFractionDigits: 
 const money = value => `USD ${number(value)}`;
 
 export default function GuidedExample({ Results, onExit }) {
-  const [years] = useState(() => exampleYears({ names: { ...SCENARIO_NAMES, team: TEAM_ALIASES.pallet_town } }));
+  const [years] = useState(() => exampleYears({ names: { ...SCENARIO_NAMES, team: TEAM_ALIASES.colombia } }));
   const [index, setIndex] = useState(0);
   const heading = useRef(null);
   const game = years[index];
