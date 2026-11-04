@@ -1,5 +1,9 @@
 # Validation history and current workspace status
 
+## Country and organization labels public release
+
+Application commit `e665bad4ccc04a7f0a870c2cbf75c4969fcc70b7` passed [Actions run 41754868795](https://github.com/sjestiven/tension-carbono/actions/runs/41754868795). The 80 tests passed in the release snapshot. The [public game](https://sjestiven.github.io/tension-carbono/) returned HTTP 200 and served the five country options, the three company sectors, and both conservation labels. The production research validator accepted all five country codes and the previous aliases, rejected an invalid code, and denied direct execution by participant roles.
+
 ## Rules 3.2.0 public release
 
 Application commit `c74af2618f5fba2540a9903f7bd8a802fd19d63b` passed the build and deployment jobs in [Actions run 41718973264](https://github.com/sjestiven/tension-carbono/actions/runs/41718973264). All 79 local tests passed. The [public game](https://sjestiven.github.io/tension-carbono/) returned HTTP 200 and served the JavaScript bundle with the 3.2.0 rules, production progress, and emissions by role.
