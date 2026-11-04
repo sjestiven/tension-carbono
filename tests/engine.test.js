@@ -7,17 +7,21 @@ const createGame = setup => createCurrentGame(setup,'2.2.0');
 const playTemplate = (rounds,setup) => playCurrentTemplate(rounds,setup,'2.2.0');
 const act = (g, type, actor, data = {}) => applyAction(g, { type, actor, ...data });
 
-test('Imported company presets use sector labels and custom names are preserved', () => {
+test('Imported organization presets use sector labels and custom names are preserved', () => {
   const save = exportGame(createCurrentGame());
   Object.assign(save.setup.names, {
     A: 'Empresa A · Postobón',
     B: 'Empresa B · Vidrios Prisma',
     C: 'Mi empresa',
+    F1: 'Fundación 1 · Fundación Natura',
+    F2: 'Fundación 2 · Fundación Omacha',
   });
   const { names } = importGame(save).setup;
   assert.equal(names.A, 'Empresa A · Bebidas azucaradas');
   assert.equal(names.B, 'Empresa B · Tecnología');
   assert.equal(names.C, 'Mi empresa');
+  assert.equal(names.F1, 'Fundación 1 · Conservación terrestre');
+  assert.equal(names.F2, 'Fundación 2 · Conservación acuática');
 });
 
 test('Student codes retain leading zeros and survive export without changing economic initialization',()=>{

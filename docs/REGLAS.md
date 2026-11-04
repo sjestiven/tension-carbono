@@ -6,7 +6,7 @@ Reglas vigentes: versión 3.2.0.
 
 Cada mesa elige el nombre de un país al comenzar. Las opciones son Argentina, Brasil, Colombia, México y Perú. El nombre permanece fijo en la partida. Si varias mesas participan en una clase, el docente coordina la asignación. Cada partida registrada tiene su propio identificador de sesión.
 
-El reparto incluye al Estado, a las empresas de los sectores de bebidas azucaradas (A), tecnología (B) y cemento (C), y a las fundaciones Natura y Omacha. Las intensidades de emisiones, los impuestos, las cuentas y las decisiones corresponden a la simulación. El nombre visible de cada participante y la selección Mujer, Hombre u Otro para su avatar son opcionales.
+El reparto incluye al Estado, a las empresas de los sectores de bebidas azucaradas (A), tecnología (B) y cemento (C), y a dos fundaciones dedicadas a la conservación terrestre (1) y acuática (2). Las intensidades de emisiones, los impuestos, las cuentas y las decisiones corresponden a la simulación. El nombre visible de cada participante y la selección Mujer, Hombre u Otro para su avatar son opcionales.
 
 Los códigos de estudiante se piden a los seis roles cuando el equipo autoriza el registro. Se conservan como texto para mantener los ceros iniciales. Supabase guarda de forma privada el alias, las elecciones iniciales explícitas de avatar, los códigos y las decisiones. Los códigos se guardan por separado y los nombres de participantes quedan en el guardado local y el JSON. Se puede iniciar y continuar sin códigos ni registro. Los JSON con identificaciones deben mantenerse privados. Importar partidas o abrir el ejemplo no activa el registro.
 
