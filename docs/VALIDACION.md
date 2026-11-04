@@ -1,5 +1,9 @@
 # Validation history and current workspace status
 
+## Annual credit lots public release
+
+Application commit `9e2063a94a136e16321aebb70f0f64fe7f3558a1` passed [Actions run 41759725672](https://github.com/sjestiven/tension-carbono/actions/runs/41759725672). All 84 local tests passed. The [public game](https://sjestiven.github.io/tension-carbono/) returned HTTP 200 and served the updated annual lot and expiration labels. The two-foundation regression confirmed that two unsold 40-credit lots expire and only newly verified lots can be sold the following year.
+
 ## Timed rounds and player goals public release
 
 Application commit `94e7d88a8c6ba988455e78630080fb483cfeb678` passed [Actions run 41757502027](https://github.com/sjestiven/tension-carbono/actions/runs/41757502027). All 83 local tests passed. The [public game](https://sjestiven.github.io/tension-carbono/) returned HTTP 200 and served the updated organization labels, project catalog, role goals, seven-digit code pattern, and round expiration message. Local Chromium checks covered timer expiration, results, and next-round reset, plus project selection, role goals, and foundation offers.
