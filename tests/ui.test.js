@@ -19,6 +19,8 @@ test('The completed-game results render all roles and both foundation inventorie
     assert.match(html, /Resultados de la partida/);
     for (const name of ['Estado', 'Empresa A', 'Empresa B', 'Empresa C', 'Fundación Bosque', 'Fundación Horizonte']) assert.ok(html.includes(name), name);
     assert.match(html, /Oferta y demanda de créditos/);
+    assert.match(html, /L-3-F1/);
+    assert.match(html, /vendidos de .*emitidos · .*vencidos/);
     assert.match(html, /Emisiones por rol/);
     const rounds=structuredClone(DEMO);
     for (const round of rounds) round.produccion={A:300,B:300,C:300};
@@ -54,11 +56,19 @@ test('The completed-game results render all roles and both foundation inventorie
     assert.match(comparison,/Caja disponible hoyUSD 5.000/);
     assert.match(comparison,/Empresa B · 21/);
 
-    const { TradeForm } = await server.ssrLoadModule('/src/components/GuidedRound.jsx');
+    const { TradeForm, QuoteComparison } = await server.ssrLoadModule('/src/components/GuidedRound.jsx');
     const withoutStock = structuredClone(market);
     withoutStock.draft.verified.F2 = false;
     const offers = renderToString(React.createElement(TradeForm, { game: withoutStock, role: 'A', send: () => {} }));
     assert.match(offers, /<option value="F2" disabled="">.*sin créditos disponibles/);
+    let secondMarket = createGame();
+    for (const action of playTemplate().actions.filter(action => action.origin !== 'system')) {
+      secondMarket = applyAction(secondMarket, action);
+      if (secondMarket.draft.year === 2 && secondMarket.draft.phase === 'market') break;
+    }
+    const inventory = renderToString(React.createElement(QuoteComparison, { game: secondMarket })).replace(/<[^>]*>/g, '');
+    assert.match(inventory, /Emitidos en L-2-F1/);
+    assert.match(inventory, /Vencidos · año 1/);
   } finally {
     await server.close();
   }

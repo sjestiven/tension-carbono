@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Check, Factory, GraduationCap, Landmark, LockKeyhole, ShieldCheck, Trees, X } from 'lucide-react';
-import { COMPANIES, FOUNDATIONS, INTENSITY, PROJECTS, PRODUCTION, available, companyView, productionView, purchasePreview, policyIssues, isBatchMarket, isStreamlined, lot, previewRound, projectDetails, projectName, remaining, gameRules } from '../engine.js';
+import { COMPANIES, FOUNDATIONS, INTENSITY, PROJECTS, PRODUCTION, available, companyView, productionView, purchasePreview, policyIssues, isBatchMarket, isStreamlined, lot, creditLotId, expiredCredits, previewRound, projectDetails, projectName, remaining, gameRules } from '../engine.js';
 import { closingIssues, currentTurn, foundationOrder, projectIssues, projectOptionIssue, roleName } from '../workflow.js';
 import { Button, Field, Help, Stat } from './ui.jsx';
 
@@ -154,17 +154,38 @@ function Verify({ game, send }) {
 function Quotes({ game, turn, send }) {
   const [price,setPrice]=useState(game.draft.quotes[turn.role]?.price ?? 18);
   const stock=available(game,turn.role);
+  const previous = game.history.at(-1);
   const validPrice=price!==''&&Number.isFinite(+price)&&+price>=0&&+price<=10000&&Number.isInteger(+price*2);
-  return <><p>Presenta tu precio por crédito. <strong>Las dos fundaciones cotizan antes de que comience cualquier compra.</strong> Las empresas compararán ambas opciones; cotizar no reserva ni vende créditos.</p><div className="mini-grid"><Stat label="Tu lote verificado" value={lot(game,turn.role)}/><Stat label="Tus créditos disponibles" value={stock}/></div>
+  return <><p>Presenta tu precio por crédito. <strong>Las dos fundaciones cotizan antes de que comience cualquier compra.</strong> Las empresas compararán ambas opciones. Cotizar no reserva ni vende créditos.</p><div className="mini-grid"><Stat label={`Créditos emitidos · año ${game.draft.year}`} value={lot(game,turn.role)}/><Stat label="Créditos disponibles de este lote" value={stock}/></div>
+    {lot(game,turn.role)>0 && <p className="muted small">Lote anual {creditLotId(game.draft.year, turn.role)}. Los proyectos instalados generan créditos nuevos cada año verificado.</p>}
+    {previous && <p className="muted small">Créditos del año {previous.year} que vencieron sin venderse: <strong>{expiredCredits(previous, turn.role)}</strong>.</p>}
     {stock>0?<form onSubmit={event=>{event.preventDefault();if(!validPrice)return;send([{type:'publishQuote',actor:turn.role,price:+price},{type:'finishFoundationTurn',actor:turn.role}]);}}><Field label="Precio unitario USD" details="Precio indicativo de tu fundación por cada crédito. Las flechas avanzan USD 0,50. Después de ambas cotizaciones, cada comprador elige vendedor, cantidad y precio; la fundación acepta o rechaza el contrato."><input type="number" required min={0} max={10000} step="0.5" value={price} onChange={event=>setPrice(event.target.value)}/></Field><div className="trade-total" aria-live="polite"><span>Ingreso proyectado si vendes todo el lote al precio indicado</span><strong>{validPrice ? money(stock * Number(price)) : "—"}</strong></div><p className="muted small">Es una estimación. El ingreso real depende de la cantidad y del precio de cada acuerdo aceptado.</p><Continue game={game} turn={turn}>Publicar cotización y continuar con {roleName(game,turn.next)}</Continue></form>:<p className="notice-text">No tienes créditos verificados disponibles. Puedes continuar sin cotizar.</p>}
     <Button className="full" onClick={()=>send([{type:'publishQuote',actor:turn.role,price:null},{type:'finishFoundationTurn',actor:turn.role}])}>Continuar sin cotización con {roleName(game,turn.next)}</Button>
     <AcceptedContracts game={game} role={turn.role} send={send}/>
-    <p className="muted small">Tu inventario pertenece solo a {roleName(game,turn.role)}. Los créditos sin vender vencen al cierre. La capacidad instalada puede generar un nuevo lote el próximo año. Las cotizaciones se revelan juntas al terminar ambos turnos.</p>
+    <p className="muted small">Cada fundación tiene su propio lote. El saldo vence al cierre. Las cotizaciones se revelan juntas al terminar ambos turnos.</p>
   </>;
 }
 
 export function QuoteComparison({game}) {
-  return <section className="quote-comparison" aria-label="Comparar fundaciones"><h3>Compara las dos fundaciones</h3><p>{isBatchMarket(game)?'Inventarios independientes. Las ofertas reservan caja y capacidad de la empresa; las fundaciones conservan su inventario hasta aceptar ventas.':'Inventarios independientes. Las cotizaciones no reservan capacidad de compra; un contrato bilateral sí la reserva.'}</p><div className="quote-grid">{foundationOrder(game).map(foundation=><article className="quote-card" key={foundation}><h4>{roleName(game,foundation)}</h4><strong>{game.draft.quotes[foundation]?`${money(game.draft.quotes[foundation].price)} / crédito`:'Sin cotización publicada'}</strong><dl><div><dt>Lote verificado</dt><dd>{lot(game,foundation)}</dd></div><div><dt>Disponible</dt><dd>{available(game,foundation)}</dd></div></dl></article>)}</div></section>;
+  const previous = game.history.at(-1);
+  const year = game.draft.year;
+  return <section className="quote-comparison" aria-label="Comparar fundaciones">
+    <h3>Compara las dos fundaciones</h3>
+    <p>Solo puedes comprar créditos del año {year}. Cada fundación tiene su propio lote. {isBatchMarket(game) ? 'Las ofertas reservan caja y capacidad de la empresa. El inventario se descuenta al aceptar una venta.' : 'Las cotizaciones no reservan capacidad de compra. Un contrato bilateral sí la reserva.'}</p>
+    <div className="quote-grid">{foundationOrder(game).map(foundation => {
+      const issued = lot(game, foundation);
+      const quote = game.draft.quotes[foundation];
+      return <article className="quote-card" key={foundation}>
+        <h4>{roleName(game, foundation)}</h4>
+        <strong>{quote ? `${money(quote.price)} / crédito` : 'Sin cotización publicada'}</strong>
+        <dl>
+          <div><dt>{issued ? `Emitidos en ${creditLotId(year, foundation)}` : `Emitidos · año ${year}`}</dt><dd>{issued}</dd></div>
+          <div><dt>Disponibles de este lote</dt><dd>{available(game, foundation)}</dd></div>
+          {previous && <div><dt>Vencidos · año {previous.year}</dt><dd>{expiredCredits(previous, foundation)}</dd></div>}
+        </dl>
+      </article>;
+    })}</div>
+  </section>;
 }
 
 export function TradeForm({ game, role, send }) {

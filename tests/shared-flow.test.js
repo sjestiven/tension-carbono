@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createGame,applyAction,exportGame,importGame,scores,transactionEffects,committedFrames,available,emissionsByRole,isGameOver} from '../src/engine.js';
+import {createGame,applyAction,exportGame,importGame,scores,transactionEffects,committedFrames,available,expiredCredits,emissionsByRole,isGameOver} from '../src/engine.js';
 import {currentTurn} from '../src/workflow.js';
 import {DEMO,playTemplate} from '../src/demo.js';
 import {transactionReceipt} from '../src/motion.js';
@@ -56,6 +56,43 @@ test('Three rounds retain installed capacity but never carry unsold credits into
   assert.equal(game.foundations.F1.issued,60);
   assert.equal(game.foundations.F1.sold,0);
   assert.deepEqual(importGame(exportGame(game)),game);
+});
+
+test('Two unsold 40-credit lots expire and only the two new lots can be sold next year', () => {
+  const rounds = structuredClone(DEMO.slice(0, 2));
+  rounds[0].proyectos = { F1: [{ tipo: 'P2' }], F2: [{ tipo: 'P2' }] };
+  rounds[0].contratos = [];
+  rounds[1].proyectos = { F1: [], F2: [] };
+  rounds[1].contratos = [
+    { empresa: 'A', fundacion: 'F1', cantidad: 40, precio: 18 },
+    { empresa: 'B', fundacion: 'F2', cantidad: 40, precio: 18 },
+  ];
+  const played = playTemplate(rounds);
+  let game = createGame();
+  for (const action of played.actions.filter(item => item.origin !== 'system')) {
+    if (action.type === 'propose' && action.actor === 'B') {
+      assert.equal(available(game, 'F2'), 40);
+      assert.throws(() => applyAction(game, { ...action, quantity: 41 }), /lote verificado disponible/);
+    }
+    game = applyAction(game, action);
+    if (action.type === 'next') {
+      assert.equal(available(game, 'F1'), 0);
+      assert.equal(available(game, 'F2'), 0);
+    }
+    if (game.draft.phase === 'results') {
+      assert.equal(available(game, 'F1'), 0);
+      assert.equal(available(game, 'F2'), 0);
+    }
+  }
+  const [first, second] = game.history;
+  assert.equal(first.credits, 0);
+  assert.equal(expiredCredits(first, 'F1'), 40);
+  assert.equal(expiredCredits(first, 'F2'), 40);
+  assert.equal(second.reduction, 80);
+  assert.deepEqual(second.contracts.map(contract => [contract.lot, contract.quantity]), [['L-2-F1', 40], ['L-2-F2', 40]]);
+  assert.equal(game.foundations.F1.issued, 80);
+  assert.equal(game.foundations.F2.issued, 80);
+  assert.deepEqual(importGame(exportGame(game)), game);
 });
 
 test('Three-round cap is inclusive and the role totals reconcile with the physical account', () => {

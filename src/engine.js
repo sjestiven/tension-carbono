@@ -121,8 +121,13 @@ function batchActor(g, role, kind) {
   check(turn.role === role && turn.kind === kind, `Ahora corresponde ${turn.role}: ${turn.kind === 'bids' ? 'confirmar ofertas' : turn.kind === 'sales' ? 'decidir las ventas' : 'presentar cotización'}.`);
 }
 export function lot(g, f) { return g.draft.verified[f] ? g.foundations[f].capacity : 0; }
+export const creditLotId = (year, foundation) => `L-${year}-${foundation}`;
+export function expiredCredits(result, foundation) {
+  const { reduction, sold } = result.foundations[foundation];
+  return reduction - sold;
+}
 export function available(g, f) {
-  if (g.draft.phase === 'results' && gameRules(g).automaticVerification) return 0;
+  if (g.draft.phase !== 'market') return 0;
   return lot(g, f) - sum(g.draft.contracts.filter(c => c.foundation === f && (isBatchMarket(g) ? accepted(c) : live(c))), c => c.quantity);
 }
 export function remaining(g, e) { return Math.floor(g.draft.production[e] * INTENSITY[e] * .5) - sum(g.draft.contracts.filter(c => c.company === e && (isBatchMarket(g) ? committed(c) : live(c))), c => c.quantity); }
@@ -505,7 +510,7 @@ function transition(original, action, legacyReplay = false) {
         check(commitment.cashAfterPayment>=0,'La caja no alcanza para pagar todas las ofertas al contado.');
         check(commitment.worstClosingCash>=0,'Las ofertas dejarían la caja al cierre negativa en alguna combinación de aceptaciones.');
       }
-      d.contracts.push({ id: nextId(g, 'C'), lot: `L-${d.year}-${a.foundation}`, company: a.company, foundation: a.foundation, quantity: a.quantity, price: a.price, proposer: a.actor, status: isBatchMarket(g)?'draft':'pending' });
+      d.contracts.push({ id: nextId(g, 'C'), lot: creditLotId(d.year, a.foundation), company: a.company, foundation: a.foundation, quantity: a.quantity, price: a.price, proposer: a.actor, status: isBatchMarket(g)?'draft':'pending' });
       d.companyConfirmed[a.company] = false;
       break;
     }

@@ -215,6 +215,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visi
 .role-goals { display:grid; gap:12px; }
 .role-goals .overview-meter { border:0; padding:0; }
 .role-goals progress { max-width:none; accent-color:#356754; }
+.credit-lot-label { display:block; margin-top:3px; color:var(--muted); }
 .guided-layout { display:block; }
 .guided-panel { max-width:1080px; margin:0 auto; }
 .guided-panel .panel-body { max-width:960px; margin:0 auto; }
