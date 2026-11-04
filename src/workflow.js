@@ -1,11 +1,12 @@
 import { COMPANIES, FOUNDATIONS, PROJECTS, companyView, projectDetails, isGameOver, isBatchMarket, isStreamlined, batchMarketTurn, gameRules } from './engine.js';
+import { SCENARIO_NAMES } from './table_setup.js';
 
 export function roleName(game, role) {
   if (role === 'Docente') return 'Mesa docente';
   const name = game.setup.names[role];
   if (!COMPANIES.includes(role)) return name;
   const label = `Empresa ${role}`;
-  return name === label || name.startsWith(`${label} `) ? name : `${label} · ${name}`;
+  return name === SCENARIO_NAMES[role] || name === label || name.startsWith(`${label} `) ? name : `${label} · ${name}`;
 }
 
 export function foundationOrder(game) {

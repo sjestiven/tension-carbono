@@ -48,8 +48,8 @@ Cada empresa puede retirar créditos enteros hasta el 50% de sus emisiones anual
 
 | Tipo | Proyecto | Costo único USD | Reducción anual tCO₂e |
 |---|---|---:|---:|
-| P1 | Eficiencia comunitaria | 600 | 20 |
-| P2 | Captura de metano | 1.000 | 40 |
+| P1 | Restauración de bosque nativo (terrestre) o de humedales (acuática) | 600 | 20 |
+| P2 | Conservación de bosque en riesgo (terrestre) o de manglares (acuática) | 1.000 | 40 |
 
 Los costos los fija el catálogo docente. Incluyen la operación hasta el año 3. Los proyectos se pueden repetir y generan reducciones desde su año de ejecución, si se verifica el lote anual. Su capacidad instalada no puede superar 100 por fundación y los ámbitos no se superponen.
 
@@ -132,7 +132,9 @@ Estos umbrales hacen operativa la lista pendiente del informe. Son elecciones pe
 
 ## Orientación docente
 
-Sesión propuesta de 90 minutos: 12 de contextualización; 8 de ensayo; hasta tres rondas de 12; 25 de discusión y 9 de respuesta individual. El reloj permite elegir 12, 8 o 4 minutos por año. La duración se conserva entre años y al recargar este navegador. Cambiarla reinicia y pausa el reloj; reiniciar solo el reloj conserva la duración elegida. Arranca automáticamente al abrir la cabina inicial del Estado cada año y se detiene al terminar la partida. Es orientativo: llegar a cero no cierra la ronda ni provoca derrota. Si la partida termina antes por emisiones, el tiempo restante puede dedicarse al análisis.
+En una sesión de 90 minutos se proponen 12 minutos de contextualización, 8 de ensayo, hasta tres rondas de 12, 25 de discusión y 9 de respuesta individual. El reloj permite elegir 12, 8 o 4 minutos por año y arranca al abrir la cabina inicial del Estado. La duración elegida se conserva entre años y al recargar. Cambiarla reinicia y pausa el reloj.
+
+Al llegar a cero, el motor liquida el año y abre resultados. Conserva los contratos aceptados y los proyectos con todas las firmas requeridas. Descarta los borradores, las ofertas pendientes y los proyectos sin las firmas necesarias. Si falta publicar la política, usa la tarifa seleccionada si es viable o USD 20 si no lo es, con 0% de cofinanciación. Si falta confirmar producción, fija la cantidad seleccionada cuando es viable y usa el nivel viable más bajo en otro caso. El cierre aplica el presupuesto climático y la mesa puede iniciar otro año si la partida sigue activa. En las versiones anteriores a 3.2 el reloj sigue siendo orientativo.
 
 Los puntos no son la nota académica. Rúbrica: 30% distinción proyecto, financiación y crédito; 30% justificación con datos; 25% cuenta fiscal frente a física; 15% mejora y participación. La respuesta final explica una decisión, una alternativa y consecuencias con dos datos.
 

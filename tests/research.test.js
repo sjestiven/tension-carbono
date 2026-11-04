@@ -4,15 +4,21 @@ import { readFileSync } from 'node:fs';
 import { PGlite } from '@electric-sql/pglite';
 import { createGame as createCurrentGame, applyAction, ROLES } from '../src/engine.js';
 import { ResearchRecorder } from '../src/research/recorder.js';
-import { actionData } from '../src/research/data.js';
+import { actionData, hasStudentCodes } from '../src/research/data.js';
 import { TEAM_ALIASES } from '../src/table_setup.js';
 import { playTemplate as playCurrentTemplate } from '../src/demo.js';
 const createGame = setup => createCurrentGame(setup,'2.2.0');
 const playTemplate = (rounds,setup) => playCurrentTemplate(rounds,setup,'2.2.0');
 
-const codes=Object.fromEntries(ROLES.map((role,index)=>[role,`TEST-00${index}`]));
+const codes=Object.fromEntries(ROLES.map((role,index)=>[role,String(index).padStart(7,'0')]));
 const setup={studentCodes:codes,names:{team:'PRIVATE TEAM'},players:{A:'PRIVATE NAME'}};
 const config={enabled:true,url:'https://example.supabase.co',study:'validation'};
+test('New research sessions require seven ASCII digits per participant', () => {
+  assert.ok(hasStudentCodes(setup));
+  for (const value of ['000001', '00000001', '000000x', 1234567, '0000001\n', '１２３４５６７']) {
+    assert.equal(hasStudentCodes({ studentCodes: { ...codes, A: value } }), false);
+  }
+});
 function recorder(transport=async payload=>payload.p_events.length,storage) {
   let saved=null;
   const disk=storage||{getItem:()=>saved,setItem:(key,value)=>{saved=value;}};

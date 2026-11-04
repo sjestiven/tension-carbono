@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { COMPANIES, gameRules, FOUNDATIONS, PROJECTS } from '../engine.js';
+import { COMPANIES, gameRules, FOUNDATIONS, projectName } from '../engine.js';
 import { exampleYears } from '../demo.js';
 import { SCENARIO_NAMES, TEAM_ALIASES } from '../table_setup.js';
 import { foundationOrder } from '../workflow.js';
@@ -45,7 +45,7 @@ export default function GuidedExample({ Results, onExit }) {
         <ul>{FOUNDATIONS.map(role => {
           const projects = round.projects.filter(project => project.foundation === role);
           return <li key={role}><strong>{names[role]}</strong>. {projects.length
-            ? projects.map(project => PROJECTS[project.type].name).join(', ')
+            ? projects.map(project => projectName(role, project.type)).join(', ')
             : 'Sin proyectos nuevos'}. {round.foundations[role].reduction} tCO₂e de reducción verificada en el año.</li>;
         })}</ul>
       </li>

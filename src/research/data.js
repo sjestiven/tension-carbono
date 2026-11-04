@@ -1,5 +1,5 @@
 import { ROLES, isGameOver, gameRules } from '../engine.js';
-import { AVATAR_GENDERS, teamAliasForName } from '../table_setup.js';
+import { AVATAR_GENDERS, isStudentCode, teamAliasForName } from '../table_setup.js';
 
 export const CONSENT_VERSION = '2026-11-03';
 export const ACTION_FIELDS = {
@@ -10,7 +10,7 @@ export const ACTION_FIELDS = {
   confirmCompany:[],submitBids:[],finishSales:[],close:[],next:[],
 };
 export function hasStudentCodes(setup) {
-  return ROLES.every(role => typeof setup?.studentCodes?.[role] === 'string' && setup.studentCodes[role].trim().length > 0);
+  return ROLES.every(role => isStudentCode(setup?.studentCodes?.[role]));
 }
 export function sessionProfile(setup) {
   const teamAlias = teamAliasForName(setup.names.team);

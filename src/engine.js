@@ -3,8 +3,8 @@ import { AVATAR_GENDERS, currentScenarioName } from './table_setup.js';
 // Motor puro y determinista. Todas las decisiones pasan por applyAction.
 export const VERSION = '3.2.0';
 const GAME_VERSIONS = [VERSION, '3.1.0', '3.0.0', '2.2.0'];
-const CURRENT_RULES = { rounds: 3, emissionsLimit: 1050, productionTarget: 1350, reductionHigh: 150, reductionMedium: 75, automaticVerification: true };
-const LEGACY_RULES = { rounds: 4, emissionsLimit: 1400, productionTarget: 1800, reductionHigh: 200, reductionMedium: 100, automaticVerification: false };
+const CURRENT_RULES = { rounds: 3, emissionsLimit: 1050, productionTarget: 1350, reductionHigh: 150, reductionMedium: 75, automaticVerification: true, timedRounds: true };
+const LEGACY_RULES = { rounds: 4, emissionsLimit: 1400, productionTarget: 1800, reductionHigh: 200, reductionMedium: 100, automaticVerification: false, timedRounds: false };
 export const gameRules = game => !game || game.version === VERSION ? CURRENT_RULES : LEGACY_RULES;
 const FOUNDATION_BASELINE = 100;
 export const COMPANIES = ['A', 'B', 'C'];
@@ -22,6 +22,13 @@ export const PROJECTS = {
   P1: { name: 'Eficiencia comunitaria', cost: 600, reduction: 20 },
   P2: { name: 'Captura de metano', cost: 1000, reduction: 40 },
 };
+const foundationProjectNames = {
+  F1: { P1: 'Restauración de bosque nativo', P2: 'Conservación de bosque en riesgo' },
+  F2: { P1: 'Restauración de humedales', P2: 'Conservación de manglares' },
+};
+export function projectName(foundation, type) {
+  return foundationProjectNames[foundation]?.[type] ?? PROJECTS[type].name;
+}
 export const DEFAULT_NAMES = { team: 'Valle Esmeralda', Estado: 'Estado', A: 'Empresa A', B: 'Empresa B', C: 'Empresa C', F1: 'Fundación Bosque', F2: 'Fundación Horizonte' };
 export class RuleError extends Error { constructor(message) { super(message); this.name = 'RuleError'; } }
 const fail = message => { throw new RuleError(message); };
@@ -80,7 +87,7 @@ function nextId(g, prefix) { return `${prefix}-${g.draft.year}-${++g.seq}`; }
 export function projectDetails(g) {
   const d = g.draft;
   return FOUNDATIONS.map(f => {
-    const projects = d.projects.filter(p => p.foundation === f).map(p => ({ ...p, ...PROJECTS[p.type], grant: round(PROJECTS[p.type].cost * d.subsidy / 100) }));
+    const projects = d.projects.filter(p => p.foundation === f).map(p => ({ ...p, ...PROJECTS[p.type], name: projectName(f, p.type), grant: round(PROJECTS[p.type].cost * d.subsidy / 100) }));
     const cost = sum(projects, p => p.cost), grant = sum(projects, p => p.grant);
     return { foundation: f, projects, cost, grant, capacity: g.foundations[f].capacity + sum(projects, p => p.reduction), cashAfter: round(g.foundations[f].cash + grant - cost) };
   });
@@ -246,6 +253,10 @@ export function isGameOver(game) {
 }
 export function applyAction(original, action) {
   check(action?.origin!=='system','Los avances automáticos se generan dentro del motor.');
+  if (action?.type === 'expireRound') {
+    actor(action, 'Docente');
+    return expireRound(original);
+  }
   let game=transition(original,action);
   if (!isStreamlined(game)) return game;
   for(let step=0;step<24;step++) {
@@ -254,6 +265,63 @@ export function applyAction(original, action) {
     game=transition(game,{...automatic,origin:'system'});
   }
   fail('No se pudo completar el avance automático.');
+}
+
+function expireRound(original) {
+  check(gameRules(original).timedRounds, 'Esta versión usa un reloj orientativo.');
+  check(!isGameOver(original) && original.draft.phase !== 'results', 'El año ya está cerrado.');
+  let game = original;
+  const advance = (type, actor, fields = {}) => {
+    game = transition(game, { type, actor, ...fields, origin: 'system' });
+  };
+
+  if (game.draft.phase === 'policy') {
+    const { tax } = game.draft;
+    advance('policy', 'Estado', { tax: policyIssues(game, tax).length ? 20 : tax, subsidy: 0 });
+    advance('publish', 'Estado');
+  }
+  if (game.draft.phase === 'projects') {
+    for (const company of COMPANIES) {
+      if (game.draft.productionLocked[company]) continue;
+      if (companyView(game, company).closingCash < 0) {
+        const quantity = Object.keys(PRODUCTION).map(Number)
+          .find(value => productionView(game, company, value).closingCash >= 0);
+        advance('production', company, { quantity });
+      }
+      advance('confirmProduction', company, { lock: true });
+    }
+    const { projectConfirmed, stateConfirmed } = game.draft;
+    for (const detail of projectDetails(game)) {
+      for (const project of detail.projects) {
+        if (!projectConfirmed[detail.foundation] || (!stateConfirmed && project.grant > 0)) {
+          advance('removeProject', detail.foundation, { id: project.id });
+        }
+      }
+      if (!game.draft.projectConfirmed[detail.foundation]) advance('confirmProjects', detail.foundation);
+    }
+    if (!game.draft.stateConfirmed) advance('confirmGrants', 'Estado');
+    advance('execute', 'Docente');
+  }
+  while (game.draft.phase === 'verification') {
+    game = transition(game, { ...automaticAction(game), origin: 'system' });
+  }
+  while (game.draft.phase === 'market') {
+    const { role, kind } = batchMarketTurn(game);
+    if (kind === 'quote') {
+      if (!game.draft.quoteDeclared[role]) advance('publishQuote', role, { price: null });
+      advance('finishFoundationTurn', role);
+    } else if (kind === 'bids') {
+      for (const offer of game.draft.contracts.filter(item => item.company === role && item.status === 'draft')) {
+        advance('cancel', role, { id: offer.id });
+      }
+      advance('submitBids', role);
+    } else if (kind === 'sales') {
+      advance('finishSales', role);
+    } else {
+      advance('close', 'Docente');
+    }
+  }
+  return game;
 }
 function automaticAction(g) {
   if(isGameOver(g))return null;
@@ -537,8 +605,11 @@ function transition(original, action, legacyReplay = false) {
   return g;
 }
 export function scores(g) {
-  const { rounds, emissionsLimit, productionTarget, reductionHigh, reductionMedium } = gameRules(g);
   check(isGameOver(g), 'Los puntos finales se calculan al terminar las rondas o tras una derrota ambiental.');
+  return scoreProgress(g);
+}
+export function scoreProgress(g) {
+  const { rounds, emissionsLimit, productionTarget, reductionHigh, reductionMedium } = gameRules(g);
   const climate = g.emissions <= emissionsLimit, out = {};
   for (const e of COMPANIES) {
     const s = g.companies[e], margin = s.income ? s.profit / s.income : 0, coverage = s.emissions ? s.credits / s.emissions : 0;
@@ -567,7 +638,9 @@ export function importGame(data) {
   if(isStreamlined(game)) {
     const canonical=actions=>JSON.stringify(actions.map(action=>Object.entries(action).sort(([left],[right])=>left.localeCompare(right))));
     for(let index=0;index<data.actions.length;) {
-      const next=applyAction(game,data.actions[index]);
+      // A clock closure starts with system actions and uses the same replay validation.
+      const action=data.actions[index];
+      const next=action?.origin==='system' ? expireRound(game) : applyAction(game,action);
       const generated=next.actions.slice(game.actions.length);
       check(canonical(generated)===canonical(data.actions.slice(index,index+generated.length)),'La bitácora no coincide con el avance automático de esta versión.');
       game=next;index+=generated.length;

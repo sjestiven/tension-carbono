@@ -45,11 +45,20 @@ test('The completed-game results render all roles and both foundation inventorie
     assert.doesNotMatch(quote,/Ejecutar y verificar los dos lotes/);
     const production = applyAction(createGame({names:{B:'21'}}),{type:'publish',actor:'Estado'});
     const comparison = renderToString(React.createElement(GuidedRound,{game:production,role:'A',choose:()=>{},send:()=>{},hide:()=>{},onResults:()=>{}})).replace(/<[^>]*>/g,'');
-    assert.match(comparison,/100 tBajo40 tCO₂eUSD 600 de utilidad/);
-    assert.match(comparison,/300 tMuy alto120 tCO₂eUSD 1.600 de utilidad/);
+    assert.match(comparison,/100 tBajo40 tCO₂e/);
+    assert.match(comparison,/300 tMuy alto120 tCO₂e/);
+    assert.doesNotMatch(comparison,/de utilidad/);
+    assert.equal((comparison.match(/Utilidad después de impuestos/g) ?? []).length, 1);
+    assert.match(comparison,/Metas del rol/);
     assert.match(comparison,/Impuesto previsto−USD 2.000/);
     assert.match(comparison,/Caja disponible hoyUSD 5.000/);
     assert.match(comparison,/Empresa B · 21/);
+
+    const { TradeForm } = await server.ssrLoadModule('/src/components/GuidedRound.jsx');
+    const withoutStock = structuredClone(market);
+    withoutStock.draft.verified.F2 = false;
+    const offers = renderToString(React.createElement(TradeForm, { game: withoutStock, role: 'A', send: () => {} }));
+    assert.match(offers, /<option value="F2" disabled="">.*sin créditos disponibles/);
   } finally {
     await server.close();
   }

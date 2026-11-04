@@ -17,11 +17,11 @@ test('Imported organization presets use sector labels and custom names are prese
     F2: 'Fundación 2 · Fundación Omacha',
   });
   const { names } = importGame(save).setup;
-  assert.equal(names.A, 'Empresa A · Bebidas azucaradas');
-  assert.equal(names.B, 'Empresa B · Tecnología');
+  assert.equal(names.A, 'Empresa de bebidas azucaradas (A)');
+  assert.equal(names.B, 'Empresa tecnológica (B)');
   assert.equal(names.C, 'Mi empresa');
-  assert.equal(names.F1, 'Fundación 1 · Conservación terrestre');
-  assert.equal(names.F2, 'Fundación 2 · Conservación acuática');
+  assert.equal(names.F1, 'Fundación de conservación terrestre (1)');
+  assert.equal(names.F2, 'Fundación de conservación acuática (2)');
 });
 
 test('Student codes retain leading zeros and survive export without changing economic initialization',()=>{

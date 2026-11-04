@@ -16,7 +16,7 @@ Project URL: `https://flqdtiyxwpwobgafebla.supabase.co`.
 
 ## Collection
 
-The form requests all six student codes only after opt-in. Codes are strings, retain leading zeros, and have a maximum length of 40 characters. Personal names remain local. The team explicitly opts into research collection when confirming participants; without opt-in the game still works and no new research session is sent.
+The form requests all six student codes only after opt-in. New sessions require exactly seven ASCII digits per code. Codes are stored as strings to retain leading zeros. Existing research sessions and saved games can still load earlier codes. Personal names remain local. The team explicitly opts into research collection when confirming participants. The game also works without recording.
 
 Codes and the team alias are fixed after recording starts. The initial `session_started` profile contains an allowlisted `team_alias` and the explicit `avatar_genders` choices, keyed by logical role. The database still accepts older queued records. The analysis query exposes `team_alias` and `initial_avatar_gender`. An empty value means the player used the preset or the game predates profile collection. The value describes the avatar. Use session UUID as the identifier and coordinate distinct aliases within each class because aliases repeat across independent devices and classes. A new group must start a new game and confirm its codes. Old exports remain importable, but imports and the built-in example never automatically become live research sessions. Editing names is not permission to begin collection. Opted-in exports also contain the codes. Keep those JSON files private.
 

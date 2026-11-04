@@ -7,6 +7,35 @@ import {transactionReceipt} from '../src/motion.js';
 
 const act=(game,type,actor,data={})=>applyAction(game,{type,actor,...data});
 
+test('Clock expiry settles each stage of the demo exactly once without accepting offers', () => {
+  let game = createGame();
+  for (const action of playTemplate().actions.filter(item => item.origin !== 'system')) {
+    if (game.draft.phase !== 'results') {
+      const closed = act(game, 'expireRound', 'Docente');
+      assert.equal(closed.draft.phase, 'results');
+      assert.equal(closed.history.length, game.history.length + 1);
+      assert.deepEqual(closed.history.at(-1).contracts, game.draft.contracts.filter(item => item.status === 'accepted'));
+      assert.ok(closed.actions.slice(game.actions.length).every(item => item.origin === 'system'));
+      assert.ok(Object.values(closed.companies).every(company => company.cash >= 0));
+      assert.deepEqual(importGame(exportGame(closed)), closed);
+      assert.throws(() => act(closed, 'expireRound', 'Docente'), /cerrado/);
+    }
+    game = applyAction(game, action);
+  }
+});
+
+test('Clock expiry keeps signed projects and discards projects without the required signatures', () => {
+  let game = act(createGame(), 'publish', 'Estado');
+  game = act(game, 'addProject', 'F1', { project: 'P1' });
+  game = act(game, 'confirmProjects', 'F1');
+  game = act(game, 'addProject', 'F2', { project: 'P2' });
+  const closed = act(game, 'expireRound', 'Docente');
+  assert.deepEqual(closed.history[0].projects.map(project => project.foundation), ['F1']);
+  assert.equal(closed.foundations.F2.cash, 1000);
+  assert.equal(closed.history[0].reduction, 20);
+  assert.equal(closed.history[0].credits, 0);
+});
+
 test('Three rounds retain installed capacity but never carry unsold credits into the next lot', () => {
   const rounds = structuredClone(DEMO.slice(0,3));
   for (const round of rounds) round.contratos = [];
